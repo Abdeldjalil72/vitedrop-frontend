@@ -9,6 +9,7 @@
     --button-text: #ffffff;
     --border-soft: rgba(0, 0, 0, 0.08);
     --green: #17c964;
+    --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   * {
@@ -19,6 +20,25 @@
     scroll-behavior: smooth;
     background: var(--bg);
     color: var(--text);
+    font-family: var(--font-primary);
+  }
+
+  [dir="rtl"] {
+    letter-spacing: normal;
+  }
+
+  .dashboard-ui {
+    font-size: 1.0625rem;
+  }
+
+  .dashboard-ui .text-xs {
+    font-size: 0.8125rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .dashboard-ui .text-sm {
+    font-size: 0.9375rem !important;
+    line-height: 1.45 !important;
   }
 }
 

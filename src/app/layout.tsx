@@ -32,7 +32,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-white text-[#0a0a0a] font-['Inter',sans-serif] antialiased selection:bg-black selection:text-white">
+      <body className="bg-white text-[#0a0a0a] antialiased selection:bg-black selection:text-white">
         {children}
       </body>
     </html>

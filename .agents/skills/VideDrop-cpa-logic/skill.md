@@ -58,5 +58,39 @@ You must ONLY use: `DEPOSIT` (wallet top-ups), `WITHDRAWAL`, `CPA_PAYOUT` (credi
   * Implement row-level database locks (e.g., `SELECT ... FOR UPDATE` in PostgreSQL) on webhook listeners to prevent race conditions from duplicate courier webhook payloads.
 
 ### 5. Geographical Data
-
   * ViteDrop checkout forms and delivery pricing modules must exclusively rely on the official 58 Algerian Wilayas and their associated Communes.
+
+  ### 6. Admin operations represented in the UI
+
+  - Admin supervision includes orders, order details/timelines/notes, products and status actions, withdrawals, reconciliation, courier webhooks, agents, users, and audit logs.
+  - Display supplier and affiliate identities together on order tables: the supplier owns the product and funds the gross CPA; the affiliate generated the lead and receives the 80% payout after courier-confirmed delivery.
+  - Product performance metrics from the API are already percentages. Render `deliveryRate` directly (`33.3%`), not multiplied by 100. Use the backend field `deliveredOrders` for the numerator.
+  - Reconciliation UI endpoints are:
+    - `GET /admin/reconciliation/summary`
+    - `GET /admin/reconciliation/wallets`
+    - `GET /admin/reconciliation/orders`
+    - `POST /admin/reconciliation/runs`
+    - `GET /admin/reconciliation/runs`
+    - `GET /admin/reconciliation/runs/:id`
+
+  ### 7. Localization, RTL, and responsive checks
+
+  - Supported dashboard languages are French, English, and Arabic. Language selection persists in `localStorage` and Arabic must set RTL direction.
+  - Use logical layout utilities (`text-start`, `text-end`, `ms-*`, `me-*`) so tables, timelines, dialogs, and navigation remain correct in RTL.
+  - Validate representative admin pages at approximately `390x844`, `768x1024`, and `1440x900`; check both rendering and horizontal overflow.
+  - Sidebar animation is viewport-specific: desktop uses synchronized width expansion/collapse with the content layout, while mobile uses a transform-based drawer and animated backdrop. Test both opening and closing at the representative viewport sizes.
+
+  ### 8. Admin verification workflow
+
+  - After API or schema changes, rebuild the backend and frontend before browser checks; stale Nest watch processes can continue serving old routes.
+  - Verify login and redirect, each admin route, product detail metrics, order detail timeline, reconciliation run/history, audit log, RBAC boundaries, invalid/ignored webhooks, and Arabic switching.
+
+### 6. Automated Product Approval & Escrow Solvency Rules
+
+Products submitted by suppliers do not require manual admin approval. They are automatically approved (`isActive: true`) and published if and only if they satisfy:
+  * **Escrow Solvency Buffer**: The supplier's prepaid wallet balance must cover at least 5x the CPA (`balance >= supplierTotalCpa * 5`).
+  * **CPA Floor & Margins**:
+    - Minimum CPA is strictly **500 DZD** (`supplierTotalCpa >= 500`).
+    - The CPA budget cannot exceed 50% of the retail selling price (`supplierTotalCpa <= retailPrice * 0.5`).
+    - The retail price must be strictly greater than the CPA.
+  * **Inventory Threshold**: Initial stock must be at least **20 units** (`stock >= 20`).
