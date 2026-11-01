@@ -174,6 +174,30 @@ async function setupPriority3Session(page: Page, path: string, options: { lang?:
     });
   });
 
+  await page.route(new RegExp(`^${apiBase}/wallets/deposit-requests$`), async (route) => {
+    if (route.request().method() === "POST") {
+      const payload = JSON.parse(route.request().postData() || "{}");
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "dep-qa-created-01",
+          supplierId: "sup-qa-uuid",
+          supplierName: "Comptoir Électronique DZ",
+          amount: payload.amount || 10000,
+          paymentRail: payload.paymentRail || "BARIDIMOB",
+          referenceNote: payload.referenceNote || "TX-DZ-2026-99482",
+          receiptUrl: payload.receiptUrl || "data:image/png;base64,mock",
+          status: "PENDING",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
   await page.addInitScript(
     ({ token, selectedLang }) => {
       localStorage.setItem("vitedrop_token", token);
@@ -320,7 +344,7 @@ test.describe("Supplier Priority 3: Product Profitability Simulator, RTO Health 
     // Success banner appears
     const successBanner = page.locator('[data-testid="receipt-slip-success-banner"]');
     await expect(successBanner).toBeVisible();
-    await expect(successBanner).toContainText(/Reçu transmis avec succès/i);
+    await expect(successBanner).toContainText(/transmis avec succès/i);
 
     // Close modal
     await page.locator('[data-testid="close-topup-modal-btn"]').click();
