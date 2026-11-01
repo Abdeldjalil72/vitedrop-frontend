@@ -243,10 +243,11 @@ test.describe("Supplier Portal English Language Switcher Verification", () => {
       page.getByText("Set CPA budgets, manage inventory, and monitor escrow coverage")
     ).toBeVisible();
 
-    // Buttons
+    // Buttons & Actions
     await expect(page.getByRole("button", { name: "Refresh" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Top-up" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Add a Product" })).toBeVisible();
+    await expect(page.locator('[data-testid="new-product-page-btn"]')).toContainText("New Product");
+    await expect(page.locator('[data-testid="add-product-btn"]')).toBeVisible();
 
     // Search placeholder
     const searchInput = page.locator('[data-testid="product-search-input"]');
