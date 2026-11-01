@@ -23,6 +23,7 @@ import {
   Radio,
   FileText,
   ArrowDownToLine,
+  Phone,
 } from "lucide-react";
 import { removeAuthToken } from "@/lib/api-client";
 import { UserRole } from "@/types";
@@ -333,6 +334,13 @@ export function Sidebar({
           href: "/supplier",
           icon: <Headphones className="w-4 h-4" />,
           badge: "3 New",
+          colorTheme: "amber",
+        },
+        {
+          id: "supplier-call-center",
+          label: lang === "ar" ? "مركز الاتصال" : "Centre d'Appels",
+          href: "/supplier/call-center",
+          icon: <Phone className="w-4 h-4" />,
           colorTheme: "amber",
         },
         {

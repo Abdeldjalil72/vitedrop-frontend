@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { getCurrentUser, apiGetMarketplaceProducts } from "@/lib/api-client";
-import { MOCK_PRODUCTS } from "@/lib/mock-data";
 import { formatDZD } from "@/lib/formatters";
 import {
   Link2,
@@ -20,6 +19,8 @@ import {
   Zap,
   Layers,
   Check,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 
 interface TrafficPreset {
@@ -154,8 +155,10 @@ const linksI18n = {
 };
 
 export default function AffiliateLinksPage() {
-  const [products, setProducts] = useState<any[]>(MOCK_PRODUCTS);
-  const [selectedProductId, setSelectedProductId] = useState<string>(MOCK_PRODUCTS[0]?.id || "prod-1");
+  const [products, setProducts] = useState<any[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activePreset, setActivePreset] = useState<string>("facebook");
   const [utmSource, setUtmSource] = useState("facebook");
   const [utmMedium, setUtmMedium] = useState("paid_social");
@@ -165,25 +168,32 @@ export default function AffiliateLinksPage() {
   const [copiedProductId, setCopiedProductId] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
+  const loadProducts = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const data = await apiGetMarketplaceProducts();
+      if (Array.isArray(data) && data.length > 0) {
+        setProducts(data);
+        setSelectedProductId(data[0].id);
+      } else {
+        setProducts([]);
+        setSelectedProductId("");
+        setLoadError("Aucun produit actif disponible dans le catalogue.");
+      }
+    } catch (err: any) {
+      console.error("Failed to load live products for link generator:", err);
+      setProducts([]);
+      setSelectedProductId("");
+      setLoadError("Impossible de charger les produits du catalogue. Veuillez vérifier votre connexion et réessayer.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setCurrentUser(getCurrentUser());
-    const load = async () => {
-      try {
-        const data = await apiGetMarketplaceProducts();
-        if (Array.isArray(data) && data.length > 0) {
-          setProducts(data);
-          setSelectedProductId(data[0].id);
-        } else {
-          setProducts(MOCK_PRODUCTS);
-          setSelectedProductId(MOCK_PRODUCTS[0]?.id || "prod-1");
-        }
-      } catch (err) {
-        console.warn("Could not load live products for link generator, using mock fallback", err);
-        setProducts(MOCK_PRODUCTS);
-        setSelectedProductId(MOCK_PRODUCTS[0]?.id || "prod-1");
-      }
-    };
-    load();
+    loadProducts();
   }, []);
 
   const affiliateId = currentUser?.sub || "aff-qa-uuid";
@@ -287,6 +297,25 @@ export default function AffiliateLinksPage() {
 
               {/* Configuration Inputs Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Error Banner & Retry */}
+                {loadError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{loadError}</span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={loadProducts}
+                      className="h-7 px-2 text-xs border-rose-200 text-rose-700 hover:bg-rose-100 shrink-0"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      {lang === "ar" ? "إعادة المحاولة" : "Réessayer"}
+                    </Button>
+                  </div>
+                )}
+
                 {/* Product Selection */}
                 <div>
                   <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
@@ -296,10 +325,15 @@ export default function AffiliateLinksPage() {
                     value={selectedProductId}
                     onChange={(e) => setSelectedProductId(e.target.value)}
                     data-testid="product-select"
-                    className="w-full text-xs rounded-xl border border-black/10 bg-white px-3 py-2.5 text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                    disabled={isLoading || Boolean(loadError)}
+                    className="w-full text-xs rounded-xl border border-black/10 bg-white px-3 py-2.5 text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500 disabled:bg-neutral-100 disabled:cursor-not-allowed"
                   >
-                    {products.length === 0 ? (
+                    {isLoading ? (
                       <option value="">{dict.loadingProducts}</option>
+                    ) : loadError ? (
+                      <option value="">{lang === "ar" ? "تعذر تحميل المنتجات" : "Erreur de chargement"}</option>
+                    ) : products.length === 0 ? (
+                      <option value="">{lang === "ar" ? "لا توجد منتجات متاحة" : "Aucun produit disponible"}</option>
                     ) : (
                       products.map((p) => (
                         <option key={p.id} value={p.id}>

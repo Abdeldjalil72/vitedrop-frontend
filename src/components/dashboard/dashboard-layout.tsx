@@ -124,6 +124,16 @@ export function DashboardLayout({
   }, [router, initialRole]);
 
   useEffect(() => {
+    const handleUnauthorized = (e: any) => {
+      e.preventDefault();
+      const returnUrl = e?.detail?.returnUrl || window.location.pathname;
+      router.replace(`/login?redirect=${encodeURIComponent(returnUrl)}`);
+    };
+    window.addEventListener("vitedrop:unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("vitedrop:unauthorized", handleUnauthorized);
+  }, [router]);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem("vitedrop_lang") as Language;
       if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {

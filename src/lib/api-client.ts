@@ -73,7 +73,16 @@ export async function apiRequest<T = any>(
     if (response.status === 401 && !isAuthRequest) {
       removeAuthToken();
       if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        window.location.assign("/login");
+        const returnUrl = window.location.pathname + window.location.search;
+        const event = new CustomEvent("vitedrop:unauthorized", {
+          cancelable: true,
+          detail: { returnUrl },
+        });
+        const dispatched = window.dispatchEvent(event);
+        if (dispatched) {
+          const redirectParam = encodeURIComponent(returnUrl);
+          window.location.assign(`/login?redirect=${redirectParam}`);
+        }
       }
     }
 
@@ -629,7 +638,10 @@ export async function apiMarkWithdrawalFailed(id: string, reason: string): Promi
 }
 
 export async function apiGetPendingWithdrawals(): Promise<AdminWithdrawal[]> {
-  return apiRequest("/admin/withdrawals/pending");
+  const res = await apiRequest<any>("/admin/withdrawals/pending");
+  if (Array.isArray(res)) return res;
+  if (res && Array.isArray(res.data)) return res.data;
+  return [];
 }
 
 export interface AdminUser {
@@ -683,6 +695,49 @@ export async function apiCreateSupplierProduct(data: {
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+export async function apiUpdateSupplierProduct(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+    retailPrice?: number;
+    supplierTotalCpa?: number;
+    stockToAdd?: number;
+    isActive?: boolean;
+  },
+): Promise<any> {
+  return apiRequest(`/supplier/products/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function apiUploadImage(
+  file: File,
+): Promise<{ success: boolean; url: string; filename: string; size: number; mimetype: string }> {
+  const token = getAuthToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/uploads/image`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.message || "Échec du téléchargement de l'image");
+  }
+  return data;
 }
 
 // ----------------------------------------------------
@@ -913,8 +968,20 @@ export async function apiUpdateProductStatus(
   }
 }
 
-export async function apiGetProductPerformance(id: string): Promise<any> {
-  return apiRequest(`/admin/products/${id}/performance`);
+export interface ProductPerformanceMetrics {
+  totalOrders: number;
+  deliveredOrders: number;
+  rtoOrders: number;
+  canceledOrders: number;
+  activeOrders: number;
+  deliveryRate: number;
+  rtoRate: number;
+}
+
+export async function apiGetProductPerformance(
+  id: string,
+): Promise<ProductPerformanceMetrics> {
+  return apiRequest<ProductPerformanceMetrics>(`/admin/products/${id}/performance`);
 }
 
 // ----------------------------------------------------

@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Language } from "@/lib/locales";
 import { formatDZD } from "@/lib/formatters";
-import { apiCreateSupplierProduct } from "@/lib/api-client";
+import {
+  apiCreateSupplierProduct,
+  apiUpdateSupplierProduct,
+  apiUploadImage,
+} from "@/lib/api-client";
 import {
   PackagePlus,
   X,
@@ -70,6 +74,7 @@ interface SupplierProductModalProps {
   walletBalance: number;
   lang: Language;
   onOpenTopUp: () => void;
+  product?: any;
 }
 
 const modalTranslations = {
@@ -211,9 +216,11 @@ export function SupplierProductModal({
   walletBalance,
   lang = "fr",
   onOpenTopUp,
+  product,
 }: SupplierProductModalProps) {
   const t = modalTranslations[lang] || modalTranslations.fr;
   const isAr = lang === "ar";
+  const isEditing = Boolean(product?.id);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -223,6 +230,7 @@ export function SupplierProductModal({
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [stock, setStock] = useState("");
+  const [stockToAdd, setStockToAdd] = useState("");
   const [retailPrice, setRetailPrice] = useState("");
   const [supplierTotalCpa, setSupplierTotalCpa] = useState("");
   const [costPrice, setCostPrice] = useState("");
@@ -232,24 +240,36 @@ export function SupplierProductModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset form when modal opens
+  // Reset or populate form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setName("");
-      setDescription("");
-      setImageUrl("");
-      setImageName("");
+      if (product) {
+        setName(product.name || "");
+        setDescription(product.description || "");
+        setImageUrl(product.imageUrl || "");
+        setImageName(product.imageUrl ? "Image du produit" : "");
+        setStock(String(product.stock ?? ""));
+        setStockToAdd("");
+        setRetailPrice(String(product.retailPrice ?? ""));
+        setSupplierTotalCpa(String(product.supplierTotalCpa ?? ""));
+      } else {
+        setName("");
+        setDescription("");
+        setImageUrl("");
+        setImageName("");
+        setStock("");
+        setStockToAdd("");
+        setRetailPrice("");
+        setSupplierTotalCpa("");
+      }
       setIsProcessingImage(false);
-      setStock("");
-      setRetailPrice("");
-      setSupplierTotalCpa("");
       setCostPrice("");
       setDeliveryFee("700");
       setDeliveryRate("70");
       setErrorMessage(null);
       setIsSubmitting(false);
     }
-  }, [isOpen]);
+  }, [isOpen, product]);
 
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -257,8 +277,14 @@ export function SupplierProductModal({
     setIsProcessingImage(true);
     try {
       setImageName(file.name);
-      const compressed = await processImageFile(file);
-      setImageUrl(compressed);
+      try {
+        const uploadRes = await apiUploadImage(file);
+        setImageUrl(uploadRes.url);
+      } catch (uploadErr) {
+        console.warn("Direct upload failed, falling back to local processing:", uploadErr);
+        const compressed = await processImageFile(file);
+        setImageUrl(compressed);
+      }
     } catch (err) {
       console.error("Failed to process image:", err);
     } finally {
@@ -342,7 +368,7 @@ export function SupplierProductModal({
       return;
     }
 
-    if (stockNum < 20) {
+    if (!isEditing && stockNum < 20) {
       setErrorMessage(t.errStock);
       return;
     }
@@ -366,18 +392,30 @@ export function SupplierProductModal({
 
     setIsSubmitting(true);
     try {
-      await apiCreateSupplierProduct({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        stock: stockNum,
-        retailPrice: retailPriceNum,
-        supplierTotalCpa: cpaNum,
-        imageUrl: imageUrl || undefined,
-      });
+      if (isEditing && product?.id) {
+        const addNum = parseInt(stockToAdd, 10);
+        await apiUpdateSupplierProduct(product.id, {
+          name: name.trim(),
+          description: description.trim() || undefined,
+          retailPrice: retailPriceNum,
+          supplierTotalCpa: cpaNum,
+          imageUrl: imageUrl || undefined,
+          stockToAdd: !isNaN(addNum) && addNum > 0 ? addNum : undefined,
+        });
+      } else {
+        await apiCreateSupplierProduct({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          stock: stockNum,
+          retailPrice: retailPriceNum,
+          supplierTotalCpa: cpaNum,
+          imageUrl: imageUrl || undefined,
+        });
+      }
       await onSuccess();
       onClose();
     } catch (err: any) {
-      setErrorMessage(err?.message || "Erreur lors de la création du produit.");
+      setErrorMessage(err?.message || (isAr ? "فشل حفظ المنتج" : "Erreur lors de l'enregistrement du produit."));
     } finally {
       setIsSubmitting(false);
     }
@@ -406,9 +444,15 @@ export function SupplierProductModal({
                 id="supplier-product-modal-title"
                 className="text-base font-bold text-neutral-900 tracking-tight"
               >
-                {t.title}
+                {isEditing ? (isAr ? "تعديل المنتج" : "Modifier le Produit") : t.title}
               </h2>
-              <p className="text-xs text-neutral-500 mt-0.5">{t.subtitle}</p>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                {isEditing
+                  ? isAr
+                    ? "تحديث الأسعار والمخزون والبيانات"
+                    : "Mise à jour des prix, stock et paramètres"
+                  : t.subtitle}
+              </p>
             </div>
           </div>
           <button

@@ -65,6 +65,7 @@ export default function SupplierProductsPage() {
   // Modals
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<SupplierProductItem | null>(null);
 
   // Status & Feedback Banners
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -194,7 +195,10 @@ export default function SupplierProductsPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => setIsProductModalOpen(true)}
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setIsProductModalOpen(true);
+                  }}
                   className="text-xs text-neutral-400 hover:text-neutral-600 h-8 px-2 text-[11px]"
                   data-testid="add-product-btn"
                 >
@@ -538,17 +542,31 @@ export default function SupplierProductsPage() {
                               {formatDZD(affiliatePayout, lang)}
                             </TableCell>
 
-                            {/* Status */}
+                            {/* Status & Actions */}
                             <TableCell className="text-end">
-                              <span
-                                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                                  isOutOfStock
-                                    ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                    : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                }`}
-                              >
-                                {isOutOfStock ? pLoc.stockLow : pLoc.statusActive}
-                              </span>
+                              <div className="flex items-center justify-end gap-2">
+                                <span
+                                  className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                                    isOutOfStock
+                                      ? "bg-amber-100 text-amber-800 border border-amber-200"
+                                      : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                  }`}
+                                >
+                                  {isOutOfStock ? pLoc.stockLow : pLoc.statusActive}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingProduct(p);
+                                    setIsProductModalOpen(true);
+                                  }}
+                                  className="h-7 px-2 text-xs font-medium text-neutral-600 hover:text-neutral-900 border-neutral-200 hover:bg-neutral-50"
+                                  data-testid={`edit-product-${p.id}`}
+                                >
+                                  {isAr ? "تعديل" : "Modifier"}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         );
@@ -559,14 +577,26 @@ export default function SupplierProductsPage() {
               </div>
             </div>
 
-            {/* Product Creation Modal with Live Solvency Pre-check */}
+            {/* Product Creation / Edit Modal with Live Solvency Pre-check */}
             <SupplierProductModal
               isOpen={isProductModalOpen}
-              onClose={() => setIsProductModalOpen(false)}
-              onSuccess={() => handleProductCreated(pLoc.msgCreated)}
+              onClose={() => {
+                setIsProductModalOpen(false);
+                setEditingProduct(null);
+              }}
+              onSuccess={() =>
+                handleProductCreated(
+                  editingProduct
+                    ? lang === "ar"
+                      ? "تم تحديث المنتج بنجاح"
+                      : "Produit mis à jour avec succès"
+                    : pLoc.msgCreated,
+                )
+              }
               walletBalance={walletBalance}
               lang={lang}
               onOpenTopUp={() => setIsTopUpModalOpen(true)}
+              product={editingProduct}
             />
 
             {/* Escrow Top-up Modal */}

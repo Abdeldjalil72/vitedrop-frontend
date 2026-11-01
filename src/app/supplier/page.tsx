@@ -48,8 +48,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-export default function SupplierDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"queue" | "confirmed" | "all">("queue");
+export default function SupplierDashboardPage({
+  defaultTab = "queue",
+  isCallCenterOnly = false,
+}: {
+  defaultTab?: "queue" | "confirmed" | "all";
+  isCallCenterOnly?: boolean;
+} = {}) {
+  const [activeTab, setActiveTab] = useState<"queue" | "confirmed" | "all">(defaultTab);
   const [leads, setLeads] = useState<SupplierOrder[]>([]);
   const [allOrders, setAllOrders] = useState<SupplierOrder[]>([]);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);

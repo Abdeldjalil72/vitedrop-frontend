@@ -96,3 +96,13 @@ export interface Wallet {
   currency: "DZD";
   pendingPayouts?: number;
 }
+
+export interface ProductPerformanceMetrics {
+  totalOrders: number;
+  deliveredOrders: number;
+  rtoOrders: number;
+  canceledOrders: number;
+  activeOrders: number;
+  deliveryRate: number;
+  rtoRate: number;
+}
