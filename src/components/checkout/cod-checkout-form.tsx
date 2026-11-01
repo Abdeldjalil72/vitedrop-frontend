@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { WilayaSelect } from "@/components/ui/wilaya-select";
 import { getWilayaByCode, ALGERIA_WILAYAS } from "@/lib/algeria-locations";
-import { formatDZD, validateAlgerianPhone } from "@/lib/formatters";
+import { formatDZD, validateAlgerianPhone, formatAlgerianPhoneInput, getAlgerianCarrier } from "@/lib/formatters";
 import { apiCreateCheckoutLead } from "@/lib/api-client";
 
 export interface CodCheckoutFormProps {
@@ -81,6 +81,11 @@ export function CodCheckoutForm({
   const phoneValidation = useMemo(() => {
     if (!customerPhone) return null;
     return validateAlgerianPhone(customerPhone);
+  }, [customerPhone]);
+
+  const carrier = useMemo(() => {
+    if (!customerPhone) return null;
+    return getAlgerianCarrier(customerPhone);
   }, [customerPhone]);
 
   // Delivery fee calculation
@@ -294,7 +299,7 @@ export function CodCheckoutForm({
               if (errors.customerName) setErrors((prev) => ({ ...prev, customerName: "" }));
             }}
             placeholder={isAr ? "مثال: كريم براهيمي" : "Ex: Karim Brahimi"}
-            className={`w-full px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
+            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
               errors.customerName
                 ? "border-rose-400 focus:ring-rose-500/10"
                 : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
@@ -314,22 +319,38 @@ export function CodCheckoutForm({
               <Phone className="w-4 h-4 text-blue-600" />
               <span>{isAr ? "رقم الهاتف للتأكيد *" : "Numéro de téléphone *"}</span>
             </label>
-            {phoneValidation && (
-              <span
-                className={`text-xs font-mono font-medium flex items-center gap-1 ${
-                  phoneValidation.isValid ? "text-emerald-600" : "text-amber-600"
-                }`}
-              >
-                {phoneValidation.isValid ? (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{isAr ? "رقم صحيح" : "Format valide"}</span>
-                  </>
-                ) : (
-                  <span>{isAr ? "مثال: 0550123456" : "Ex: 0550123456"}</span>
-                )}
-              </span>
-            )}
+            <div className="flex items-center gap-1.5">
+              {carrier && (
+                <span
+                  data-testid="checkout-carrier-badge"
+                  className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full transition-all ${
+                    carrier === "Mobilis"
+                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                      : carrier === "Djezzy"
+                      ? "bg-rose-100 text-rose-800 border border-rose-300"
+                      : "bg-red-100 text-red-800 border border-red-300"
+                  }`}
+                >
+                  {carrier}
+                </span>
+              )}
+              {phoneValidation && (
+                <span
+                  className={`text-xs font-mono font-medium flex items-center gap-1 ${
+                    phoneValidation.isValid ? "text-emerald-600" : "text-amber-600"
+                  }`}
+                >
+                  {phoneValidation.isValid ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>{isAr ? "رقم صحيح" : "Format valide"}</span>
+                    </>
+                  ) : (
+                    <span>{isAr ? "مثال: 0550 12 34 56" : "Ex: 0550 12 34 56"}</span>
+                  )}
+                </span>
+              )}
+            </div>
           </div>
           <input
             type="tel"
@@ -338,11 +359,12 @@ export function CodCheckoutForm({
             data-testid="checkout-customer-phone"
             value={customerPhone}
             onChange={(e) => {
-              setCustomerPhone(e.target.value);
+              const formatted = formatAlgerianPhoneInput(e.target.value);
+              setCustomerPhone(formatted);
               if (errors.customerPhone) setErrors((prev) => ({ ...prev, customerPhone: "" }));
             }}
             placeholder="05 / 06 / 07 XX XX XX XX"
-            className={`w-full px-4 py-3 rounded-2xl border text-sm font-mono tracking-wider transition-all focus:outline-none focus:ring-4 ${
+            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm sm:text-base font-mono tracking-wider transition-all focus:outline-none focus:ring-4 ${
               errors.customerPhone
                 ? "border-rose-400 focus:ring-rose-500/10"
                 : phoneValidation?.isValid
@@ -389,7 +411,7 @@ export function CodCheckoutForm({
                   setCommune(e.target.value);
                   if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
                 }}
-                className={`w-full px-4 py-3 rounded-2xl border text-sm bg-white transition-all appearance-none focus:outline-none focus:ring-4 ${
+                className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm bg-white transition-all appearance-none focus:outline-none focus:ring-4 ${
                   errors.commune
                     ? "border-rose-400 focus:ring-rose-500/10"
                     : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
@@ -415,7 +437,7 @@ export function CodCheckoutForm({
                 if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
               }}
               placeholder={isAr ? "اكتب اسم بلديتك" : "Nom de votre commune"}
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              className="w-full min-h-[48px] px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             />
           )}
           {errors.commune && <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">{errors.commune}</p>}
@@ -513,7 +535,7 @@ export function CodCheckoutForm({
                 ? "الحي، رقم الشارع، أو أقرب مكان معروف (مثال: حي النصر قرب المسجد)"
                 : "Quartier, numéro de rue ou repère connu"
             }
-            className={`w-full px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
+            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
               errors.address
                 ? "border-rose-400 focus:ring-rose-500/10"
                 : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"

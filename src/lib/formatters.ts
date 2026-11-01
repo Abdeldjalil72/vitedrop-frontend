@@ -55,6 +55,35 @@ export function validateAlgerianPhone(input: string): { isValid: boolean; normal
   };
 }
 
+export function formatAlgerianPhoneInput(input: string): string {
+  let cleaned = input.replace(/[^\d+]/g, "");
+  if (cleaned.startsWith("+213")) {
+    cleaned = "0" + cleaned.slice(4);
+  } else if (cleaned.startsWith("00213")) {
+    cleaned = "0" + cleaned.slice(5);
+  }
+  cleaned = cleaned.replace(/\D/g, "").slice(0, 10);
+
+  if (cleaned.length <= 4) {
+    return cleaned;
+  }
+  if (cleaned.length <= 6) {
+    return `${cleaned.slice(0, 4)} ${cleaned.slice(4)}`;
+  }
+  if (cleaned.length <= 8) {
+    return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 6)} ${cleaned.slice(6)}`;
+  }
+  return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 6)} ${cleaned.slice(6, 8)} ${cleaned.slice(8, 10)}`;
+}
+
+export function getAlgerianCarrier(phone: string): "Ooredoo" | "Mobilis" | "Djezzy" | null {
+  const norm = phone.replace(/\D/g, "");
+  if (norm.startsWith("05")) return "Ooredoo";
+  if (norm.startsWith("06")) return "Mobilis";
+  if (norm.startsWith("07")) return "Djezzy";
+  return null;
+}
+
 export function calculateCpaSplit(grossCpa: number): {
   affiliateNet: number;
   platformFee: number;

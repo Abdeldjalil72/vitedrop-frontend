@@ -4,6 +4,8 @@ import {
   formatDateTime,
   formatDate,
   validateAlgerianPhone,
+  formatAlgerianPhoneInput,
+  getAlgerianCarrier,
   calculateCpaSplit,
 } from "@/lib/formatters";
 
@@ -71,6 +73,21 @@ describe("Formatters & Algerian Localization Helpers", () => {
       expect(validateAlgerianPhone("0850123456").isValid).toBe(false); // Invalid prefix
       expect(validateAlgerianPhone("123456").isValid).toBe(false); // Too short
       expect(validateAlgerianPhone("+33612345678").isValid).toBe(false); // French number
+    });
+  });
+
+  describe("formatAlgerianPhoneInput & getAlgerianCarrier", () => {
+    it("should format raw phone digits with Algerian standard chunks (05XX XX XX XX)", () => {
+      expect(formatAlgerianPhoneInput("0550123456")).toBe("0550 12 34 56");
+      expect(formatAlgerianPhoneInput("0661223344")).toBe("0661 22 33 44");
+      expect(formatAlgerianPhoneInput("+213770112233")).toBe("0770 11 22 33");
+    });
+
+    it("should detect carrier from standard Algerian mobile prefixes", () => {
+      expect(getAlgerianCarrier("0550 12 34 56")).toBe("Ooredoo");
+      expect(getAlgerianCarrier("0661 22 33 44")).toBe("Mobilis");
+      expect(getAlgerianCarrier("0770 11 22 33")).toBe("Djezzy");
+      expect(getAlgerianCarrier("0212 34 56 78")).toBe(null);
     });
   });
 
