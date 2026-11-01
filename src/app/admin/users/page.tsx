@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/table";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminMetricGrid, AdminMetricCard } from "@/components/admin/admin-metric-grid";
+import { UserStatusModal } from "@/components/admin/user-status-modal";
+import { UserRoleModal } from "@/components/admin/user-role-modal";
 import { formatDZD } from "@/lib/formatters";
 import {
   Users,
@@ -24,23 +26,22 @@ import {
   Headphones,
   UserCheck,
   UserX,
-  Wallet,
   Phone,
   Mail,
   RefreshCw,
   Edit2,
   CheckCircle2,
   AlertTriangle,
-  X,
+  Copy,
+  Check,
+  Wallet,
 } from "lucide-react";
-import { Modal } from "@/components/ui/modal";
 import {
   apiGetAdminUsers,
-  apiUpdateUserStatus,
-  apiUpdateUserRole,
   getCurrentUser,
   AdminUser,
 } from "@/lib/api-client";
+import { AdminTopUpModal } from "@/components/admin/admin-topup-modal";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -50,15 +51,24 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [statusConfirmUser, setStatusConfirmUser] = useState<AdminUser | null>(null);
-  const [selectedRole, setSelectedRole] = useState<string>("");
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [topUpSupplier, setTopUpSupplier] = useState<AdminUser | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const currentUser = useMemo(() => getCurrentUser(), []);
 
+  const handleCopy = (text: string, key: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 2000);
+    }
+  };
+
   const loadUsers = async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const data = await apiGetAdminUsers();
       setUsers(Array.isArray(data) ? data : []);
@@ -73,51 +83,6 @@ export default function AdminUsersPage() {
     loadUsers();
   }, []);
 
-  const handleConfirmStatusToggle = async () => {
-    if (!statusConfirmUser) return;
-    const newStatus = !statusConfirmUser.isActive;
-    setIsUpdating(true);
-    setErrorMessage(null);
-
-    try {
-      await apiUpdateUserStatus(statusConfirmUser.id, newStatus);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === statusConfirmUser.id ? { ...u, isActive: newStatus } : u))
-      );
-      setActionMessage(
-        newStatus ? "Compte réactivé avec succès" : "Compte suspendu"
-      );
-      setTimeout(() => setActionMessage(null), 3500);
-      setStatusConfirmUser(null);
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Erreur lors de la mise à jour du statut.");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleSaveRole = async () => {
-    if (!editingUser || !selectedRole) return;
-    setIsUpdating(true);
-    setErrorMessage(null);
-
-    try {
-      await apiUpdateUserRole(editingUser.id, selectedRole);
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUser.id ? { ...u, role: selectedRole as any } : u
-        )
-      );
-      setEditingUser(null);
-      setActionMessage("Rôle mis à jour avec succès (Session invalidée)");
-      setTimeout(() => setActionMessage(null), 3500);
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Erreur lors du changement de rôle.");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
   // Filtered Users
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
@@ -126,7 +91,8 @@ export default function AdminUsersPage() {
         (u.fullName &&
           u.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (u.phone && u.phone.includes(searchTerm));
+        (u.phone && u.phone.includes(searchTerm)) ||
+        u.id.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesRole = roleFilter === "ALL" || u.role === roleFilter;
 
@@ -148,7 +114,7 @@ export default function AdminUsersPage() {
     return { total, affiliates, suppliers, suspended };
   }, [users]);
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role: string, isAr: boolean, isEn: boolean) => {
     switch (role) {
       case "ADMIN":
         return (
@@ -161,14 +127,14 @@ export default function AdminUsersPage() {
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200/80">
             <Briefcase className="w-3.5 h-3.5 text-purple-600" />
-            Fournisseur
+            {isAr ? "مورد" : isEn ? "Supplier" : "Fournisseur"}
           </span>
         );
       case "CALL_CENTER_AGENT":
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/80">
             <Headphones className="w-3.5 h-3.5 text-amber-600" />
-            Agent Call Center
+            {isAr ? "مركز اتصال" : isEn ? "Call Center" : "Call Center"}
           </span>
         );
       case "AFFILIATE":
@@ -176,7 +142,7 @@ export default function AdminUsersPage() {
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/80">
             <Users className="w-3.5 h-3.5 text-sky-600" />
-            Media Buyer
+            {isAr ? "مسوق" : isEn ? "Media Buyer" : "Media Buyer"}
           </span>
         );
     }
@@ -186,17 +152,20 @@ export default function AdminUsersPage() {
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isAr = lang === "ar";
+        const isEn = lang === "en";
 
         return (
           <div className="space-y-5 sm:space-y-6 lg:space-y-8 text-start">
             {/* Header */}
             <AdminPageHeader
-              badge={isAr ? "إدارة المنظومة" : "Administration & RBAC"}
+              badge={isAr ? "إدارة المنظومة" : isEn ? "Administration & RBAC" : "Administration & RBAC"}
               badgeVariant="rose"
-              title={isAr ? "إدارة المستخدمين" : "Gestion des Utilisateurs"}
+              title={isAr ? "إدارة المستخدمين" : isEn ? "User Management" : "Gestion des Utilisateurs"}
               description={
                 isAr
                   ? "التحكم في حسابات المسوقين، الموردين، وإدارة الصلاحيات وحالات الحسابات."
+                  : isEn
+                  ? "Oversee network accounts, balance ledgers, and access permissions."
                   : "Supervisez tous les comptes du réseau, contrôlez les soldes et gérez les statuts d'accès."
               }
               actions={
@@ -210,7 +179,7 @@ export default function AdminUsersPage() {
                   <RefreshCw
                     className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
                   />
-                  <span>{isAr ? "تحديث" : "Actualiser"}</span>
+                  <span>{isAr ? "تحديث" : isEn ? "Refresh" : "Actualiser"}</span>
                 </Button>
               }
             />
@@ -226,25 +195,25 @@ export default function AdminUsersPage() {
             {/* KPI Summary Cards */}
             <AdminMetricGrid columns={4}>
               <AdminMetricCard
-                label={isAr ? "إجمالي المستخدمين" : "Total Utilisateurs"}
+                label={isAr ? "إجمالي المستخدمين" : isEn ? "Total Users" : "Total Utilisateurs"}
                 value={stats.total}
                 icon={Users}
                 variant="default"
               />
               <AdminMetricCard
-                label={isAr ? "المسوقون (Affiliates)" : "Affiliés Actifs"}
+                label={isAr ? "المسوقون (Affiliates)" : isEn ? "Active Affiliates" : "Affiliés Actifs"}
                 value={stats.affiliates}
                 icon={Users}
                 variant="sky"
               />
               <AdminMetricCard
-                label={isAr ? "الموردون (Suppliers)" : "Fournisseurs"}
+                label={isAr ? "الموردون (Suppliers)" : isEn ? "Suppliers" : "Fournisseurs"}
                 value={stats.suppliers}
                 icon={Briefcase}
                 variant="purple"
               />
               <AdminMetricCard
-                label={isAr ? "حسابات معطلة" : "Comptes Suspendus"}
+                label={isAr ? "حسابات معطلة" : isEn ? "Suspended Accounts" : "Comptes Suspendus"}
                 value={stats.suspended}
                 icon={UserX}
                 variant={stats.suspended > 0 ? "rose" : "default"}
@@ -261,6 +230,8 @@ export default function AdminUsersPage() {
                   placeholder={
                     isAr
                       ? "البحث بالاسم، البريد أو الهاتف..."
+                      : isEn
+                      ? "Search by name, email, or phone..."
                       : "Rechercher par nom, email ou téléphone..."
                   }
                   value={searchTerm}
@@ -274,10 +245,10 @@ export default function AdminUsersPage() {
                 {/* Role Tabs */}
                 <div className="inline-flex p-1 bg-[#f4f4f4] rounded-full text-xs font-semibold overflow-x-auto max-w-full">
                   {[
-                    { id: "ALL", label: isAr ? "الكل" : "Tous" },
-                    { id: "AFFILIATE", label: isAr ? "مسوقين" : "Affiliés" },
-                    { id: "SUPPLIER", label: isAr ? "موردين" : "Fournisseurs" },
-                    { id: "ADMIN", label: isAr ? "إدارة" : "Admins" },
+                    { id: "ALL", label: isAr ? "الكل" : isEn ? "All" : "Tous" },
+                    { id: "AFFILIATE", label: isAr ? "مسوقين" : isEn ? "Affiliates" : "Affiliés" },
+                    { id: "SUPPLIER", label: isAr ? "موردين" : isEn ? "Suppliers" : "Fournisseurs" },
+                    { id: "ADMIN", label: isAr ? "إدارة" : isEn ? "Admins" : "Admins" },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -296,9 +267,9 @@ export default function AdminUsersPage() {
                 {/* Status Toggle */}
                 <div className="inline-flex p-1 bg-[#f4f4f4] rounded-full text-xs font-semibold">
                   {[
-                    { id: "ALL", label: isAr ? "كل الحالات" : "Tous Statuts" },
-                    { id: "ACTIVE", label: isAr ? "نشط" : "Actifs" },
-                    { id: "SUSPENDED", label: isAr ? "معلق" : "Suspendus" },
+                    { id: "ALL", label: isAr ? "كل الحالات" : isEn ? "All Statuses" : "Tous Statuts" },
+                    { id: "ACTIVE", label: isAr ? "نشط" : isEn ? "Active" : "Actifs" },
+                    { id: "SUSPENDED", label: isAr ? "معلق" : isEn ? "Suspended" : "Suspendus" },
                   ].map((st) => (
                     <button
                       key={st.id}
@@ -331,12 +302,18 @@ export default function AdminUsersPage() {
                     <span className="text-sm font-medium">
                       {isAr
                         ? "لا توجد نتائج مطابقة لبحثك"
+                        : isEn
+                        ? "No users found matching these criteria"
                         : "Aucun utilisateur trouvé avec ces critères"}
                     </span>
                   </div>
                 ) : (
                   filteredUsers.map((user) => (
-                    <div key={user.id} className="p-3.5 space-y-3">
+                    <div
+                      key={user.id}
+                      className="p-3.5 space-y-3"
+                      data-testid="admin-user-card"
+                    >
                       {/* Identity & Role */}
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
@@ -345,7 +322,7 @@ export default function AdminUsersPage() {
                           </div>
                           <div className="min-w-0">
                             <div className="font-semibold text-xs text-neutral-950 truncate">
-                              {user.fullName || (isAr ? "بدون اسم" : "Non spécifié")}
+                              {user.fullName || (isAr ? "بدون اسم" : isEn ? "Not specified" : "Non spécifié")}
                             </div>
                             <div className="text-[11px] text-neutral-500 truncate flex items-center gap-1">
                               <Mail className="w-3 h-3 text-neutral-400 shrink-0" />
@@ -353,14 +330,14 @@ export default function AdminUsersPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="shrink-0">{getRoleBadge(user.role)}</div>
+                        <div className="shrink-0">{getRoleBadge(user.role, isAr, isEn)}</div>
                       </div>
 
-                      {/* Details: Balance, Status, Phone */}
+                      {/* Details: Balance, Status, Phone, ID */}
                       <div className="grid grid-cols-2 gap-2 p-2.5 bg-neutral-50 rounded-xl text-xs">
                         <div>
                           <span className="text-[10px] text-neutral-400 block font-sans">
-                            {isAr ? "الرصيد" : "Solde"}
+                            {isAr ? "الرصيد" : isEn ? "Balance" : "Solde"}
                           </span>
                           <span className="font-mono font-bold text-neutral-900">
                             {formatDZD(user.balance, lang)}
@@ -368,27 +345,78 @@ export default function AdminUsersPage() {
                         </div>
                         <div>
                           <span className="text-[10px] text-neutral-400 block font-sans">
-                            {isAr ? "الحالة" : "Statut"}
+                            {isAr ? "الحالة" : isEn ? "Status" : "Statut"}
                           </span>
                           {user.isActive ? (
                             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                              {isAr ? "نشط" : "Actif"}
+                              {isAr ? "نشط" : isEn ? "Active" : "Actif"}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700">
                               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                              {isAr ? "معلق" : "Suspendu"}
+                              {isAr ? "معلق" : isEn ? "Suspended" : "Suspendu"}
                             </span>
                           )}
                         </div>
+
+                        {/* Phone with LTR Protection */}
                         {user.phone && (
-                          <div className="col-span-2 pt-1 border-t border-neutral-200/60 flex items-center gap-1.5 text-[11px] font-mono text-neutral-700">
-                            <Phone className="w-3 h-3 text-neutral-400 shrink-0" />
-                            <span>{user.phone}</span>
+                          <div className="col-span-2 pt-1 border-t border-neutral-200/60 flex items-center justify-between gap-1.5 text-[11px] text-neutral-700">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <Phone className="w-3 h-3 text-neutral-400 shrink-0" />
+                              <span dir="ltr" className="font-mono truncate">
+                                {user.phone}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(user.phone || "", `card-phone-${user.id}`)}
+                              className="p-1 rounded text-neutral-400 hover:text-black hover:bg-neutral-200/60 transition-colors"
+                              data-testid="copy-user-phone"
+                              aria-label={isAr ? "نسخ رقم الهاتف" : isEn ? "Copy phone number" : "Copier téléphone"}
+                            >
+                              {copiedKey === `card-phone-${user.id}` ? (
+                                <Check className="w-3 h-3 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                            </button>
                           </div>
                         )}
+
+                        {/* User ID copy */}
+                        <div className="col-span-2 pt-1 border-t border-neutral-200/60 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
+                          <span>ID: <span dir="ltr">{user.id.slice(0, 8)}...</span></span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(user.id, `card-id-${user.id}`)}
+                            className="p-1 rounded hover:text-black hover:bg-neutral-200/60 transition-colors"
+                            data-testid="copy-user-id"
+                            aria-label={isAr ? "نسخ المعرف" : isEn ? "Copy ID" : "Copier identifiant"}
+                          >
+                            {copiedKey === `card-id-${user.id}` ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Supplier Top-Up Quick Action (Mobile) */}
+                      {user.role === "SUPPLIER" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setTopUpSupplier(user)}
+                          className="min-h-[38px] text-xs font-semibold flex items-center justify-center gap-1.5 w-full bg-purple-50 text-purple-700 border border-purple-200/80 hover:bg-purple-100"
+                          data-testid={`mobile-topup-supplier-btn-${user.id}`}
+                        >
+                          <Wallet className="w-3.5 h-3.5" />
+                          <span>{isAr ? "شحن رصيد المورد" : isEn ? "Top-Up Supplier Balance" : "Recharger le Solde Fournisseur"}</span>
+                        </Button>
+                      )}
 
                       {/* Actions */}
                       <div className="grid grid-cols-2 gap-2 pt-1">
@@ -396,19 +424,25 @@ export default function AdminUsersPage() {
                           variant="secondary"
                           size="sm"
                           disabled={currentUser?.sub === user.id}
-                          onClick={() => {
-                            setEditingUser(user);
-                            setSelectedRole(user.role);
-                          }}
+                          onClick={() => setEditingUser(user)}
                           className="min-h-[40px] text-xs font-medium flex items-center justify-center gap-1.5 w-full"
+                          data-testid="edit-role-btn"
                           title={
                             currentUser?.sub === user.id
-                              ? "Auto-modification désactivée"
+                              ? isAr
+                                ? "التعديل الذاتي معطل"
+                                : isEn
+                                ? "Self-editing disabled"
+                                : "Auto-modification désactivée"
+                              : isAr
+                              ? "تعديل الصلاحية"
+                              : isEn
+                              ? "Edit role"
                               : "Modifier rôle"
                           }
                         >
                           <Edit2 className="w-3.5 h-3.5 text-neutral-500" />
-                          <span>{isAr ? "الصلاحية" : "Rôle"}</span>
+                          <span>{isAr ? "الصلاحية" : isEn ? "Role" : "Rôle"}</span>
                         </Button>
 
                         {user.isActive ? (
@@ -418,23 +452,33 @@ export default function AdminUsersPage() {
                             disabled={currentUser?.sub === user.id}
                             onClick={() => setStatusConfirmUser(user)}
                             className="min-h-[40px] text-xs font-medium flex items-center justify-center gap-1.5 w-full"
+                            data-testid="status-toggle-btn"
                             title={
                               currentUser?.sub === user.id
-                                ? "Auto-suspension impossible"
+                                ? isAr
+                                  ? "التعليق الذاتي غير متاح"
+                                  : isEn
+                                  ? "Cannot suspend yourself"
+                                  : "Auto-suspension impossible"
+                                : isAr
+                                ? "تعليق"
+                                : isEn
+                                ? "Suspend"
                                 : "Suspendre"
                             }
                           >
                             <UserX className="w-3.5 h-3.5" />
-                            <span>{isAr ? "تعليق" : "Suspendre"}</span>
+                            <span>{isAr ? "تعليق" : isEn ? "Suspend" : "Suspendre"}</span>
                           </Button>
                         ) : (
                           <Button
                             size="sm"
                             onClick={() => setStatusConfirmUser(user)}
                             className="min-h-[40px] text-xs font-medium flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white w-full"
+                            data-testid="status-toggle-btn"
                           >
                             <UserCheck className="w-3.5 h-3.5" />
-                            <span>{isAr ? "تفعيل" : "Activer"}</span>
+                            <span>{isAr ? "تفعيل" : isEn ? "Activate" : "Activer"}</span>
                           </Button>
                         )}
                       </div>
@@ -448,14 +492,14 @@ export default function AdminUsersPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-[#fbfbfb]">
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "المستخدم" : "Utilisateur"}</TableHead>
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الدور" : "Rôle"}</TableHead>
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الهاتف" : "Contact"}</TableHead>
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الرصيد" : "Solde Portefeuille"}</TableHead>
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الحالة" : "Statut"}</TableHead>
-                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "تاريخ التسجيل" : "Date Inscription"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "المستخدم" : isEn ? "User" : "Utilisateur"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الدور" : isEn ? "Role" : "Rôle"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الهاتف" : isEn ? "Contact" : "Contact"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الرصيد" : isEn ? "Wallet Balance" : "Solde Portefeuille"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "الحالة" : isEn ? "Status" : "Statut"}</TableHead>
+                      <TableHead className="py-4 text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">{isAr ? "تاريخ التسجيل" : isEn ? "Registration Date" : "Date Inscription"}</TableHead>
                       <TableHead className="py-4 text-end text-xs font-bold uppercase tracking-wider text-[#6b6b6b]">
-                        {isAr ? "الإجراءات" : "Actions"}
+                        {isAr ? "الإجراءات" : isEn ? "Actions" : "Actions"}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -468,7 +512,7 @@ export default function AdminUsersPage() {
                         >
                           <div className="flex flex-col items-center justify-center gap-2">
                             <RefreshCw className="w-5 h-5 animate-spin text-sky-600" />
-                            <span className="text-sm font-medium">{isAr ? "جاري التحميل..." : "Chargement des utilisateurs..."}</span>
+                            <span className="text-sm font-medium">{isAr ? "جاري التحميل..." : isEn ? "Loading users..." : "Chargement des utilisateurs..."}</span>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -481,14 +525,20 @@ export default function AdminUsersPage() {
                           <span className="text-sm font-medium">
                             {isAr
                               ? "لا توجد نتائج مطابقة لبحثك"
+                              : isEn
+                              ? "No users found matching these criteria"
                               : "Aucun utilisateur trouvé avec ces critères"}
                           </span>
                         </TableCell>
                       </TableRow>
                     ) : (
                       filteredUsers.map((user) => (
-                        <TableRow key={user.id} className="hover:bg-neutral-50/70 transition-colors">
-                          {/* Name, Avatar, and Email */}
+                        <TableRow
+                          key={user.id}
+                          className="hover:bg-neutral-50/70 transition-colors"
+                          data-testid="admin-user-row"
+                        >
+                          {/* Name, Avatar, Email & ID */}
                           <TableCell className="py-4">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-neutral-100 to-neutral-200/80 border border-black/[0.06] flex items-center justify-center font-bold text-xs text-neutral-800 shrink-0 select-none shadow-2xs">
@@ -496,29 +546,59 @@ export default function AdminUsersPage() {
                               </div>
                               <div className="flex flex-col min-w-0">
                                 <span className="font-semibold text-sm text-neutral-950 tracking-tight leading-snug truncate">
-                                  {user.fullName || (isAr ? "بدون اسم" : "Non spécifié")}
+                                  {user.fullName || (isAr ? "بدون اسم" : isEn ? "Not specified" : "Non spécifié")}
                                 </span>
                                 <span className="text-xs text-[#6b6b6b] flex items-center gap-1.5 font-normal truncate mt-0.5">
                                   <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                                   <span>{user.email}</span>
                                 </span>
-                                <span className="text-[10px] text-neutral-400 font-mono tracking-wider mt-0.5">
-                                  ID: {user.id.slice(0, 8)}
-                                </span>
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <span className="text-[10px] text-neutral-400 font-mono tracking-wider">
+                                    ID: <span dir="ltr">{user.id.slice(0, 8)}</span>
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopy(user.id, `table-id-${user.id}`)}
+                                    className="p-0.5 rounded text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors"
+                                    data-testid="copy-user-id"
+                                    aria-label={isAr ? "نسخ معرف المستخدم" : isEn ? "Copy user ID" : "Copier ID utilisateur"}
+                                  >
+                                    {copiedKey === `table-id-${user.id}` ? (
+                                      <Check className="w-3 h-3 text-emerald-600" />
+                                    ) : (
+                                      <Copy className="w-3 h-3" />
+                                    )}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </TableCell>
 
                           {/* Role */}
-                          <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
+                          <TableCell className="py-4">{getRoleBadge(user.role, isAr, isEn)}</TableCell>
 
-                          {/* Phone */}
+                          {/* Phone with Directional Safety */}
                           <TableCell className="py-4">
                             {user.phone ? (
-                              <span className="text-xs font-mono font-medium text-neutral-800 flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5">
                                 <Phone className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                                {user.phone}
-                              </span>
+                                <span dir="ltr" className="text-xs font-mono font-medium text-neutral-800">
+                                  {user.phone}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(user.phone || "", `table-phone-${user.id}`)}
+                                  className="p-1 rounded text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors"
+                                  data-testid="copy-user-phone"
+                                  aria-label={isAr ? "نسخ رقم الهاتف" : isEn ? "Copy phone number" : "Copier téléphone"}
+                                >
+                                  {copiedKey === `table-phone-${user.id}` ? (
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="w-3 h-3" />
+                                  )}
+                                </button>
+                              </div>
                             ) : (
                               <span className="text-xs text-neutral-400 italic">
                                 —
@@ -538,19 +618,19 @@ export default function AdminUsersPage() {
                             {user.isActive ? (
                               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                {isAr ? "نشط" : "Actif"}
+                                {isAr ? "نشط" : isEn ? "Active" : "Actif"}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/80">
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                {isAr ? "معلق" : "Suspendu"}
+                                {isAr ? "معلق" : isEn ? "Suspended" : "Suspendu"}
                               </span>
                             )}
                           </TableCell>
 
                           {/* Created At */}
                           <TableCell className="py-4 text-xs text-[#6b6b6b] font-mono font-medium">
-                            {new Date(user.createdAt).toLocaleDateString(lang === "ar" ? "ar-DZ" : "fr-FR", {
+                            {new Date(user.createdAt).toLocaleDateString(lang === "ar" ? "ar-DZ" : isEn ? "en-US" : "fr-FR", {
                               year: "numeric",
                               month: "short",
                               day: "numeric",
@@ -560,24 +640,45 @@ export default function AdminUsersPage() {
                           {/* Actions */}
                           <TableCell className="py-4 text-end">
                             <div className="flex items-center justify-end gap-2">
+                              {/* Top-up Supplier Button */}
+                              {user.role === "SUPPLIER" && (
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => setTopUpSupplier(user)}
+                                  className="text-xs px-2.5 py-1.5 rounded-xl font-medium gap-1.5 bg-purple-50 text-purple-700 border border-purple-200/80 hover:bg-purple-100"
+                                  data-testid={`topup-supplier-btn-${user.id}`}
+                                  title={isAr ? "شحن رصيد المورد" : isEn ? "Top-up supplier balance" : "Recharger solde fournisseur"}
+                                >
+                                  <Wallet className="w-3.5 h-3.5" />
+                                  <span>{isAr ? "شحن" : isEn ? "Top-Up" : "Recharger"}</span>
+                                </Button>
+                              )}
+
                               {/* Change Role Button */}
                               <Button
                                 variant="secondary"
                                 size="sm"
                                 disabled={currentUser?.sub === user.id}
-                                onClick={() => {
-                                  setEditingUser(user);
-                                  setSelectedRole(user.role);
-                                }}
+                                onClick={() => setEditingUser(user)}
                                 className="text-xs px-3 py-1.5 rounded-xl font-medium gap-1.5"
+                                data-testid="edit-role-btn"
                                 title={
                                   currentUser?.sub === user.id
-                                    ? "Auto-modification désactivée"
+                                    ? isAr
+                                      ? "التعديل الذاتي معطل"
+                                      : isEn
+                                      ? "Self-editing disabled"
+                                      : "Auto-modification désactivée"
+                                    : isAr
+                                    ? "تعديل الصلاحية"
+                                    : isEn
+                                    ? "Edit role"
                                     : "Modifier rôle"
                                 }
                               >
                                 <Edit2 className="w-3.5 h-3.5 text-neutral-500" />
-                                <span>{isAr ? "الصلاحية" : "Rôle"}</span>
+                                <span>{isAr ? "الصلاحية" : isEn ? "Role" : "Rôle"}</span>
                               </Button>
 
                               {/* Suspend / Reactivate */}
@@ -588,23 +689,33 @@ export default function AdminUsersPage() {
                                   disabled={currentUser?.sub === user.id}
                                   onClick={() => setStatusConfirmUser(user)}
                                   className="text-xs px-3 py-1.5 rounded-xl font-medium gap-1.5"
+                                  data-testid="status-toggle-btn"
                                   title={
                                     currentUser?.sub === user.id
-                                      ? "Auto-suspension impossible"
+                                      ? isAr
+                                        ? "التعليق الذاتي غير متاح"
+                                        : isEn
+                                        ? "Cannot suspend yourself"
+                                        : "Auto-suspension impossible"
+                                      : isAr
+                                      ? "تعليق"
+                                      : isEn
+                                      ? "Suspend"
                                       : "Suspendre"
                                   }
                                 >
                                   <UserX className="w-3.5 h-3.5" />
-                                  <span>{isAr ? "تعليق" : "Suspendre"}</span>
+                                  <span>{isAr ? "تعليق" : isEn ? "Suspend" : "Suspendre"}</span>
                                 </Button>
                               ) : (
                                 <Button
                                   size="sm"
                                   onClick={() => setStatusConfirmUser(user)}
                                   className="text-xs px-3 py-1.5 rounded-xl font-medium gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  data-testid="status-toggle-btn"
                                 >
                                   <UserCheck className="w-3.5 h-3.5" />
-                                  <span>{isAr ? "تفعيل" : "Activer"}</span>
+                                  <span>{isAr ? "تفعيل" : isEn ? "Activate" : "Activer"}</span>
                                 </Button>
                               )}
                             </div>
@@ -625,152 +736,80 @@ export default function AdminUsersPage() {
                   <span>{errorMessage}</span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setErrorMessage(null)} className="text-xs text-rose-800">
-                  {isAr ? "إغلاق" : "Fermer"}
+                  {isAr ? "إغلاق" : isEn ? "Close" : "Fermer"}
                 </Button>
               </div>
             )}
 
-            {/* Status Confirmation Modal */}
-            <Modal
+            {/* WCAG Accessible User Status Modal */}
+            <UserStatusModal
+              user={statusConfirmUser}
               isOpen={!!statusConfirmUser}
               onClose={() => setStatusConfirmUser(null)}
-              title={
-                statusConfirmUser?.isActive
-                  ? isAr ? "تأكيد تعليق الحساب" : "Confirmer la suspension"
-                  : isAr ? "تأكيد تفعيل الحساب" : "Confirmer la réactivation"
-              }
-              maxWidth="sm"
-            >
-              <div className="space-y-4 pt-2 text-start">
-                <p className="text-xs text-neutral-600">
-                  {statusConfirmUser?.isActive
+              onSuccess={(updatedUser) => {
+                setUsers((prev) =>
+                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+                );
+                setActionMessage(
+                  updatedUser.isActive
                     ? isAr
-                      ? `هل أنت متأكد من تعليق حساب "${statusConfirmUser?.fullName || statusConfirmUser?.email}"؟ سيتم إبطال جلسته فوراً.`
-                      : `Voulez-vous suspendre l'accès de "${statusConfirmUser?.fullName || statusConfirmUser?.email}" ? Sa session sera immédiatement révoquée.`
+                      ? "تمت إعادة تفعيل الحساب بنجاح"
+                      : isEn
+                      ? "Account reactivated successfully"
+                      : "Compte réactivé avec succès"
                     : isAr
-                    ? `هل ترغب في إعادة تفعيل حساب "${statusConfirmUser?.fullName || statusConfirmUser?.email}"؟`
-                    : `Voulez-vous réactiver le compte de "${statusConfirmUser?.fullName || statusConfirmUser?.email}" ?`}
-                </p>
+                    ? "تم تعليق الحساب بنجاح"
+                    : isEn
+                    ? "Account suspended successfully"
+                    : "Compte suspendu avec succès"
+                );
+                setTimeout(() => setActionMessage(null), 3500);
+              }}
+              lang={lang}
+            />
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setStatusConfirmUser(null)}
-                    disabled={isUpdating}
-                  >
-                    {isAr ? "إلغاء" : "Annuler"}
-                  </Button>
-                  <Button
-                    variant={statusConfirmUser?.isActive ? "danger" : "primary"}
-                    size="sm"
-                    onClick={handleConfirmStatusToggle}
-                    disabled={isUpdating}
-                  >
-                    {isUpdating
-                      ? "Traitement..."
-                      : statusConfirmUser?.isActive
-                      ? isAr ? "تعليق الحساب" : "Suspendre"
-                      : isAr ? "تفعيل الحساب" : "Réactiver"}
-                  </Button>
-                </div>
-              </div>
-            </Modal>
-
-            {/* Modal: Change Role */}
-            <Modal
+            {/* WCAG Accessible User Role Modal */}
+            <UserRoleModal
+              user={editingUser}
+              currentUserSub={currentUser?.sub}
               isOpen={!!editingUser}
-              onClose={() => !isUpdating && setEditingUser(null)}
-              title="Modifier le Rôle Utilisateur"
-              maxWidth="md"
-            >
-              {editingUser && (
-                <div className="space-y-4 pt-2 text-start">
-                  <div className="p-3 bg-neutral-50 rounded-xl text-xs space-y-1 border border-neutral-200">
-                    <div className="font-semibold text-neutral-900">
-                      {editingUser.fullName || "Utilisateur"}
-                    </div>
-                    <div className="text-neutral-500 font-mono">
-                      {editingUser.email}
-                    </div>
-                    <div className="text-neutral-400 text-[10px] font-mono">
-                      ID: {editingUser.id}
-                    </div>
-                  </div>
+              onClose={() => setEditingUser(null)}
+              onSuccess={(updatedUser) => {
+                setUsers((prev) =>
+                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+                );
+                setActionMessage(
+                  isAr
+                    ? "تم تعديل الصلاحية بنجاح (تم إبطال الجلسة)"
+                    : isEn
+                    ? "Role updated successfully (Session invalidated)"
+                    : "Rôle mis à jour avec succès (Session invalidée)"
+                );
+                setTimeout(() => setActionMessage(null), 3500);
+              }}
+              lang={lang}
+            />
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-neutral-800">
-                      Sélectionner le nouveau rôle :
-                    </label>
-                    <div className="grid grid-cols-1 gap-2">
-                      {[
-                        {
-                          id: "AFFILIATE",
-                          label: "Affilié (Media Buyer)",
-                          desc: "Accès marketplace, création de liens CPA et retraits.",
-                        },
-                        {
-                          id: "SUPPLIER",
-                          label: "Fournisseur (Supplier)",
-                          desc: "Publication de catalogue, validation commandes et escrow.",
-                        },
-                        {
-                          id: "CALL_CENTER_AGENT",
-                          label: "Agent Call Center",
-                          desc: "Confirmation téléphonique des commandes pour son fournisseur.",
-                        },
-                        {
-                          id: "ADMIN",
-                          label: "Administrateur Système",
-                          desc: "Accès total, gestion escrow et supervision globale.",
-                        },
-                      ].map((r) => (
-                        <div
-                          key={r.id}
-                          onClick={() => setSelectedRole(r.id)}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                            selectedRole === r.id
-                              ? "border-rose-500 bg-rose-50/50 ring-1 ring-rose-500/30"
-                              : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold text-xs text-neutral-900">
-                              {r.label}
-                            </span>
-                            {selectedRole === r.id && (
-                              <CheckCircle2 className="w-4 h-4 text-rose-600" />
-                            )}
-                          </div>
-                          <p className="text-[11px] text-[#6b6b6b] mt-0.5">
-                            {r.desc}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-neutral-100 flex items-center justify-end gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setEditingUser(null)}
-                      disabled={isUpdating}
-                    >
-                      Annuler
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleSaveRole}
-                      disabled={isUpdating || selectedRole === editingUser.role}
-                      className="bg-neutral-900 hover:bg-black text-white"
-                    >
-                      {isUpdating ? "Enregistrement..." : "Appliquer le rôle"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Modal>
+            {/* Prepaid Escrow Supplier Top-Up Modal */}
+            <AdminTopUpModal
+              isOpen={!!topUpSupplier}
+              onClose={() => setTopUpSupplier(null)}
+              supplier={topUpSupplier}
+              onSuccess={(newBalance, supplierId) => {
+                setUsers((prev) =>
+                  prev.map((u) => (u.id === supplierId ? { ...u, balance: newBalance } : u))
+                );
+                setActionMessage(
+                  isAr
+                    ? "تم شحن رصيد المورد بنجاح"
+                    : isEn
+                    ? "Supplier escrow balance credited successfully"
+                    : "Solde séquestre fournisseur rechargé avec succès"
+                );
+                setTimeout(() => setActionMessage(null), 3500);
+              }}
+              lang={lang}
+            />
           </div>
         );
       }}

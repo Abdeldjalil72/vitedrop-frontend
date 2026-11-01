@@ -60,3 +60,6 @@ export function Select({
     </div>
   );
 }
+
+export { ModernSelect } from "./modern-select";
+export type { ModernSelectOption, ModernSelectProps } from "./modern-select";

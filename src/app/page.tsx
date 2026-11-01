@@ -12,6 +12,7 @@ export default function Home() {
   const [activeAudience, setActiveAudience] = useState<"buyer" | "supplier">("buyer");
   const [orderStep, setOrderStep] = useState(0);
   const [pageLang, setPageLang] = useState<"en" | "fr" | "ar">("en");
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<DecodedToken | null>(null);
 
   useEffect(() => {
@@ -89,7 +90,9 @@ export default function Home() {
             <div className="relative group">
               <button
                 type="button"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-[#f4f4f4] transition-colors text-sm font-semibold text-black"
+                data-testid="nav-lang-btn"
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-[#f4f4f4] transition-colors text-sm font-semibold text-black cursor-pointer"
               >
                 <svg className="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
@@ -99,10 +102,10 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-xl border border-black/[0.06] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
-                <button onClick={() => setPageLang("en")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 ${pageLang === "en" ? "text-sky-600" : "text-black"}`}>English</button>
-                <button onClick={() => setPageLang("fr")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 ${pageLang === "fr" ? "text-sky-600" : "text-black"}`}>Français</button>
-                <button onClick={() => setPageLang("ar")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 ${pageLang === "ar" ? "text-sky-600" : "text-black"}`}>العربية</button>
+              <div className={`absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-xl border border-black/[0.06] transition-all duration-200 py-1 z-50 ${isLangOpen ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"}`}>
+                <button data-testid="lang-option-en" onClick={() => { setPageLang("en"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "en" ? "text-sky-600" : "text-black"}`}>English</button>
+                <button data-testid="lang-option-fr" onClick={() => { setPageLang("fr"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "fr" ? "text-sky-600" : "text-black"}`}>Français</button>
+                <button data-testid="lang-option-ar" onClick={() => { setPageLang("ar"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "ar" ? "text-sky-600" : "text-black"}`}>العربية</button>
               </div>
             </div>
 
@@ -115,10 +118,10 @@ export default function Home() {
                 </Link>
               ) : (
                 <React.Fragment>
-                  <Link href="/login" className="text-sm font-semibold text-neutral-600 hover:text-black transition-colors px-3 py-2 rounded-xl hover:bg-neutral-50">
+                  <Link data-testid="nav-login-link" href="/login" className="text-sm font-semibold text-neutral-600 hover:text-black transition-colors px-3 py-2 rounded-xl hover:bg-neutral-50">
                     {pageLang === 'ar' ? 'تسجيل الدخول' : (pageLang === 'fr' ? 'Connexion' : 'Login')}
                   </Link>
-                  <Link href="/register" className="text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors px-4 py-2 rounded-full">
+                  <Link data-testid="nav-register-link" href="/register" className="text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors px-4 py-2 rounded-full">
                     {pageLang === 'ar' ? 'إنشاء حساب' : (pageLang === 'fr' ? "S'inscrire" : 'Sign Up')}
                   </Link>
                 </React.Fragment>
@@ -666,6 +669,7 @@ export default function Home() {
 
           {/* Title with Blur Fade-in */}
           <motion.h1
+            data-testid="hero-title"
             variants={{
               hidden: { opacity: 0, y: 35, filter: "blur(6px)" },
               visible: {
@@ -709,6 +713,7 @@ export default function Home() {
           >
             {/* Primary Action Button */}
             <motion.a
+              data-testid="hero-explore-btn"
               whileHover={{ y: -2, boxShadow: "0 14px 28px -6px rgba(14, 165, 233, 0.4)" }}
               whileTap={{ scale: 0.98 }}
               href="#products"
@@ -726,7 +731,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="w-full sm:w-auto h-14 pl-2 pr-6 rounded-full bg-white border-4 border-[#f8f8f8] hover:border-black/10 transition-colors flex items-center gap-3 shadow-sm"
             >
-              <div className="w-10 h-10 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 shadow-2xs">
                 VD
               </div>
               <div className="text-left">
@@ -791,6 +796,7 @@ export default function Home() {
           <div className="mt-8 p-1.5 rounded-full bg-[#f4f4f4] flex items-center relative">
             <button
               type="button"
+              data-testid="audience-tab-buyer"
               onClick={() => setActiveAudience("buyer")}
               className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${
                 activeAudience === "buyer"
@@ -810,6 +816,7 @@ export default function Home() {
             </button>
             <button
               type="button"
+              data-testid="audience-tab-supplier"
               onClick={() => setActiveAudience("supplier")}
               className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${
                 activeAudience === "supplier"
@@ -1034,21 +1041,43 @@ export default function Home() {
               <div className="editorial-card p-6 rounded-2xl space-y-3.5 text-sm">
                 <div className="flex justify-between items-center text-[#6b6b6b]">
                   <span>Customer Selling Price (COD collected at door):</span>
-                  <span className="font-semibold text-black">4,800 DZD</span>
+                  <span className="font-mono font-bold text-neutral-900">4,800 DZD</span>
                 </div>
                 <div className="flex justify-between items-center text-[#6b6b6b]">
                   <span>Supplier Base Inventory Cost:</span>
-                  <span>- 2,400 DZD</span>
+                  <span className="font-mono text-neutral-600">- 2,400 DZD</span>
                 </div>
                 <div className="flex justify-between items-center text-[#6b6b6b]">
                   <span>Average Yalidine Courier Delivery Fee:</span>
-                  <span>- 800 DZD</span>
+                  <span className="font-mono text-neutral-600">- 800 DZD</span>
                 </div>
                 <div className="pt-3 border-t border-black/[0.08] flex justify-between items-center">
                   <span className="font-bold text-black text-base">Your Net CPA Commission:</span>
-                  <span className="text-xl font-extrabold text-black">
+                  <span className="font-mono text-xl font-extrabold text-emerald-600">
                     + 1,600 DZD <span className="text-xs font-normal text-[#6b6b6b]">/ order</span>
                   </span>
+                </div>
+
+                {/* Proof-of-Settlement Payout Rail Capsule */}
+                <div className="mt-3.5 pt-3 border-t border-dashed border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-xs bg-neutral-50/80 p-2.5 rounded-xl">
+                  <div className="flex items-center gap-1.5 text-neutral-700">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="font-medium text-[11px]">
+                      {pageLang === "ar"
+                        ? "سحب فوري مضمون خلال 24 ساعة عبر :"
+                        : pageLang === "fr"
+                        ? "Virements garantis sous 24h :"
+                        : "Guaranteed 24h settlement rails:"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                    <span className="px-2 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-300 font-bold">
+                      BARIDIMOB
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold">
+                      CCP 24H
+                    </span>
+                  </div>
                 </div>
               </div>
 

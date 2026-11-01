@@ -68,6 +68,70 @@ export const ALGERIA_WILAYAS: Wilaya[] = [
   { code: "58", name: "El Meniaa", nameAr: "المنيعة", homeDeliveryFee: 850, deskDeliveryFee: 600, communes: ["El Meniaa", "Hassi Gara"] }
 ];
 
-export function getWilayaByCode(code: string): Wilaya | undefined {
-  return ALGERIA_WILAYAS.find((w) => w.code === code);
+export function getWilayaByCode(code: string | number): Wilaya | undefined {
+  const normalized = String(code).padStart(2, "0");
+  return ALGERIA_WILAYAS.find((w) => w.code === normalized);
+}
+
+export interface WilayaDeliveryIntelligence {
+  tier: "high_density" | "standard" | "stop_desk_recommended";
+  successRate: number; // Percentage, e.g., 94, 86, 68
+  recommendedModality: "domicile" | "stop_desk";
+  labelFr: string;
+  labelEn: string;
+  labelAr: string;
+  adviceFr: string;
+  adviceEn: string;
+  adviceAr: string;
+}
+
+const HIGH_DENSITY_WILAYAS = new Set(["16", "09", "31", "42", "35"]); // Alger, Blida, Oran, Tipaza, Boumerdès
+
+const STOP_DESK_RECOMMENDED_WILAYAS = new Set([
+  "01", "07", "08", "11", "30", "32", "33", "37", "39", "45", "47",
+  "49", "50", "51", "52", "53", "54", "55", "56", "57", "58"
+]); // Deep South & Sahara hubs (Ghardaïa, Ouargla, Tamanrasset, Adrar, etc.)
+
+export function getWilayaDeliveryIntelligence(code: string | number): WilayaDeliveryIntelligence {
+  const normalized = String(code).padStart(2, "0");
+
+  if (HIGH_DENSITY_WILAYAS.has(normalized)) {
+    return {
+      tier: "high_density",
+      successRate: 94,
+      recommendedModality: "domicile",
+      labelFr: "Domicile (94% Succès)",
+      labelEn: "Home (94% Success)",
+      labelAr: "توصيل للمنزل (نجاح 94%)",
+      adviceFr: "Zone urbaine dense. Livraison rapide à domicile.",
+      adviceEn: "Dense urban zone. Fast home delivery.",
+      adviceAr: "منطقة حضرية سريعة. توصيل ناجح للمنزل.",
+    };
+  }
+
+  if (STOP_DESK_RECOMMENDED_WILAYAS.has(normalized)) {
+    return {
+      tier: "stop_desk_recommended",
+      successRate: 68,
+      recommendedModality: "stop_desk",
+      labelFr: "Stop-Desk Recommandé",
+      labelEn: "Stop-Desk Recommended",
+      labelAr: "مكتب ياليدين (Stop-Desk)",
+      adviceFr: "Éloignement géographique. Proposer le retrait en agence pour éviter les retours (RTO).",
+      adviceEn: "Remote area. Agency pickup recommended to reduce RTO.",
+      adviceAr: "منطقة بعيدة. يُنصح باقتراح الاستلام من المكتب لتفادي الرجوع.",
+    };
+  }
+
+  return {
+    tier: "standard",
+    successRate: 86,
+    recommendedModality: "domicile",
+    labelFr: "Domicile (86% Succès)",
+    labelEn: "Home (86% Success)",
+    labelAr: "توصيل للمنزل (نجاح 86%)",
+    adviceFr: "Couverture standard. Domicile ou bureau selon disponibilité du client.",
+    adviceEn: "Standard coverage. Home or desk delivery based on availability.",
+    adviceAr: "تغطية عادية. توصيل للمنزل أو المكتب حسب رغبة الزبون.",
+  };
 }

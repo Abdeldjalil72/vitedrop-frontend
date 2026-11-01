@@ -25,6 +25,9 @@ import {
   ShieldCheck,
   PauseCircle,
   Archive,
+  Copy,
+  Check,
+  PackagePlus,
 } from "lucide-react";
 
 export default function AdminProductsPage() {
@@ -42,6 +45,15 @@ export default function AdminProductsPage() {
   const [modalTargetStatus, setModalTargetStatus] = useState<ProductTargetStatus | null>(
     null
   );
+
+  // Copy state
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -75,34 +87,34 @@ export default function AdminProductsPage() {
     setFilters((prev) => ({ ...prev, offset: newOffset }));
   };
 
-  const getProductBadge = (status: string, isArabic: boolean) => {
+  const getProductBadge = (status: string, isArabic: boolean, isEnglish: boolean) => {
     switch (status) {
       case "active":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>{isArabic ? "نشط" : "Actif"}</span>
+            <span>{isArabic ? "نشط" : isEnglish ? "Active" : "Actif"}</span>
           </span>
         );
       case "suspended":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-            <span>{isArabic ? "معلق" : "Suspendu"}</span>
+            <span>{isArabic ? "معلق" : isEnglish ? "Suspended" : "Suspendu"}</span>
           </span>
         );
       case "out_of_stock":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            <span>{isArabic ? "نفد المخزون" : "Rupture"}</span>
+            <span>{isArabic ? "نفد المخزون" : isEnglish ? "Out of Stock" : "Rupture"}</span>
           </span>
         );
       case "archived":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
             <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
-            <span>{isArabic ? "مؤرشف" : "Archivé"}</span>
+            <span>{isArabic ? "مؤرشف" : isEnglish ? "Archived" : "Archivé"}</span>
           </span>
         );
       default:
@@ -121,33 +133,52 @@ export default function AdminProductsPage() {
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isArabic = lang === "ar";
+        const isEnglish = lang === "en";
 
         const renderMobileCard = (product: AdminProductItem) => (
-          <div className="space-y-2.5 text-xs text-start">
+          <div data-testid="admin-product-card" className="space-y-2.5 text-xs text-start">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <Link
-                  href={`/admin/products/${product.id}`}
-                  className="font-bold text-neutral-900 hover:text-rose-600 text-sm line-clamp-1"
-                >
-                  {product.name}
-                </Link>
-                <div className="text-[11px] text-purple-700 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <Link
+                    href={`/admin/products/${product.id}`}
+                    className="font-bold text-neutral-900 hover:text-rose-600 text-sm line-clamp-1"
+                  >
+                    {product.name}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(`mob-prod-${product.id}`, product.id)}
+                    className="p-1 text-neutral-400 hover:text-neutral-700"
+                    title={isArabic ? "نسخ المعرف" : isEnglish ? "Copy ID" : "Copier ID"}
+                  >
+                    {copiedId === `mob-prod-${product.id}` ? (
+                      <Check className="w-3 h-3 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </button>
+                </div>
+                <div className="text-[11px] text-purple-700 font-medium mt-0.5">
                   {product.supplierName || product.supplierId.slice(0, 8)}
                 </div>
               </div>
-              <div className="shrink-0">{getProductBadge(product.status, isArabic)}</div>
+              <div className="shrink-0">{getProductBadge(product.status, isArabic, isEnglish)}</div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-neutral-100">
               <div>
-                <span className="text-[10px] text-neutral-400 block">Prix Public</span>
+                <span className="text-[10px] text-neutral-400 block">
+                  {isArabic ? "سعر التجزئة" : isEnglish ? "Retail Price" : "Prix Public"}
+                </span>
                 <span className="font-bold font-mono text-neutral-900">
                   {formatDZD(product.retailPrice, lang)}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-neutral-400 block">CPA Brut</span>
+                <span className="text-[10px] text-neutral-400 block">
+                  {isArabic ? "العمولة الإجمالية" : isEnglish ? "Gross CPA" : "CPA Brut"}
+                </span>
                 <span className="font-bold font-mono text-emerald-700">
                   {formatDZD(product.supplierTotalCpa, lang)}
                 </span>
@@ -175,7 +206,7 @@ export default function AdminProductsPage() {
                     className="h-7 px-2 text-xs text-amber-700 hover:bg-amber-50"
                   >
                     <PauseCircle className="w-3.5 h-3.5 me-1" />
-                    <span>{isArabic ? "تعليق" : "Suspendre"}</span>
+                    <span>{isArabic ? "تعليق" : isEnglish ? "Suspend" : "Suspendre"}</span>
                   </Button>
                 ) : product.status === "suspended" ? (
                   <Button
@@ -185,7 +216,7 @@ export default function AdminProductsPage() {
                     className="h-7 px-2 text-xs text-emerald-700 hover:bg-emerald-50"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 me-1" />
-                    <span>{isArabic ? "تفعيل" : "Réactiver"}</span>
+                    <span>{isArabic ? "تفعيل" : isEnglish ? "Reactivate" : "Réactiver"}</span>
                   </Button>
                 ) : null}
 
@@ -197,7 +228,7 @@ export default function AdminProductsPage() {
                     className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
                   >
                     <Archive className="w-3.5 h-3.5 me-1" />
-                    <span>{isArabic ? "أرشفة" : "Archiver"}</span>
+                    <span>{isArabic ? "أرشفة" : isEnglish ? "Archive" : "Archiver"}</span>
                   </Button>
                 )}
               </div>
@@ -209,24 +240,54 @@ export default function AdminProductsPage() {
           <table className="w-full text-xs text-start">
             <thead className="bg-neutral-50 text-neutral-500 font-medium border-b border-neutral-200">
               <tr>
-                <th className="px-4 py-3 text-start">{isArabic ? "المنتج والمورد" : "Produit & Fournisseur"}</th>
-                <th className="px-4 py-3 text-start">{isArabic ? "سعر التجزئة" : "Prix Public"}</th>
-                <th className="px-4 py-3 text-start">{isArabic ? "العمولة الإجمالية (CPA)" : "CPA Brut"}</th>
-                <th className="px-4 py-3 text-start">{isArabic ? "المخزون (متاح / محجوز)" : "Stock (Dispo / Réservé)"}</th>
-                <th className="px-4 py-3 text-start">{isArabic ? "الحالة" : "Statut"}</th>
-                <th className="px-4 py-3 text-end">{isArabic ? "إجراءات التحكم" : "Actions Opérationnelles"}</th>
+                <th className="px-4 py-3 text-start">
+                  {isArabic ? "المنتج والمورد" : isEnglish ? "Product & Supplier" : "Produit & Fournisseur"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {isArabic ? "سعر التجزئة" : isEnglish ? "Retail Price" : "Prix Public"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {isArabic ? "العمولة الإجمالية (CPA)" : isEnglish ? "Gross CPA" : "CPA Brut"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {isArabic ? "المخزون (متاح / محجوز)" : isEnglish ? "Stock (Avail. / Reserved)" : "Stock (Dispo / Réservé)"}
+                </th>
+                <th className="px-4 py-3 text-start">
+                  {isArabic ? "الحالة" : isEnglish ? "Status" : "Statut"}
+                </th>
+                <th className="px-4 py-3 text-end">
+                  {isArabic ? "إجراءات التحكم" : isEnglish ? "Operational Actions" : "Actions Opérationnelles"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 font-mono">
               {products.map((product) => (
-                <tr key={product.id} className="hover:bg-neutral-50/60 transition-colors">
+                <tr
+                  key={product.id}
+                  data-testid="admin-product-row"
+                  className="hover:bg-neutral-50/60 transition-colors"
+                >
                   <td className="px-4 py-3 font-sans">
-                    <Link
-                      href={`/admin/products/${product.id}`}
-                      className="font-bold text-neutral-900 hover:text-rose-600 line-clamp-1"
-                    >
-                      {product.name}
-                    </Link>
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href={`/admin/products/${product.id}`}
+                        className="font-bold text-neutral-900 hover:text-rose-600 line-clamp-1"
+                      >
+                        {product.name}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(`tab-prod-${product.id}`, product.id)}
+                        className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+                        title={isArabic ? "نسخ المعرف" : isEnglish ? "Copy ID" : "Copier ID"}
+                      >
+                        {copiedId === `tab-prod-${product.id}` ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
                     <div className="text-[11px] text-purple-700 font-medium mt-0.5">
                       {product.supplierName || product.supplierId.slice(0, 8)}
                     </div>
@@ -258,7 +319,7 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 font-sans">
-                    {getProductBadge(product.status, isArabic)}
+                    {getProductBadge(product.status, isArabic, isEnglish)}
                   </td>
                   <td className="px-4 py-3 text-end font-sans">
                     <div className="flex items-center justify-end gap-1.5">
@@ -267,7 +328,7 @@ export default function AdminProductsPage() {
                           variant="ghost"
                           size="sm"
                           className="h-7 w-7 p-0"
-                          title={isArabic ? "تفاصيل" : "Détails"}
+                          title={isArabic ? "تفاصيل" : isEnglish ? "Details" : "Détails"}
                         >
                           <Eye className="w-3.5 h-3.5 text-neutral-500" />
                         </Button>
@@ -281,7 +342,7 @@ export default function AdminProductsPage() {
                           className="h-7 px-2 text-xs text-amber-700 hover:bg-amber-50"
                         >
                           <PauseCircle className="w-3.5 h-3.5 me-1" />
-                          <span>{isArabic ? "تعليق" : "Suspendre"}</span>
+                          <span>{isArabic ? "تعليق" : isEnglish ? "Suspend" : "Suspendre"}</span>
                         </Button>
                       ) : product.status === "suspended" ? (
                         <Button
@@ -291,7 +352,7 @@ export default function AdminProductsPage() {
                           className="h-7 px-2 text-xs text-emerald-700 hover:bg-emerald-50"
                         >
                           <ShieldCheck className="w-3.5 h-3.5 me-1" />
-                          <span>{isArabic ? "تفعيل" : "Réactiver"}</span>
+                          <span>{isArabic ? "تفعيل" : isEnglish ? "Reactivate" : "Réactiver"}</span>
                         </Button>
                       ) : null}
 
@@ -303,7 +364,7 @@ export default function AdminProductsPage() {
                           className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
                         >
                           <Archive className="w-3.5 h-3.5 me-1" />
-                          <span>{isArabic ? "أرشفة" : "Archiver"}</span>
+                          <span>{isArabic ? "أرشفة" : isEnglish ? "Archive" : "Archiver"}</span>
                         </Button>
                       )}
                     </div>
@@ -318,24 +379,34 @@ export default function AdminProductsPage() {
           <div className="space-y-5 sm:space-y-6 lg:space-y-8 text-start">
             {/* Header */}
             <AdminPageHeader
-              eyebrow={isArabic ? "كتالوج المنصة والرقابة" : "Catalog Supervision"}
-              title={isArabic ? "إدارة وتراخيص المنتجات" : "Supervision des Produits & Stock"}
+              eyebrow={isArabic ? "كتالوج المنصة والرقابة" : isEnglish ? "Catalog Supervision" : "Catalog Supervision"}
+              title={
+                isArabic
+                  ? "إدارة وتراخيص المنتجات"
+                  : isEnglish
+                  ? "Products Supervision & Stock"
+                  : "Supervision des Produits & Stock"
+              }
               description={
                 isArabic
                   ? "التحكم في تفعيل المنتجات، حجز المخزون، والتعليق التشغيلي عند الضرورة."
+                  : isEnglish
+                  ? "Reserved stock monitoring, operational suspensions, and escrow coverage integrity."
                   : "Contrôle du stock réservé, suspensions opérationnelles et suivi de la couverture escrow."
               }
               actions={
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={fetchProducts}
-                  disabled={isLoading}
-                  className="flex items-center gap-1.5 text-xs font-medium"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-                  <span>{isArabic ? "تحديث" : "Actualiser"}</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={fetchProducts}
+                    disabled={isLoading}
+                    className="flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+                    <span>{isArabic ? "تحديث" : isEnglish ? "Refresh" : "Actualiser"}</span>
+                  </Button>
+                </div>
               }
             />
 
@@ -345,7 +416,13 @@ export default function AdminProductsPage() {
                 <Search className="w-4 h-4 text-neutral-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder={isArabic ? "بحث بالاسم أو المعرف..." : "Rechercher par nom..."}
+                  placeholder={
+                    isArabic
+                      ? "بحث بالاسم أو المعرف..."
+                      : isEnglish
+                      ? "Search by name or ID..."
+                      : "Rechercher par nom..."
+                  }
                   value={filters.search || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({
@@ -370,11 +447,11 @@ export default function AdminProductsPage() {
                   }
                   className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-neutral-900 focus:bg-white transition-all"
                 >
-                  <option value="ALL">{isArabic ? "جميع الحالات" : "Tous les statuts"}</option>
-                  <option value="active">{isArabic ? "نشط" : "Actif"}</option>
-                  <option value="suspended">{isArabic ? "معلق" : "Suspendu"}</option>
-                  <option value="out_of_stock">{isArabic ? "نفد المخزون" : "Rupture de Stock"}</option>
-                  <option value="archived">{isArabic ? "مؤرشف" : "Archivé"}</option>
+                  <option value="ALL">{isArabic ? "جميع الحالات" : isEnglish ? "All Statuses" : "Tous les statuts"}</option>
+                  <option value="active">{isArabic ? "نشط" : isEnglish ? "Active" : "Actif"}</option>
+                  <option value="suspended">{isArabic ? "معلق" : isEnglish ? "Suspended" : "Suspendu"}</option>
+                  <option value="out_of_stock">{isArabic ? "نفد المخزون" : isEnglish ? "Out of Stock" : "Rupture de Stock"}</option>
+                  <option value="archived">{isArabic ? "مؤرشف" : isEnglish ? "Archived" : "Archivé"}</option>
                 </select>
               </div>
             </div>
@@ -391,9 +468,15 @@ export default function AdminProductsPage() {
               renderTable={renderDesktopTable}
               renderCard={renderMobileCard}
               emptyIcon={<Package className="w-8 h-8 text-neutral-300" />}
-              emptyTitle={isArabic ? "لا توجد منتجات مطابقة للبحث" : "Aucun produit trouvé"}
+              emptyTitle={
+                isArabic
+                  ? "لا توجد منتجات مطابقة للبحث"
+                  : isEnglish
+                  ? "No products found"
+                  : "Aucun produit trouvé"
+              }
               lang={lang}
-              title={isArabic ? "الكتالوج" : "Catalogue"}
+              title={isArabic ? "الكتالوج" : isEnglish ? "Catalog" : "Catalogue"}
             />
 
             {/* Status Modal */}

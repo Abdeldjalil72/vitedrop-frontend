@@ -6,22 +6,29 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { translations } from "@/lib/locales";
-import { Mail, CheckCircle2, ArrowLeft, ArrowRight } from "lucide-react";
+import { apiForgotPassword } from "@/lib/api-client";
+import { Mail, CheckCircle2, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email.trim()) return;
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+    try {
+      await apiForgotPassword(email.trim());
       setIsSubmitted(true);
-    }, 800);
+    } catch (err: any) {
+      setError(err?.message || "Une erreur est survenue lors de l'envoi du lien.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,7 +48,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             {isSubmitted ? (
-              <div className="space-y-5 text-center py-4">
+              <div data-testid="forgot-success-view" className="space-y-5 text-center py-4">
                 <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
@@ -55,15 +62,23 @@ export default function ForgotPasswordPage() {
                 </div>
                 <div className="pt-2">
                   <Link href="/login">
-                    <Button variant="secondary" size="sm" className="w-full">
+                    <Button data-testid="back-to-login-btn" variant="secondary" size="sm" className="w-full">
                       {t.auth.backToLogin}
                     </Button>
                   </Link>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form noValidate onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div data-testid="forgot-error-alert" className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
                 <Input
+                  data-testid="forgot-email-input"
                   label={t.auth.email}
                   type="email"
                   placeholder="votre.email@domaine.dz"
@@ -75,6 +90,7 @@ export default function ForgotPasswordPage() {
 
                 <div className="pt-2">
                   <Button
+                    data-testid="forgot-submit-btn"
                     type="submit"
                     size="md"
                     isLoading={isLoading}
@@ -86,6 +102,7 @@ export default function ForgotPasswordPage() {
 
                 <div className="text-center pt-2">
                   <Link
+                    data-testid="forgot-login-link"
                     href="/login"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6b6b6b] hover:text-neutral-900 transition-colors"
                   >

@@ -34,16 +34,33 @@ export function ResponsiveAdminList<T>({
   renderTable,
   renderCard,
   emptyIcon,
-  emptyTitle = "Aucun élément trouvé",
-  emptyDescription = "Aucun enregistrement ne correspond aux critères de recherche.",
+  emptyTitle,
+  emptyDescription,
   lang = "fr",
   title,
   toolbarRight,
 }: ResponsiveAdminListProps<T>) {
   const isArabic = lang === "ar";
+  const isEnglish = lang === "en";
+
+  const resolvedEmptyTitle =
+    emptyTitle ||
+    (isArabic
+      ? "لم يتم العثور على أي عنصر"
+      : isEnglish
+      ? "No items found"
+      : "Aucun élément trouvé");
+
+  const resolvedEmptyDescription =
+    emptyDescription ||
+    (isArabic
+      ? "لا توجد سجلات تطابق معايير البحث."
+      : isEnglish
+      ? "No records match the search criteria."
+      : "Aucun enregistrement ne correspond aux critères de recherche.");
 
   return (
-    <div className="bg-white rounded-xl border border-neutral-200/80 shadow-xs overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#e7e5df] shadow-xs overflow-hidden">
       {/* List Header */}
       {(title || total !== undefined || toolbarRight) && (
         <div className="p-3.5 sm:p-4 border-b border-neutral-100 flex items-center justify-between gap-3 text-start">
@@ -87,8 +104,8 @@ export function ResponsiveAdminList<T>({
       ) : items.length === 0 ? (
         <div className="p-8 sm:p-12 text-center text-neutral-500 space-y-2">
           {emptyIcon && <div className="mx-auto w-10 h-10 text-neutral-300 flex items-center justify-center">{emptyIcon}</div>}
-          <p className="text-sm font-semibold text-neutral-800">{emptyTitle}</p>
-          <p className="text-xs text-neutral-400 max-w-sm mx-auto">{emptyDescription}</p>
+          <p className="text-sm font-semibold text-neutral-800">{resolvedEmptyTitle}</p>
+          <p className="text-xs text-neutral-400 max-w-sm mx-auto">{resolvedEmptyDescription}</p>
         </div>
       ) : (
         <>
@@ -119,7 +136,7 @@ export function ResponsiveAdminList<T>({
             className="text-xs flex items-center gap-1 h-8 px-2.5"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
-            <span>{isArabic ? "السابق" : "Précédent"}</span>
+            <span>{isArabic ? "السابق" : isEnglish ? "Previous" : "Précédent"}</span>
           </Button>
 
           <span className="font-mono text-neutral-600 text-xs">
@@ -133,7 +150,7 @@ export function ResponsiveAdminList<T>({
             onClick={() => onPageChange(page + 1)}
             className="text-xs flex items-center gap-1 h-8 px-2.5"
           >
-            <span>{isArabic ? "التالي" : "Suivant"}</span>
+            <span>{isArabic ? "التالي" : isEnglish ? "Next" : "Suivant"}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </Button>
         </div>

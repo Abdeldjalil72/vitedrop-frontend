@@ -46,9 +46,13 @@ export default function LoginPage() {
           router.push("/affiliate");
         }
       }, 700);
-    } catch (err: any) {
+    } catch (err) {
       setIsLoading(false);
-      setError(err?.message || "Échec de connexion au serveur.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Échec de connexion au serveur."
+      );
     }
   };
 
@@ -85,7 +89,7 @@ export default function LoginPage() {
 
             {/* Error / Success Banners */}
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+              <div role="alert" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>

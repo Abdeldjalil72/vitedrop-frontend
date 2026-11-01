@@ -15,6 +15,7 @@ export type OrderStatus =
 export type TransactionType =
   | "DEPOSIT"
   | "WITHDRAWAL"
+  | "WITHDRAWAL_REFUND"
   | "CPA_PAYOUT"
   | "PLATFORM_FEE"
   | "SUPPLIER_DEBIT";
@@ -76,13 +77,15 @@ export interface LeadOrder {
 export interface WalletTransaction {
   id: string;
   walletId: string;
-  userId: string;
-  userRole: UserRole;
+  userId?: string;
+  userRole?: UserRole;
   type: TransactionType;
   amount: number;
   balanceAfter: number;
+  reference?: string;
   referenceId?: string; // lead id or withdrawal id
-  description: string;
+  description?: string;
+  orderId?: string;
   createdAt: string;
 }
 

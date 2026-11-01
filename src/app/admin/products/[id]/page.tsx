@@ -27,6 +27,8 @@ import {
   TrendingUp,
   Percent,
   CheckCircle2,
+  Copy,
+  Check,
 } from "lucide-react";
 
 export default function AdminProductDetailPage({
@@ -40,10 +42,19 @@ export default function AdminProductDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Copy state
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   // Status modal
   const [modalTargetStatus, setModalTargetStatus] = useState<ProductTargetStatus | null>(
     null
   );
+
+  const handleCopy = (key: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(key);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const fetchProduct = async () => {
     setIsLoading(true);
@@ -124,7 +135,21 @@ export default function AdminProductDetailPage({
                       {product.status.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-400 font-mono mt-0.5">ID: {product.id}</p>
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-mono mt-0.5">
+                    <span>ID: {product.id}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("prod-id", product.id)}
+                      className="p-1 rounded-md text-neutral-400 hover:text-neutral-700"
+                      title={isArabic ? "نسخ معرف المنتج" : "Copier ID"}
+                    >
+                      {copiedId === "prod-id" ? (
+                        <Check className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -184,10 +209,6 @@ export default function AdminProductDetailPage({
                 <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-700">
                   {formatDZD(product.supplierTotalCpa, lang)}
                 </span>
-                <div className="text-[10px] sm:text-[11px] text-neutral-400 font-mono mt-1 truncate">
-                  Aff: {formatDZD(product.affiliateNetPayout, lang)} &bull; Fee:{" "}
-                  {formatDZD(product.platformFee, lang)}
-                </div>
               </div>
 
               <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs">
@@ -217,6 +238,7 @@ export default function AdminProductDetailPage({
                 </div>
               </div>
             </div>
+
 
             {/* Product Details Section */}
             <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-4">
@@ -249,8 +271,20 @@ export default function AdminProductDetailPage({
                     <Store className="w-4 h-4" />
                     <span>{isArabic ? "المورد المسؤول" : "Fournisseur Titulaire"}</span>
                   </div>
-                  <div className="font-mono text-neutral-600">
-                    ID: {product.supplierId}
+                  <div className="font-mono text-neutral-600 flex items-center gap-1.5">
+                    <span>ID: {product.supplierId}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("sup-id", product.supplierId)}
+                      className="p-1 rounded-md text-neutral-400 hover:text-neutral-700"
+                      title={isArabic ? "نسخ معرف المورد" : "Copier ID"}
+                    >
+                      {copiedId === "sup-id" ? (
+                        <Check className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
                   </div>
                   <p className="text-[11px] text-neutral-500">
                     {isArabic

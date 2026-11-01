@@ -139,6 +139,15 @@ export function CodCheckoutForm({
         : "Veuillez préciser votre adresse (rue, quartier ou point de repère)";
     }
 
+    if (stock <= 0) {
+      setApiError(
+        isAr
+          ? "عذراً، هذا المنتج غير متوفر حالياً بسبب نفاد المخزون."
+          : "Désolé, ce produit n'est plus disponible en stock."
+      );
+      return;
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -161,6 +170,10 @@ export function CodCheckoutForm({
         affiliateId,
         fbclid,
         ttclid,
+        utmCampaign,
+        utm_campaign: utmCampaign,
+        subId,
+        sub_id: subId,
       });
 
       if (res && res.success && res.orderId) {
@@ -178,9 +191,32 @@ export function CodCheckoutForm({
       }
     } catch (err: any) {
       console.error("Checkout order lead error:", err);
-      setApiError(
-        err.message || (isAr ? "حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى" : "Une erreur est survenue lors de l'enregistrement de votre commande")
-      );
+      const isRateLimited =
+        err?.message?.includes("429") ||
+        err?.message?.toLowerCase().includes("trop de requêtes") ||
+        err?.message?.toLowerCase().includes("too many requests");
+      const isStockConflict =
+        err?.message?.includes("409") ||
+        err?.message?.toLowerCase().includes("stock") ||
+        err?.message?.toLowerCase().includes("épuisé");
+
+      if (isRateLimited) {
+        setApiError(
+          isAr
+            ? "لقد تجاوزت الحد المسموح به من الطلبات. يُرجى الانتظار بضع دقائق قبل تكرار المحاولة."
+            : "Trop de tentatives de commande. Veuillez patienter quelques minutes avant de renouveler votre tentative."
+        );
+      } else if (isStockConflict) {
+        setApiError(
+          isAr
+            ? "عذراً، نفد المخزون المتاح لهذا المنتج أثناء معالجة طلبك."
+            : "Désolé, le stock disponible pour ce produit a été épuisé."
+        );
+      } else {
+        setApiError(
+          err.message || (isAr ? "حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى" : "Une erreur est survenue lors de l'enregistrement de votre commande")
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -209,11 +245,29 @@ export function CodCheckoutForm({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-6">
+      <form noValidate onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-6">
+        {stock <= 0 && (
+          <div
+            data-testid="checkout-out-of-stock-alert"
+            className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs sm:text-sm flex items-start gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">{isAr ? "المنتج غير متوفر حالياً" : "Rupture de stock"}</p>
+              <p className="text-xs text-amber-800 mt-0.5">
+                {isAr
+                  ? "عذراً، نفد المخزون المخصص لهذا العرض الترويجي. لا يمكن تسجيل طلبات جديدة في الوقت الحالي."
+                  : "Désolé, tout le stock disponible a été réservé. Les commandes sont temporairement suspendues."}
+              </p>
+            </div>
+          </div>
+        )}
+
         {apiError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            data-testid="checkout-api-error"
             className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-start gap-3"
           >
             <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -233,6 +287,7 @@ export function CodCheckoutForm({
           <input
             type="text"
             required
+            data-testid="checkout-customer-name"
             value={customerName}
             onChange={(e) => {
               setCustomerName(e.target.value);
@@ -246,7 +301,9 @@ export function CodCheckoutForm({
             }`}
           />
           {errors.customerName && (
-            <p className="text-xs text-rose-600 font-medium">{errors.customerName}</p>
+            <p data-testid="checkout-error-name" className="text-xs text-rose-600 font-medium">
+              {errors.customerName}
+            </p>
           )}
         </div>
 
@@ -278,6 +335,7 @@ export function CodCheckoutForm({
             type="tel"
             required
             dir="ltr"
+            data-testid="checkout-customer-phone"
             value={customerPhone}
             onChange={(e) => {
               setCustomerPhone(e.target.value);
@@ -293,7 +351,7 @@ export function CodCheckoutForm({
             }`}
           />
           {errors.customerPhone ? (
-            <p className="text-xs text-rose-600 font-medium">{errors.customerPhone}</p>
+            <p data-testid="checkout-error-phone" className="text-xs text-rose-600 font-medium">{errors.customerPhone}</p>
           ) : (
             <p className="text-[11px] text-neutral-500">
               {isAr 
@@ -312,6 +370,7 @@ export function CodCheckoutForm({
             label={isAr ? "الولاية (58 ولاية) *" : "Wilaya de livraison (58 Wilayas) *"}
             error={errors.wilaya}
             showDeliveryFees={true}
+            data-testid="checkout-wilaya-select"
           />
         </div>
 
@@ -324,6 +383,7 @@ export function CodCheckoutForm({
           {currentWilaya.communes && currentWilaya.communes.length > 0 ? (
             <div className="relative">
               <select
+                data-testid="checkout-commune-select"
                 value={commune}
                 onChange={(e) => {
                   setCommune(e.target.value);
@@ -348,6 +408,7 @@ export function CodCheckoutForm({
             <input
               type="text"
               required
+              data-testid="checkout-commune-input"
               value={commune}
               onChange={(e) => {
                 setCommune(e.target.value);
@@ -357,7 +418,7 @@ export function CodCheckoutForm({
               className="w-full px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             />
           )}
-          {errors.commune && <p className="text-xs text-rose-600 font-medium">{errors.commune}</p>}
+          {errors.commune && <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">{errors.commune}</p>}
         </div>
 
         {/* 5. Delivery Type Selector: Home vs Stop-Desk */}
@@ -371,6 +432,7 @@ export function CodCheckoutForm({
             {/* Home Delivery */}
             <button
               type="button"
+              data-testid="delivery-type-home"
               onClick={() => setDeliveryType("home")}
               className={`p-3.5 rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
                 deliveryType === "home"
@@ -401,6 +463,7 @@ export function CodCheckoutForm({
             {/* Stop-Desk Pickup */}
             <button
               type="button"
+              data-testid="delivery-type-desk"
               onClick={() => setDeliveryType("desk")}
               className={`p-3.5 rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
                 deliveryType === "desk"
@@ -439,6 +502,7 @@ export function CodCheckoutForm({
           <input
             type="text"
             required
+            data-testid="checkout-address"
             value={address}
             onChange={(e) => {
               setAddress(e.target.value);
@@ -455,7 +519,11 @@ export function CodCheckoutForm({
                 : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
             }`}
           />
-          {errors.address && <p className="text-xs text-rose-600 font-medium">{errors.address}</p>}
+          {errors.address && (
+            <p data-testid="checkout-error-address" className="text-xs text-rose-600 font-medium">
+              {errors.address}
+            </p>
+          )}
         </div>
 
         {/* 7. Quantity Selector */}
@@ -476,6 +544,7 @@ export function CodCheckoutForm({
               <button
                 key={qty}
                 type="button"
+                data-testid={`checkout-quantity-${qty}`}
                 onClick={() => setQuantity(qty)}
                 className={`py-2.5 px-3 rounded-2xl border font-semibold text-xs sm:text-sm transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 relative ${
                   quantity === qty
@@ -514,12 +583,14 @@ export function CodCheckoutForm({
                 {deliveryType === "home" ? (isAr ? "للمنزل" : "Domicile") : "Bureau"})
               </span>
             </span>
-            <span className="font-mono font-medium text-blue-700">{formatDZD(deliveryFee, lang)}</span>
+            <span data-testid="checkout-delivery-fee" className="font-mono font-medium text-blue-700">
+              {formatDZD(deliveryFee, lang)}
+            </span>
           </div>
 
           <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-sm sm:text-base font-bold text-neutral-900">
             <span>{isAr ? "المبلغ الإجمالي عند الاستلام:" : "Montant total à payer au livreur:"}</span>
-            <span className="font-mono text-lg text-emerald-600">
+            <span data-testid="checkout-grand-total" className="font-mono text-lg text-emerald-600">
               {formatDZD(grandTotal, lang)}
             </span>
           </div>
@@ -529,17 +600,23 @@ export function CodCheckoutForm({
         <div className="space-y-3 pt-2">
           <button
             type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg text-white shadow-xl shadow-blue-600/25 transition-all cursor-pointer flex items-center justify-center gap-3 relative overflow-hidden group ${
-              isSubmitting
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99]"
+            data-testid="checkout-submit-btn"
+            disabled={isSubmitting || stock <= 0}
+            className={`w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg text-white shadow-xl transition-all flex items-center justify-center gap-3 relative overflow-hidden group ${
+              isSubmitting || stock <= 0
+                ? "bg-neutral-400 cursor-not-allowed shadow-none"
+                : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99] cursor-pointer shadow-blue-600/25"
             }`}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>{isAr ? "جارٍ تسجيل طلبك..." : "Validation de votre commande..."}</span>
+              </>
+            ) : stock <= 0 ? (
+              <>
+                <AlertCircle className="w-5 h-5" />
+                <span>{isAr ? "عذراً، نفد المخزون حالياً" : "Actuellement en rupture de stock"}</span>
               </>
             ) : (
               <>

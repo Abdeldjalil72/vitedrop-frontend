@@ -26,15 +26,17 @@ export function Tabs<T extends string = string>({
   className = "",
 }: TabsProps<T>) {
   return (
-    <div
-      className={`inline-flex items-center p-1.5 bg-[#f4f4f4] rounded-full border border-black/[0.04] ${className}`}
-    >
+    <div className="w-full overflow-x-auto scrollbar-none py-0.5">
+      <div
+        className={`inline-flex items-center p-1.5 bg-[#f4f4f4] rounded-full border border-black/[0.04] whitespace-nowrap min-w-max ${className}`}
+      >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
           <button
             key={tab.id}
             type="button"
+            data-testid={`tab-${tab.id}`}
             onClick={() => onChange(tab.id)}
             className={`relative px-4 py-1.5 text-xs font-semibold rounded-full transition-colors flex items-center gap-1.5 z-10 cursor-pointer ${
               isActive ? "text-neutral-900" : "text-[#6b6b6b] hover:text-black"
@@ -63,6 +65,7 @@ export function Tabs<T extends string = string>({
           </button>
         );
       })}
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ export interface WilayaSelectProps {
   showDeliveryFees?: boolean;
   className?: string;
   placeholder?: string;
+  "data-testid"?: string;
 }
 
 export function WilayaSelect({
@@ -29,6 +30,7 @@ export function WilayaSelect({
   showDeliveryFees = false,
   className = "",
   placeholder,
+  "data-testid": testId = "wilaya-select-trigger",
 }: WilayaSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -96,6 +98,7 @@ export function WilayaSelect({
       {/* Trigger Button */}
       <button
         type="button"
+        data-testid={testId}
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl bg-white border border-black/10 text-sm transition-all text-start cursor-pointer hover:border-black/25 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 ${
           isOpen ? "border-sky-500 ring-4 ring-sky-500/10 shadow-xs" : ""
@@ -186,6 +189,7 @@ export function WilayaSelect({
                     <button
                       key={w.code}
                       type="button"
+                      data-testid={`wilaya-option-${w.code}`}
                       onClick={() => {
                         onChange(w.code);
                         setIsOpen(false);
@@ -248,7 +252,7 @@ export function WilayaSelect({
 
             {/* Footer Summary */}
             <div className="px-3 py-2 bg-[#fbfbfb] border-t border-black/[0.04] flex items-center justify-between text-[10px] text-[#6b6b6b] font-mono">
-              <span>58 Wilayas d'Algérie</span>
+              <span>58 Wilayas d&apos;Algérie</span>
               <span>Yalidine & ZR Express Coverage</span>
             </div>
           </motion.div>

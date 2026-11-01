@@ -69,10 +69,11 @@ export async function apiRequest<T = any>(
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    if (response.status === 401) {
+    const isAuthRequest = path.startsWith("/auth/");
+    if (response.status === 401 && !isAuthRequest) {
       removeAuthToken();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
+      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+        window.location.assign("/login");
       }
     }
 
@@ -151,19 +152,56 @@ export async function apiRegisterSupplier(data: {
   throw new Error("Échec de la création de compte fournisseur.");
 }
 
+export async function apiForgotPassword(
+  email: string
+): Promise<{ success: boolean; message: string; debugToken?: string }> {
+  return apiRequest("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function apiResetPassword(
+  token: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> {
+  return apiRequest("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, newPassword }),
+  });
+}
+
 // Wallet API Methods
 export async function apiGetMyWallet(): Promise<{
   id: string;
   balance: number;
   ownerType: string;
 }> {
-  return apiRequest("/wallets/me");
+  const data = await apiRequest<{ id: string; balance: string | number; ownerType: string }>("/wallets/me");
+  if (data && data.balance !== undefined) {
+    return {
+      ...data,
+      balance: Number(data.balance || 0),
+    };
+  }
+  return data as any;
 }
 
 export async function apiGetTransactions(limit = 20, offset = 0) {
-  return apiRequest<{ data: any[]; total: number; limit: number; offset: number }>(
+  const res = await apiRequest<{ data: any[]; total: number; limit: number; offset: number }>(
     `/wallets/transactions?limit=${limit}&offset=${offset}`
   );
+  if (res?.data && Array.isArray(res.data)) {
+    return {
+      ...res,
+      data: res.data.map((tx: any) => ({
+        ...tx,
+        amount: Number(tx.amount || 0),
+        balanceAfter: Number(tx.balanceAfter || 0),
+      })),
+    };
+  }
+  return res;
 }
 
 export async function apiWithdrawWallet(
@@ -171,10 +209,92 @@ export async function apiWithdrawWallet(
   method: string,
   recipientDetails: string
 ): Promise<{ success: boolean; newBalance: number; transactionId: string }> {
+  const backendMethod =
+    method === "BANK" ? "BANK_TRANSFER" : method === "USDT" ? "BARIDIMOB" : method;
   return apiRequest("/wallets/withdraw", {
     method: "POST",
-    body: JSON.stringify({ amount, method, recipientDetails }),
+    body: JSON.stringify({ amount, method: backendMethod, recipientDetails }),
   });
+}
+
+// User Payout Settings API
+export interface PayoutSettings {
+  payoutMethod: "BARIDIMOB" | "CCP" | "BANK_TRANSFER" | string;
+  payoutRip: string;
+  payoutCcpNumber: string;
+  payoutCcpKey: string;
+  payoutFullName: string;
+}
+
+export async function apiGetPayoutSettings(): Promise<PayoutSettings> {
+  return apiRequest<PayoutSettings>("/users/payout-settings");
+}
+
+export async function apiUpdatePayoutSettings(
+  data: Partial<PayoutSettings>
+): Promise<{ success: boolean; payoutMethod: string; payoutRip: string }> {
+  return apiRequest("/users/payout-settings", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+// Telemetry & Affiliate Analytics API
+export interface AffiliateAnalytics {
+  totalClicks: number;
+  totalLeads: number;
+  totalDelivered: number;
+  totalCanceled: number;
+  inPipeline: number;
+  totalEarnings: number;
+  pendingEarnings: number;
+  conversionRate: number;
+  deliveryRate: number;
+  epc: number;
+}
+
+export async function apiRecordClick(data: {
+  productId: string;
+  affiliateId: string;
+  utmSource?: string;
+  utmCampaign?: string;
+  subId?: string;
+}): Promise<{ recorded: boolean; deduplicated: boolean; clickId: string }> {
+  return apiRequest("/tracking/click", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function apiGetAffiliateAnalytics(): Promise<AffiliateAnalytics> {
+  return apiRequest<AffiliateAnalytics>("/affiliate/analytics");
+}
+
+export function updateGlobalWalletBalance(balance: number): void {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("vitedrop_wallet_balance", String(balance));
+    } catch {}
+    window.dispatchEvent(new CustomEvent("vitedrop_balance_updated", { detail: balance }));
+  }
+}
+
+export async function apiAdminTopUpSupplier(
+  supplierId: string,
+  amount: number,
+  referenceId: string
+): Promise<{ id: string; balance: number; ownerId: string; ownerType: string }> {
+  const data = await apiRequest<{ id: string; balance: string | number; ownerId: string; ownerType: string }>(
+    `/wallets/top-up/${supplierId}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ amount, referenceId }),
+    }
+  );
+  return {
+    ...data,
+    balance: Number(data.balance || 0),
+  };
 }
 
 // Marketplace API Methods
@@ -210,6 +330,10 @@ export interface CreateCheckoutPayload {
   affiliateId: string;
   fbclid?: string;
   ttclid?: string;
+  utmCampaign?: string;
+  utm_campaign?: string;
+  subId?: string;
+  sub_id?: string;
 }
 
 export async function apiCreateCheckoutLead(
@@ -219,6 +343,62 @@ export async function apiCreateCheckoutLead(
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+// Public Order Tracking
+export interface PublicOrderTimelineItem {
+  status: string;
+  date: string;
+  reason?: string;
+}
+
+export interface PublicOrderTracking {
+  id: string;
+  reference: string;
+  trackingNumber: string | null;
+  courier: string | null;
+  status: string;
+  customerName: string;
+  maskedPhone: string;
+  wilaya: number;
+  commune: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  returnReason?: string | null;
+  returnNotes?: string | null;
+  restockStatus?: string | null;
+  canRequestReturn?: boolean;
+  isReturnRequested?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  timeline: PublicOrderTimelineItem[];
+}
+
+export async function apiTrackOrder(reference: string): Promise<PublicOrderTracking> {
+  return apiRequest<PublicOrderTracking>(`/orders/track/${encodeURIComponent(reference.trim())}`);
+}
+
+export async function apiCreateReturnRequest(dto: {
+  reference?: string;
+  orderId?: string;
+  phone: string;
+  reason: string;
+  notes?: string;
+}): Promise<{ success: boolean; orderId: string; message: string; returnReason: string }> {
+  return apiRequest<{ success: boolean; orderId: string; message: string; returnReason: string }>(
+    "/orders/return-request",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        reference: dto.reference || dto.orderId,
+        phone: dto.phone,
+        reason: dto.reason,
+        notes: dto.notes,
+      }),
+    }
+  );
 }
 
 // Affiliate Orders Tracking API
@@ -266,7 +446,11 @@ export interface SupplierOrder {
   commune: string;
   trackingNumber: string | null;
   courier: string | null;
+  courierLabelUrl?: string | null;
   cancellationReason?: string | null;
+  returnReason?: string | null;
+  returnNotes?: string | null;
+  restockStatus?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -295,9 +479,53 @@ export async function apiCancelSupplierLead(
   });
 }
 
-export async function apiDispatchSupplierOrder(orderId: string): Promise<SupplierOrder> {
+export async function apiDispatchSupplierOrder(
+  orderId: string,
+  data?: { trackingNumber?: string; courier?: string }
+): Promise<SupplierOrder> {
   return apiRequest<SupplierOrder>(`/supplier/call-center/${orderId}/dispatch`, {
     method: "POST",
+    body: data ? JSON.stringify(data) : undefined,
+  });
+}
+
+export async function apiDispatchYalidine(orderId: string): Promise<SupplierOrder> {
+  return apiRequest<SupplierOrder>(`/supplier/call-center/${orderId}/dispatch-yalidine`, {
+    method: "POST",
+  });
+}
+
+export async function apiRecordCallAttempt(
+  orderId: string,
+  attempt: number,
+  reason?: string
+): Promise<{ success: boolean; attempt: number; reason: string }> {
+  return apiRequest<{ success: boolean; attempt: number; reason: string }>(
+    `/supplier/call-center/${orderId}/call-attempt`,
+    {
+      method: "POST",
+      body: JSON.stringify({ attempt, reason: reason || "Injoignable / Pas de réponse" }),
+    }
+  );
+}
+
+export async function apiRestockRtoOrder(
+  orderId: string,
+  condition: "INTACT" | "DAMAGED",
+  notes?: string
+): Promise<{
+  success: boolean;
+  orderId: string;
+  status: string;
+  restockStatus: string;
+  stockRestored: boolean;
+  quantity: number;
+  currentProductStock: number | null;
+  message?: string;
+}> {
+  return apiRequest(`/supplier/orders/${orderId}/rto-restock`, {
+    method: "POST",
+    body: JSON.stringify({ condition, notes }),
   });
 }
 
@@ -420,10 +648,14 @@ export async function apiGetAdminUsers(): Promise<AdminUser[]> {
   return apiRequest<AdminUser[]>("/admin/users");
 }
 
-export async function apiUpdateUserStatus(id: string, isActive: boolean): Promise<{ success: boolean; id: string; isActive: boolean }> {
+export async function apiUpdateUserStatus(
+  id: string,
+  isActive: boolean,
+  reason?: string
+): Promise<{ success: boolean; id: string; isActive: boolean }> {
   return apiRequest(`/admin/users/${id}/status`, {
     method: "PATCH",
-    body: JSON.stringify({ isActive }),
+    body: JSON.stringify({ isActive, reason }),
   });
 }
 
@@ -442,6 +674,7 @@ export async function apiGetSupplierProducts(): Promise<any[]> {
 export async function apiCreateSupplierProduct(data: {
   name: string;
   description?: string;
+  imageUrl?: string;
   stock: number;
   retailPrice: number;
   supplierTotalCpa: number;
@@ -495,7 +728,7 @@ export interface AdminOrderEvent {
   toStatus: string;
   triggerSource: string;
   reason?: string | null;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
   createdAt: string;
 }
 
@@ -656,10 +889,28 @@ export async function apiUpdateProductStatus(
   status: "active" | "suspended" | "archived",
   reason?: string
 ): Promise<AdminProductItem> {
-  return apiRequest(`/admin/products/${id}/status`, {
-    method: "PATCH",
-    body: JSON.stringify({ status, reason }),
-  });
+  try {
+    return await apiRequest(`/admin/products/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status, reason }),
+    });
+  } catch (err: unknown) {
+    if (status === "archived") {
+      return apiRequest(`/admin/products/${id}/archive`, {
+        method: "PATCH",
+      });
+    } else if (status === "suspended") {
+      return apiRequest(`/admin/products/${id}/suspend`, {
+        method: "PATCH",
+        body: JSON.stringify({ reason }),
+      });
+    } else if (status === "active") {
+      return apiRequest(`/admin/products/${id}/reactivate`, {
+        method: "PATCH",
+      });
+    }
+    throw err;
+  }
 }
 
 export async function apiGetProductPerformance(id: string): Promise<any> {
@@ -699,24 +950,48 @@ export interface OrderDiscrepancy {
   issue: string;
 }
 
+export interface ReconciliationRun {
+  id: string;
+  createdAt: string;
+  walletsAudited: number;
+  walletsWithVariance: number;
+  ordersAudited?: number;
+  ordersWithAnomalies?: number;
+  totalVarianceAmount?: number;
+  status?: "SUCCESS" | "FAILED" | "COMPLETED" | string;
+  executedBy?: string | null;
+}
+
+export interface ReconciliationRunDetail extends ReconciliationRun {
+  walletDiscrepancies?: WalletDiscrepancy[];
+  orderDiscrepancies?: OrderDiscrepancy[];
+  logs?: string[];
+}
+
 export async function apiGetReconciliationSummary(): Promise<ReconciliationSummary> {
   const data = await apiRequest<{
-    totalWalletsChecked: number;
-    walletVariancesCount: number;
-    totalVarianceAmount: number;
-    totalOrdersChecked: number;
-    orderAnomaliesCount: number;
+    totalWalletsChecked?: number;
+    walletsAudited?: number;
+    walletVariancesCount?: number;
+    walletsWithVariance?: number;
+    totalVarianceAmount?: number;
+    totalOrdersChecked?: number;
+    deliveredOrdersAudited?: number;
+    orderAnomaliesCount?: number;
+    ordersMissingSettlement?: number;
+    ordersWithDuplicateTransactions?: number;
     lastRun?: { createdAt?: string } | null;
+    lastRunAt?: string | null;
   }>("/admin/reconciliation/summary");
 
   return {
-    walletsAudited: data.totalWalletsChecked,
-    walletsWithVariance: data.walletVariancesCount,
-    totalVarianceAmount: data.totalVarianceAmount,
-    deliveredOrdersAudited: data.totalOrdersChecked,
-    ordersMissingSettlement: data.orderAnomaliesCount,
-    ordersWithDuplicateTransactions: 0,
-    lastRunAt: data.lastRun?.createdAt || null,
+    walletsAudited: data.walletsAudited ?? data.totalWalletsChecked ?? 0,
+    walletsWithVariance: data.walletsWithVariance ?? data.walletVariancesCount ?? 0,
+    totalVarianceAmount: data.totalVarianceAmount ?? 0,
+    deliveredOrdersAudited: data.deliveredOrdersAudited ?? data.totalOrdersChecked ?? 0,
+    ordersMissingSettlement: data.ordersMissingSettlement ?? data.orderAnomaliesCount ?? 0,
+    ordersWithDuplicateTransactions: data.ordersWithDuplicateTransactions ?? 0,
+    lastRunAt: data.lastRunAt ?? data.lastRun?.createdAt ?? null,
   };
 }
 
@@ -738,16 +1013,34 @@ export async function apiGetReconciliationOrders(): Promise<{
 
 export async function apiRunReconciliation(): Promise<{
   success: boolean;
-  run: any;
+  run: ReconciliationRun;
 }> {
-  const run = await apiRequest("/admin/reconciliation/runs", {
-    method: "POST",
-  });
+  const response = await apiRequest<ReconciliationRun | { run: ReconciliationRun; success?: boolean }>(
+    "/admin/reconciliation/runs",
+    { method: "POST" }
+  );
+
+  const run: ReconciliationRun =
+    "run" in response && response.run ? response.run : (response as ReconciliationRun);
+
   return { success: true, run };
 }
 
-export async function apiGetReconciliationRuns(): Promise<any[]> {
-  return apiRequest("/admin/reconciliation/runs");
+export async function apiGetReconciliationRuns(): Promise<ReconciliationRun[]> {
+  const response = await apiRequest<ReconciliationRun[] | { data: ReconciliationRun[] }>(
+    "/admin/reconciliation/runs"
+  );
+  if (Array.isArray(response)) {
+    return response;
+  }
+  if (response && Array.isArray((response as { data: ReconciliationRun[] }).data)) {
+    return (response as { data: ReconciliationRun[] }).data;
+  }
+  return [];
+}
+
+export async function apiGetReconciliationRunDetail(id: string): Promise<ReconciliationRunDetail> {
+  return apiRequest<ReconciliationRunDetail>(`/admin/reconciliation/runs/${id}`);
 }
 
 // ----------------------------------------------------
@@ -833,8 +1126,8 @@ export interface AuditLogItem {
   action: string;
   entityType: string;
   entityId: string;
-  beforeState: any;
-  afterState: any;
+  beforeState: Record<string, unknown> | null;
+  afterState: Record<string, unknown> | null;
   reason: string | null;
   ipAddress: string | null;
   createdAt: string;
@@ -863,3 +1156,209 @@ export async function apiGetAuditLogs(
   const qs = params.toString();
   return apiRequest(`/admin/audit-logs${qs ? `?${qs}` : ""}`);
 }
+
+// ----------------------------------------------------
+// Supplier Inbound Deposit Requests & Slips API
+// ----------------------------------------------------
+export type DepositRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type DepositPaymentRail = "BARIDIMOB" | "CCP" | "BNA" | "CASH";
+
+export interface DepositRequest {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  supplierEmail: string;
+  supplierPhone: string;
+  amount: number;
+  paymentRail: DepositPaymentRail;
+  referenceNote: string | null;
+  receiptUrl: string;
+  status: DepositRequestStatus;
+  rejectionReason: string | null;
+  processedBy?: string | null;
+  processedAt?: string | null;
+  walletTransactionId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DepositRequestsResponse {
+  data: DepositRequest[];
+  total: number;
+  pendingCount: number;
+  limit: number;
+  offset: number;
+}
+
+export async function apiSubmitDepositRequest(data: {
+  amount: number;
+  paymentRail: DepositPaymentRail | string;
+  referenceNote?: string;
+  receiptUrl: string;
+}): Promise<DepositRequest> {
+  return apiRequest("/wallets/deposit-requests", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function apiGetMyDepositRequests(): Promise<DepositRequest[]> {
+  return apiRequest("/wallets/deposit-requests/me");
+}
+
+export async function apiGetAdminDepositRequests(query: {
+  status?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+} = {}): Promise<DepositRequestsResponse> {
+  const params = new URLSearchParams();
+  if (query.status && query.status !== "ALL") params.set("status", query.status);
+  if (query.search) params.set("search", query.search);
+  if (query.limit !== undefined) params.set("limit", String(query.limit));
+  if (query.offset !== undefined) params.set("offset", String(query.offset));
+
+  const qs = params.toString();
+  return apiRequest(`/admin/deposit-requests${qs ? `?${qs}` : ""}`);
+}
+
+export async function apiApproveDepositRequest(
+  id: string,
+  verifiedAmount?: number,
+  adminNote?: string
+): Promise<{ success: boolean; newBalance: number; depositRequest: DepositRequest }> {
+  return apiRequest(`/admin/deposit-requests/${id}/approve`, {
+    method: "PATCH",
+    body: JSON.stringify({ verifiedAmount, adminNote }),
+  });
+}
+
+export async function apiRejectDepositRequest(
+  id: string,
+  reason: string
+): Promise<{ success: boolean; depositRequest: DepositRequest }> {
+  return apiRequest(`/admin/deposit-requests/${id}/reject`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export interface SupplierSettings {
+  storeName: string;
+  phone: string;
+  notificationEmail: string;
+  warehouseWilaya: number;
+  warehouseCommune: string;
+  courierPreference: "YALIDINE" | "ZR_EXPRESS" | "AUTO";
+  whatsappTemplate: string;
+  enableCallCenterNotifications: boolean;
+  enableStockAlerts: boolean;
+}
+
+const DEFAULT_SUPPLIER_SETTINGS: SupplierSettings = {
+  storeName: "ViteDrop COD Partner",
+  phone: "0550123456",
+  notificationEmail: "supplier@vitedrop.com",
+  warehouseWilaya: 16, // Alger
+  warehouseCommune: "Bab Ezzouar",
+  courierPreference: "AUTO",
+  whatsappTemplate: "Bonjour {customer_name}, c'est le service confirmation pour votre commande de {product_name}. Confirmez-vous la livraison à {wilaya} ?",
+  enableCallCenterNotifications: true,
+  enableStockAlerts: true,
+};
+
+export async function apiGetSupplierSettings(): Promise<SupplierSettings> {
+  try {
+    return await apiRequest<SupplierSettings>("/supplier/settings");
+  } catch {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("vitedrop_supplier_settings");
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch {
+          // fallback to default
+        }
+      }
+    }
+    return { ...DEFAULT_SUPPLIER_SETTINGS };
+  }
+}
+
+export async function apiUpdateSupplierSettings(
+  settings: Partial<SupplierSettings>
+): Promise<SupplierSettings> {
+  if (typeof window !== "undefined") {
+    const current = await apiGetSupplierSettings();
+    const updated = { ...current, ...settings };
+    localStorage.setItem("vitedrop_supplier_settings", JSON.stringify(updated));
+  }
+  try {
+    return await apiRequest<SupplierSettings>("/supplier/settings", {
+      method: "PUT",
+      body: JSON.stringify(settings),
+    });
+  } catch {
+    const current = await apiGetSupplierSettings();
+    return { ...current, ...settings };
+  }
+}
+
+export interface AdminPlatformSettings {
+  platformFeePercent: number;
+  highPriorityWithdrawalThreshold: number;
+  minimumTopUpAmount: number;
+  defaultShippingFee: number;
+  rtoPenaltyAllowed: boolean;
+  webhookReplayWindowSeconds: number;
+  courierWebhookSecretConfigured: boolean;
+}
+
+const DEFAULT_ADMIN_SETTINGS: AdminPlatformSettings = {
+  platformFeePercent: 20,
+  highPriorityWithdrawalThreshold: 20000,
+  minimumTopUpAmount: 5000,
+  defaultShippingFee: 800,
+  rtoPenaltyAllowed: false,
+  webhookReplayWindowSeconds: 300,
+  courierWebhookSecretConfigured: true,
+};
+
+export async function apiGetAdminPlatformSettings(): Promise<AdminPlatformSettings> {
+  try {
+    return await apiRequest<AdminPlatformSettings>("/admin/settings");
+  } catch {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("vitedrop_admin_platform_settings");
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch {
+          // fallback
+        }
+      }
+    }
+    return { ...DEFAULT_ADMIN_SETTINGS };
+  }
+}
+
+export async function apiUpdateAdminPlatformSettings(
+  settings: Partial<AdminPlatformSettings>
+): Promise<AdminPlatformSettings> {
+  if (typeof window !== "undefined") {
+    const current = await apiGetAdminPlatformSettings();
+    const updated = { ...current, ...settings };
+    localStorage.setItem("vitedrop_admin_platform_settings", JSON.stringify(updated));
+  }
+  try {
+    return await apiRequest<AdminPlatformSettings>("/admin/settings", {
+      method: "PUT",
+      body: JSON.stringify(settings),
+    });
+  } catch {
+    const current = await apiGetAdminPlatformSettings();
+    return { ...current, ...settings };
+  }
+}
+
+

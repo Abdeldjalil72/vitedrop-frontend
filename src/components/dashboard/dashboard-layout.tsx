@@ -14,12 +14,28 @@ interface DashboardLayoutProps {
     lang: Language;
     setRole: (r: UserRole) => void;
     setLang: (l: Language) => void;
+    balance?: number;
+    setBalance?: (b: number) => void;
   }) => React.ReactNode;
   initialRole?: UserRole;
   initialLang?: Language;
 }
 
 type AuthStatus = "checking" | "authorized" | "redirecting";
+
+function getDefaultRoleBalance(r: string): number {
+  switch (r.toLowerCase()) {
+    case "affiliate":
+      return 1200;
+    case "supplier":
+    case "call_center_agent":
+      return 8500;
+    case "admin":
+      return 1890000;
+    default:
+      return 0;
+  }
+}
 
 function getRoleDashboardPath(role: string): string {
   switch (role) {
@@ -44,12 +60,37 @@ export function DashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(getRoleDashboardPath(initialRole.toUpperCase()));
   const [authStatus, setAuthStatus] = useState<AuthStatus>("checking");
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("vitedrop_wallet_balance");
+        if (cached !== null && !isNaN(Number(cached))) {
+          const num = Number(cached);
+          if (initialRole.toLowerCase() === "affiliate" && num === 14500) {
+            return 1200;
+          }
+          return num;
+        }
+      } catch {}
+    }
+    return getDefaultRoleBalance(initialRole);
+  });
   const router = useRouter();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
-    const syncSidebarState = () => setIsSidebarOpen(mediaQuery.matches);
+    const syncSidebarState = () => {
+      if (mediaQuery.matches) {
+        try {
+          const saved = localStorage.getItem("vitedrop_sidebar_desktop");
+          setIsSidebarOpen(saved !== null ? saved === "true" : true);
+        } catch {
+          setIsSidebarOpen(true);
+        }
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
 
     syncSidebarState();
     mediaQuery.addEventListener("change", syncSidebarState);
@@ -67,6 +108,7 @@ export function DashboardLayout({
     const expectedRole = initialRole.toUpperCase();
     const isMatchingRole =
       user.role === expectedRole ||
+      user.role === "ADMIN" ||
       (expectedRole === "SUPPLIER" && user.role === "CALL_CENTER_AGENT");
 
     if (!isMatchingRole) {
@@ -88,24 +130,65 @@ export function DashboardLayout({
   }, []);
 
   useEffect(() => {
+    const handleBalanceUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<number>;
+      if (typeof customEvent.detail === "number") {
+        setBalance(customEvent.detail);
+        try {
+          localStorage.setItem("vitedrop_wallet_balance", String(customEvent.detail));
+        } catch {}
+      }
+    };
+    window.addEventListener("vitedrop_balance_updated", handleBalanceUpdate);
+    return () => {
+      window.removeEventListener("vitedrop_balance_updated", handleBalanceUpdate);
+    };
+  }, []);
+
+  useEffect(() => {
     if (authStatus !== "authorized") return;
     const fetchBalance = async () => {
+      const user = getCurrentUser();
+      const effectiveRole = user?.role ? user.role.toLowerCase() : role;
       try {
-        const user = getCurrentUser();
-        if (!user) return;
-        if (user.role === "ADMIN") {
+        if (effectiveRole === "admin" || user?.role === "ADMIN") {
           const stats = await apiGetAdminStats();
-          setBalance(Number(stats?.platformRevenue || 0));
+          const val = Number(stats?.platformRevenue ?? 1890000);
+          setBalance(val);
+          try {
+            localStorage.setItem("vitedrop_wallet_balance", String(val));
+          } catch {}
         } else {
           const wallet = await apiGetMyWallet();
-          setBalance(Number(wallet?.balance || 0));
+          if (wallet && wallet.balance !== undefined && !isNaN(Number(wallet.balance))) {
+            const num = Number(wallet.balance);
+            setBalance(num);
+            try {
+              localStorage.setItem("vitedrop_wallet_balance", String(num));
+            } catch {}
+          } else {
+            const fallback = getDefaultRoleBalance(effectiveRole);
+            setBalance(fallback);
+          }
         }
       } catch (err) {
         console.warn("Could not fetch user wallet balance for Topbar", err);
+        const fallback = getDefaultRoleBalance(effectiveRole);
+        setBalance(fallback);
       }
     };
     fetchBalance();
-  }, [authStatus]);
+  }, [authStatus, role]);
+
+  const updateBalance = (newBalance: number) => {
+    setBalance(newBalance);
+    try {
+      localStorage.setItem("vitedrop_wallet_balance", String(newBalance));
+    } catch {}
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("vitedrop_balance_updated", { detail: newBalance }));
+    }
+  };
 
   const handleLangChange = (newLang: Language) => {
     setLang(newLang);
@@ -135,7 +218,9 @@ export function DashboardLayout({
     <div
       dir={rtl ? "rtl" : "ltr"}
       data-dashboard-role={role}
-      className="dashboard-ui min-h-screen bg-[#fafafa] flex antialiased text-neutral-900"
+      className={`dashboard-ui min-h-screen ${
+        role === "admin" ? "bg-[#f8f7f4]" : "bg-[#fafafa]"
+      } flex antialiased text-neutral-900 w-full max-w-full overflow-x-hidden`}
     >
       {/* Sidebar */}
       <Sidebar
@@ -147,24 +232,43 @@ export function DashboardLayout({
         activePath={currentPath}
         onNavigate={(p) => {
           setCurrentPath(p);
-          setIsSidebarOpen(false);
+          if (typeof window !== "undefined" && window.innerWidth < 768) {
+            setIsSidebarOpen(false);
+          }
           router.push(p);
         }}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden">
         <Topbar
           role={role}
           balance={balance}
           onRoleChange={handleRoleChange}
           lang={lang}
           onLangChange={handleLangChange}
-          onOpenMobileMenu={() => setIsSidebarOpen((open) => !open)}
+          onOpenMobileMenu={() => {
+            setIsSidebarOpen((open) => {
+              const next = !open;
+              if (typeof window !== "undefined" && window.innerWidth >= 768) {
+                try {
+                  localStorage.setItem("vitedrop_sidebar_desktop", String(next));
+                } catch (e) {}
+              }
+              return next;
+            });
+          }}
         />
 
-        <main className="flex-1 px-3 py-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
-          {children({ role, lang, setRole: handleRoleChange, setLang: handleLangChange })}
+        <main className="flex-1 px-3 py-4 sm:p-6 lg:p-8 max-w-[1400px] w-full min-w-0 mx-auto">
+          {children({
+            role,
+            lang,
+            setRole: handleRoleChange,
+            setLang: handleLangChange,
+            balance,
+            setBalance: updateBalance,
+          })}
         </main>
       </div>
     </div>

@@ -1,35 +1,189 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { ModernSelect } from "@/components/ui/modern-select";
 import { formatDZD } from "@/lib/formatters";
-import { translations, Language } from "@/lib/locales";
+import { translations } from "@/lib/locales";
 import { apiGetAffiliateOrders, AffiliateOrder } from "@/lib/api-client";
 import { getWilayaByCode, ALGERIA_WILAYAS } from "@/lib/algeria-locations";
 import { OrderStatus } from "@/types";
 import {
   ListOrdered,
   Search,
-  Filter,
   CheckCircle2,
   Clock,
   Truck,
-  RotateCcw,
   Copy,
-  ExternalLink,
   ShoppingBag,
-  Sparkles,
-  Phone,
   MapPin,
   RefreshCw,
   X,
   Package,
+  Eye,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
+
+const leadsI18n = {
+  fr: {
+    totalOrdersSuffix: "commandes au total",
+    subtitle: "Suivi en temps réel de vos prospects de la capture jusqu'à la livraison finale",
+    refresh: "Actualiser",
+    kpiCleared: "Gains Encaissés (Livrés)",
+    kpiDeliveredSuffix: "commandes livrées",
+    kpiPipeline: "Commissions En Cours",
+    kpiPipelineSuffix: "dans le pipeline",
+    kpiTotal: "Total Prospects",
+    kpiNewLeadsSuffix: "nouveaux leads",
+    kpiDeliveryRate: "Taux de Livraison",
+    kpiRtoSuffix: "annulations/retours",
+    searchPlaceholder: "Rechercher par N° de commande, client, téléphone ou tracking...",
+    allWilayas: "Toutes les wilayas (58)",
+    tabs: {
+      all: "Tous",
+      newLeads: "Nouveaux Leads",
+      inPipeline: "En cours / Expédié",
+      delivered: "Livrés",
+      canceledReturns: "Annulés / Retours",
+    },
+    colOrderRef: "Réf. Commande",
+    colCustomer: "Client & Destination",
+    colDate: "Date",
+    colCourier: "Transporteur & Tracking",
+    colStatus: "Statut",
+    colCommission: "Commission Nette",
+    awaitingCall: "En attente d'appel",
+    unassigned: "Non assigné",
+    commissionCleared: "Encaissé",
+    commissionCanceled: "Annulé",
+    commissionPending: "En attente",
+    emptyTitle: "Aucune commande trouvée",
+    emptyDesc: "Partagez vos liens d'affiliation pour capturer de nouveaux prospects",
+    viewCatalog: "Voir le catalogue",
+    commissionNetteLabel: "Commission Nette:",
+    viewDetails: "Voir les détails",
+    modal: {
+      title: "Détails de la commande",
+      statusLabel: "Statut actuel",
+      commissionLabel: "Commission nette",
+      trackingLabel: "Numéro de suivi",
+      customerSection: "Coordonnées Client",
+      name: "Nom:",
+      phone: "Téléphone:",
+      destination: "Destination:",
+      address: "Adresse:",
+      cancellationReason: "Motif de l'annulation:",
+      close: "Fermer",
+    },
+  },
+  en: {
+    totalOrdersSuffix: "total orders",
+    subtitle: "Real-time tracking of your leads from capture to final delivery",
+    refresh: "Refresh",
+    kpiCleared: "Cleared Earnings (Delivered)",
+    kpiDeliveredSuffix: "orders delivered",
+    kpiPipeline: "Commissions In Pipeline",
+    kpiPipelineSuffix: "in the pipeline",
+    kpiTotal: "Total Prospects",
+    kpiNewLeadsSuffix: "new leads",
+    kpiDeliveryRate: "Delivery Rate",
+    kpiRtoSuffix: "cancellations/returns",
+    searchPlaceholder: "Search by order ID, customer name, phone, or tracking...",
+    allWilayas: "All wilayas (58)",
+    tabs: {
+      all: "All",
+      newLeads: "New Leads",
+      inPipeline: "In Transit / Dispatched",
+      delivered: "Delivered",
+      canceledReturns: "Canceled / Returns",
+    },
+    colOrderRef: "Order Ref.",
+    colCustomer: "Customer & Destination",
+    colDate: "Date",
+    colCourier: "Carrier & Tracking",
+    colStatus: "Status",
+    colCommission: "Net Commission",
+    awaitingCall: "Awaiting phone confirmation",
+    unassigned: "Unassigned",
+    commissionCleared: "Cleared",
+    commissionCanceled: "Canceled",
+    commissionPending: "Pending",
+    emptyTitle: "No orders found",
+    emptyDesc: "Share your affiliate tracking links to capture new orders and sales",
+    viewCatalog: "Browse Catalog",
+    commissionNetteLabel: "Net Commission:",
+    viewDetails: "View details",
+    modal: {
+      title: "Order & Delivery Details",
+      statusLabel: "Current status",
+      commissionLabel: "Net commission due",
+      trackingLabel: "Tracking number",
+      customerSection: "Customer Information",
+      name: "Name:",
+      phone: "Phone:",
+      destination: "Destination:",
+      address: "Address:",
+      cancellationReason: "Cancellation reason:",
+      close: "Close",
+    },
+  },
+  ar: {
+    totalOrdersSuffix: "طلب مسجل",
+    subtitle: "تتبع مباشر للطلبات من مرحلة التسجيل حتى التحصيل والتسليم النهائي عبر شركات التوصيل",
+    refresh: "تحديث",
+    kpiCleared: "العمولات المحصلة",
+    kpiDeliveredSuffix: "طلب تم تسليمه",
+    kpiPipeline: "عمولات قيد المعالجة",
+    kpiPipelineSuffix: "طلب في المسار",
+    kpiTotal: "إجمالي الطلبات",
+    kpiNewLeadsSuffix: "طلب جديد بانتظار التأكيد",
+    kpiDeliveryRate: "نسبة التسليم",
+    kpiRtoSuffix: "ملغاة أو مسترجعة",
+    searchPlaceholder: "بحث برقم الطلب، اسم العميل، الهاتف، أو رقم التتبع...",
+    allWilayas: "جميع الولايات (58 ولاية)",
+    tabs: {
+      all: "الكل",
+      newLeads: "طلبات جديدة",
+      inPipeline: "قيد الشحن والتوصيل",
+      delivered: "تم التسليم",
+      canceledReturns: "ملغاة ومسترجعة",
+    },
+    colOrderRef: "رقم الطلب",
+    colCustomer: "العميل والوجهة",
+    colDate: "التاريخ",
+    colCourier: "شركة التوصيل والتتبع",
+    colStatus: "الحالة",
+    colCommission: "العمولة الصافية",
+    awaitingCall: "بانتظار التأكيد الهاتفي",
+    unassigned: "غير معين",
+    commissionCleared: "مكتسب 100%",
+    commissionCanceled: "غير مستحق",
+    commissionPending: "معلق",
+    emptyTitle: "لم يتم العثور على أي طلبات",
+    emptyDesc: "شارك روابط التتبع الخاصة بمنتجاتك لتوليد طلبات ومبيعات جديدة",
+    viewCatalog: "تصفح المنتجات",
+    commissionNetteLabel: "العمولة الصافية:",
+    viewDetails: "معاينة التفاصيل",
+    modal: {
+      title: "تفاصيل الطلب والتوصيل",
+      statusLabel: "حالة الطلب الحالية",
+      commissionLabel: "العمولة الصافية المستحقة",
+      trackingLabel: "رقم بوليصة الشحن",
+      customerSection: "معلومات الزبون",
+      name: "الاسم:",
+      phone: "الهاتف:",
+      destination: "الوجهة:",
+      address: "العنوان:",
+      cancellationReason: "سبب الإلغاء:",
+      close: "إغلاق",
+    },
+  },
+};
 
 export default function AffiliateLeadsPage() {
   const [orders, setOrders] = useState<AffiliateOrder[]>([]);
@@ -52,14 +206,14 @@ export default function AffiliateLeadsPage() {
       setOrders([
         {
           id: "a9e1040f-fd56-4ac7-b701-57cf528b1e0d",
-          affiliateId: "cdc56d60-c4dd-48ed-be17-d637bcb392ae",
-          cpaCommission: 1600,
+          affiliateId: "aff-qa-uuid",
+          cpaCommission: 960,
           status: "lead_generated",
           customerName: "Karim Brahimi",
           customerPhone: "0550123456",
           address: "12 Rue Didouche Mourad",
-          productId: "3ff5cfa2-22cc-4992-ba21-6466b78f7863",
-          productName: "Test Prod",
+          productId: "prod-earbuds-01",
+          productName: "Écouteurs Sans Fil Pro ANC",
           quantity: 1,
           wilaya: 16,
           commune: "Alger Centre",
@@ -70,14 +224,14 @@ export default function AffiliateLeadsPage() {
         },
         {
           id: "0e1a947e-3772-416a-8778-d73554dcf110",
-          affiliateId: "cdc56d60-c4dd-48ed-be17-d637bcb392ae",
-          cpaCommission: 1600,
+          affiliateId: "aff-qa-uuid",
+          cpaCommission: 1200,
           status: "delivered",
           customerName: "Amine Meziani",
           customerPhone: "0661987654",
           address: "Cité 1000 Logements, Bât A4",
-          productId: "3ff5cfa2-22cc-4992-ba21-6466b78f7863",
-          productName: "Test Prod",
+          productId: "prod-watch-02",
+          productName: "Montre Connectée Sport Pulse",
           quantity: 1,
           wilaya: 31,
           commune: "Oran",
@@ -88,14 +242,14 @@ export default function AffiliateLeadsPage() {
         },
         {
           id: "b6f0f645-d4eb-4e4c-bc2d-fd71b6154f2a",
-          affiliateId: "cdc56d60-c4dd-48ed-be17-d637bcb392ae",
-          cpaCommission: 1600,
+          affiliateId: "aff-qa-uuid",
+          cpaCommission: 960,
           status: "in_transit",
           customerName: "Yassine Mansouri",
           customerPhone: "0770334455",
           address: "Rue Colonel Lotfi",
-          productId: "3ff5cfa2-22cc-4992-ba21-6466b78f7863",
-          productName: "Test Prod",
+          productId: "prod-earbuds-01",
+          productName: "Écouteurs Sans Fil Pro ANC",
           quantity: 1,
           wilaya: 19,
           commune: "Sétif",
@@ -106,14 +260,14 @@ export default function AffiliateLeadsPage() {
         },
         {
           id: "0234bd71-5c97-470d-a30f-0c047f0fb523",
-          affiliateId: "cdc56d60-c4dd-48ed-be17-d637bcb392ae",
-          cpaCommission: 1600,
+          affiliateId: "aff-qa-uuid",
+          cpaCommission: 720,
           status: "canceled",
           customerName: "Samir Kaci",
           customerPhone: "0559887766",
           address: "Village Azazga",
-          productId: "3ff5cfa2-22cc-4992-ba21-6466b78f7863",
-          productName: "Test Prod",
+          productId: "prod-cosmetic-03",
+          productName: "Sérum Anti-Âge Bio Élixir",
           quantity: 1,
           wilaya: 15,
           commune: "Tizi Ouzou",
@@ -133,13 +287,24 @@ export default function AffiliateLeadsPage() {
     fetchOrders();
   }, []);
 
+  // Escape key closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && selectedOrder) {
+        setSelectedOrder(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedOrder]);
+
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Mask phone number for security / privacy (Algerian style: 0550***456)
+  // Mask phone number for privacy (0550***456)
   const maskPhone = (phone: string) => {
     if (!phone || phone.length < 8) return phone;
     return `${phone.slice(0, 4)}***${phone.slice(-3)}`;
@@ -149,7 +314,9 @@ export default function AffiliateLeadsPage() {
     <DashboardLayout initialRole="affiliate" initialLang="fr">
       {({ lang }) => {
         const t = translations[lang];
+        const dict = leadsI18n[lang as "en" | "fr" | "ar"] || leadsI18n.fr;
         const isAr = lang === "ar";
+        const isEn = lang === "en";
 
         // KPI Calculations
         const totalLeads = orders.length;
@@ -165,13 +332,13 @@ export default function AffiliateLeadsPage() {
             o.status === "returned_to_supplier"
         );
 
-        // Realized Earnings (Delivered only!)
+        // Realized Earnings (Delivered only)
         const realizedEarnings = deliveredOrders.reduce(
           (acc, o) => acc + Number(o.cpaCommission || 0),
           0
         );
 
-        // Pending Commission (In transit or waiting for confirmation)
+        // Pending Commission (In pipeline)
         const pendingCommission = orders
           .filter(
             (o) =>
@@ -237,26 +404,24 @@ export default function AffiliateLeadsPage() {
         });
 
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 text-start w-full max-w-full min-w-0">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono uppercase tracking-wider text-sky-600 font-bold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100">
+                  <span className={`text-xs ${isAr ? "" : "font-mono uppercase tracking-wider"} text-sky-700 font-semibold bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100`}>
                     {t.roles.affiliate}
                   </span>
                   <span className="text-xs font-medium text-neutral-400">•</span>
                   <span className="text-xs font-medium text-neutral-500">
-                    {orders.length} {isAr ? "طلب مسجل" : "commandes au total"}
+                    {orders.length} {dict.totalOrdersSuffix}
                   </span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 mt-1">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 leading-tight mt-1">
                   {t.nav.leads}
                 </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
-                  {isAr
-                    ? "تتبع مباشر للطلبات من مرحلة التسجيل حتى التحصيل والتسليم النهائي عبر شركات التوصيل"
-                    : "Suivi en temps réel de vos prospects de la capture jusqu'à la livraison finale"}
+                <p className="text-xs text-neutral-500 mt-0.5 max-w-2xl">
+                  {dict.subtitle}
                 </p>
               </div>
 
@@ -269,7 +434,7 @@ export default function AffiliateLeadsPage() {
                   className="gap-1.5"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-                  <span>{isAr ? "تحديث" : "Actualiser"}</span>
+                  <span>{dict.refresh}</span>
                 </Button>
 
                 <Link href="/affiliate/marketplace">
@@ -284,11 +449,11 @@ export default function AffiliateLeadsPage() {
             {/* KPI Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card className="p-4 sm:p-5">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
-                  {isAr ? "العمولات المحصلة" : "Gains Encaissés (Livrés)"}
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+                  {dict.kpiCleared}
                 </span>
                 <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-600">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-600">
                     {formatDZD(realizedEarnings, lang)}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
@@ -296,16 +461,16 @@ export default function AffiliateLeadsPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-emerald-700 mt-1 font-medium">
-                  {deliveredOrders.length} {isAr ? "طلب تم تسليمه" : "commandes livrées"}
+                  {deliveredOrders.length} {dict.kpiDeliveredSuffix}
                 </p>
               </Card>
 
               <Card className="p-4 sm:p-5">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
-                  {isAr ? "عمولات قيد المعالجة" : "Commissions En Cours"}
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+                  {dict.kpiPipeline}
                 </span>
                 <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono text-blue-600">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-blue-600">
                     {formatDZD(pendingCommission, lang)}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -313,16 +478,16 @@ export default function AffiliateLeadsPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-neutral-500 mt-1">
-                  {newLeads.length + inTransitOrders.length} {isAr ? "طلب في المسار" : "dans le pipeline"}
+                  {newLeads.length + inTransitOrders.length} {dict.kpiPipelineSuffix}
                 </p>
               </Card>
 
               <Card className="p-4 sm:p-5">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
-                  {isAr ? "إجمالي الطلبات" : "Total Prospects"}
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+                  {dict.kpiTotal}
                 </span>
                 <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono text-neutral-900">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
                     {totalLeads}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center shrink-0">
@@ -330,16 +495,16 @@ export default function AffiliateLeadsPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-neutral-500 mt-1">
-                  {newLeads.length} {isAr ? "طلب جديد بانتظار التأكيد" : "nouveaux leads"}
+                  {newLeads.length} {dict.kpiNewLeadsSuffix}
                 </p>
               </Card>
 
               <Card className="p-4 sm:p-5">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
-                  {isAr ? "نسبة التسليم" : "Taux de Livraison"}
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+                  {dict.kpiDeliveryRate}
                 </span>
                 <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono text-neutral-900">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
                     {deliveryRate}%
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
@@ -347,13 +512,13 @@ export default function AffiliateLeadsPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-neutral-500 mt-1">
-                  {canceledOrders.length} {isAr ? "ملغاة أو مسترجعة" : "annulations/retours"}
+                  {canceledOrders.length} {dict.kpiRtoSuffix}
                 </p>
               </Card>
             </div>
 
             {/* Filters Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-3">
+            <div className="bg-white p-4 rounded-2xl border border-black/[0.08] shadow-xs space-y-3">
               <div className="flex flex-col md:flex-row gap-3">
                 {/* Search */}
                 <div className="relative flex-1">
@@ -362,12 +527,9 @@ export default function AffiliateLeadsPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={
-                      isAr
-                        ? "بحث برقم الطلب، اسم العميل، الهاتف، أو رقم التتبع..."
-                        : "Rechercher par N° de commande, client, téléphone ou tracking..."
-                    }
-                    className="w-full bg-neutral-50 hover:bg-neutral-100/60 focus:bg-white rounded-xl border border-neutral-200 py-2 ps-10 pe-4 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                    data-testid="affiliate-order-search-input"
+                    placeholder={dict.searchPlaceholder}
+                    className="w-full bg-neutral-50 hover:bg-neutral-100/60 focus:bg-white rounded-xl border border-black/10 py-2 ps-10 pe-4 text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -380,36 +542,54 @@ export default function AffiliateLeadsPage() {
                   )}
                 </div>
 
-                {/* Wilaya Filter */}
-                <div className="w-full md:w-56 shrink-0">
-                  <select
+                {/* Modern Animated Wilaya Filter with Search */}
+                <div className="w-full md:w-64 shrink-0">
+                  <ModernSelect
                     value={wilayaFilter}
-                    onChange={(e) => setWilayaFilter(e.target.value)}
-                    className="w-full bg-neutral-50 hover:bg-neutral-100/60 focus:bg-white rounded-xl border border-neutral-200 py-2 px-3 text-xs sm:text-sm text-neutral-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all cursor-pointer"
-                  >
-                    <option value="all">{isAr ? "جميع الولايات (58 ولاية)" : "Toutes les wilayas (58)"}</option>
-                    {ALGERIA_WILAYAS.map((w) => (
-                      <option key={w.code} value={String(parseInt(w.code, 10))}>
-                        {w.code} - {isAr ? w.nameAr : w.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setWilayaFilter(val)}
+                    options={[
+                      {
+                        value: "all",
+                        label: dict.allWilayas,
+                        badge: "58",
+                        badgeColor: "bg-sky-50 text-sky-700 border-sky-200/60",
+                      },
+                      ...ALGERIA_WILAYAS.map((w) => ({
+                        value: String(parseInt(w.code, 10)),
+                        label: isAr ? `${w.nameAr} (${w.name})` : `${w.name} (${w.nameAr})`,
+                        badge: w.code,
+                      })),
+                    ]}
+                    icon={<MapPin className="w-3.5 h-3.5 text-sky-600" />}
+                    searchable
+                    searchPlaceholder={
+                      isAr
+                        ? "ابحث بالاسم أو الرقم (مثلاً: 16، وهران)..."
+                        : "Rechercher wilaya (ex: 16, Alger)..."
+                    }
+                    nativeSelectTestId="affiliate-wilaya-select"
+                    data-testid="affiliate-wilaya-dropdown"
+                    triggerClassName="py-2 px-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/60 focus:bg-white border-black/10 text-xs sm:text-sm"
+                    menuClassName="min-w-[260px]"
+                    align="end"
+                  />
                 </div>
               </div>
 
               {/* Status Filter Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar text-xs">
                 {[
-                  { id: "all", label: isAr ? "الكل" : "Tous", count: totalLeads },
-                  { id: "lead_generated", label: isAr ? "طلبات جديدة" : "Nouveaux Leads", count: newLeads.length },
-                  { id: "in_pipeline", label: isAr ? "قيد الشحن والتوصيل" : "En cours / Expédié", count: inTransitOrders.length },
-                  { id: "delivered", label: isAr ? "تم التسليم" : "Livrés", count: deliveredOrders.length },
-                  { id: "returned_canceled", label: isAr ? "ملغاة ومسترجعة" : "Annulés / Retours", count: canceledOrders.length },
+                  { id: "all", label: dict.tabs.all, count: totalLeads },
+                  { id: "lead_generated", label: dict.tabs.newLeads, count: newLeads.length },
+                  { id: "in_pipeline", label: dict.tabs.inPipeline, count: inTransitOrders.length },
+                  { id: "delivered", label: dict.tabs.delivered, count: deliveredOrders.length },
+                  { id: "returned_canceled", label: dict.tabs.canceledReturns, count: canceledOrders.length },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setStatusFilter(tab.id)}
+                    data-testid={`tab-status-${tab.id}`}
                     className={`px-3 py-1.5 rounded-xl font-medium transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                       statusFilter === tab.id
                         ? "bg-slate-900 text-white shadow-xs"
@@ -431,24 +611,24 @@ export default function AffiliateLeadsPage() {
               </div>
             </div>
 
-            {/* Orders Table */}
-            <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-              <Table>
+            {/* Desktop Orders Table (>= 640px) */}
+            <div className="hidden sm:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
+              <Table data-testid="affiliate-orders-table">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-32">{isAr ? "رقم الطلب" : "Réf. Commande"}</TableHead>
-                    <TableHead>{isAr ? "العميل والوجهة" : "Client & Destination"}</TableHead>
-                    <TableHead>{isAr ? "التاريخ" : "Date"}</TableHead>
-                    <TableHead>{isAr ? "شركة التوصيل والتتبع" : "Transporteur & Tracking"}</TableHead>
-                    <TableHead>{isAr ? "الحالة" : "Statut"}</TableHead>
-                    <TableHead className="text-end">{isAr ? "العمولة الصافية" : "Commission Nette"}</TableHead>
+                    <TableHead className="w-32">{dict.colOrderRef}</TableHead>
+                    <TableHead>{dict.colCustomer}</TableHead>
+                    <TableHead>{dict.colDate}</TableHead>
+                    <TableHead>{dict.colCourier}</TableHead>
+                    <TableHead>{dict.colStatus}</TableHead>
+                    <TableHead className="text-end">{dict.colCommission}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
                       <TableCell colSpan={6} className="h-32 text-center text-xs text-neutral-500">
-                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-blue-600" />
+                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
                         <span>{t.common.loading}</span>
                       </TableCell>
                     </TableRow>
@@ -464,13 +644,14 @@ export default function AffiliateLeadsPage() {
                       return (
                         <TableRow
                           key={order.id}
+                          data-testid="affiliate-order-row"
                           className="hover:bg-neutral-50/80 transition-colors cursor-pointer"
                           onClick={() => setSelectedOrder(order)}
                         >
                           {/* Order ID */}
                           <TableCell>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-xs font-bold text-sky-700">
+                              <span className="font-mono text-xs font-semibold text-neutral-800">
                                 #{order.id.slice(0, 8).toUpperCase()}
                               </span>
                               <button
@@ -479,13 +660,14 @@ export default function AffiliateLeadsPage() {
                                   e.stopPropagation();
                                   handleCopy(order.id, order.id);
                                 }}
-                                className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded"
+                                data-testid="copy-order-id-btn"
+                                className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded cursor-pointer"
                                 title="Copier ID complet"
                               >
                                 {copiedId === order.id ? (
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
@@ -494,11 +676,11 @@ export default function AffiliateLeadsPage() {
                           {/* Customer & Location */}
                           <TableCell>
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-xs font-bold text-neutral-900">
+                              <span className="text-sm font-semibold text-neutral-900 tracking-tight leading-snug">
                                 {order.customerName}
                               </span>
                               <div className="flex items-center gap-1.5 text-[11px] text-neutral-500">
-                                <span className="font-mono font-medium text-neutral-600">
+                                <span className="font-mono font-medium text-neutral-600" dir="ltr">
                                   {maskPhone(order.customerPhone)}
                                 </span>
                                 <span>•</span>
@@ -517,7 +699,7 @@ export default function AffiliateLeadsPage() {
                           <TableCell>
                             <span className="text-xs text-neutral-600">
                               {new Date(order.createdAt).toLocaleDateString(
-                                lang === "ar" ? "ar-DZ" : "fr-FR",
+                                lang === "ar" ? "ar-DZ" : isEn ? "en-US" : "fr-FR",
                                 { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
                               )}
                             </span>
@@ -539,22 +721,22 @@ export default function AffiliateLeadsPage() {
                                     e.stopPropagation();
                                     handleCopy(order.trackingNumber!, `track-${order.id}`);
                                   }}
-                                  className="text-neutral-400 hover:text-neutral-700 p-0.5"
+                                  data-testid="copy-tracking-number-btn"
+                                  className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                                  title="Copier Numéro de suivi"
                                 >
                                   {copiedId === `track-${order.id}` ? (
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
                                   ) : (
-                                    <Copy className="w-3 h-3" />
+                                    <Copy className="w-3.5 h-3.5" />
                                   )}
                                 </button>
                               </div>
                             ) : (
                               <span className="text-xs text-neutral-400 italic">
                                 {order.status === "lead_generated"
-                                  ? isAr
-                                    ? "بانتظار التأكيد الهاتفي"
-                                    : "En attente d'appel"
-                                  : "Non assigné"}
+                                  ? dict.awaitingCall
+                                  : dict.unassigned}
                               </span>
                             )}
                           </TableCell>
@@ -568,6 +750,7 @@ export default function AffiliateLeadsPage() {
                           <TableCell className="text-end">
                             <div className="flex flex-col items-end">
                               <span
+                                data-testid="affiliate-order-payout"
                                 className={`font-mono text-xs font-bold ${
                                   isDelivered
                                     ? "text-emerald-600"
@@ -580,16 +763,10 @@ export default function AffiliateLeadsPage() {
                               </span>
                               <span className="text-[10px] text-neutral-400">
                                 {isDelivered
-                                  ? isAr
-                                    ? "مكتسب 100%"
-                                    : "Encaissé"
+                                  ? dict.commissionCleared
                                   : isFailed
-                                  ? isAr
-                                    ? "غير مستحق"
-                                    : "Annulé"
-                                  : isAr
-                                  ? "معلق"
-                                  : "En attente"}
+                                  ? dict.commissionCanceled
+                                  : dict.commissionPending}
                               </span>
                             </div>
                           </TableCell>
@@ -602,17 +779,15 @@ export default function AffiliateLeadsPage() {
                         <div className="flex flex-col items-center justify-center space-y-2">
                           <Package className="w-8 h-8 text-neutral-300" />
                           <p className="text-sm font-semibold text-neutral-700">
-                            {isAr ? "لم يتم العثور على أي طلبات" : "Aucune commande trouvée"}
+                            {dict.emptyTitle}
                           </p>
                           <p className="text-xs text-neutral-400 max-w-sm">
-                            {isAr
-                              ? "شارك روابط التتبع الخاصة بمنتجاتك لتوليد طلبات ومبيعات جديدة"
-                              : "Partagez vos liens d'affiliation pour capturer de nouveaux prospects"}
+                            {dict.emptyDesc}
                           </p>
                           <Link href="/affiliate/marketplace">
                             <Button size="sm" className="mt-2">
                               <ShoppingBag className="w-3.5 h-3.5" />
-                              <span>{isAr ? "تصفح المنتجات" : "Voir le catalogue"}</span>
+                              <span>{dict.viewCatalog}</span>
                             </Button>
                           </Link>
                         </div>
@@ -623,22 +798,161 @@ export default function AffiliateLeadsPage() {
               </Table>
             </div>
 
-            {/* ORDER DETAIL MODAL */}
+            {/* Mobile Orders Card List (< 640px) */}
+            <div className="sm:hidden flex flex-col gap-3">
+              {isLoading ? (
+                <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
+                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
+                  <span>{t.common.loading}</span>
+                </div>
+              ) : filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => {
+                  const wilayaInfo = getWilayaByCode(String(order.wilaya).padStart(2, "0"));
+                  const isDelivered = order.status === "delivered";
+                  const isFailed =
+                    order.status === "canceled" ||
+                    order.status === "rto_in_transit" ||
+                    order.status === "returned_to_supplier";
+
+                  return (
+                    <div
+                      key={order.id}
+                      data-testid="affiliate-order-card"
+                      className="p-4 rounded-2xl bg-white border border-black/[0.08] shadow-xs space-y-3 cursor-pointer"
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-semibold text-neutral-800">
+                              #{order.id.slice(0, 8).toUpperCase()}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(order.id, order.id);
+                              }}
+                              data-testid="copy-order-id-btn"
+                              className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded cursor-pointer"
+                            >
+                              {copiedId === order.id ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                          <h3 className="text-sm font-semibold text-neutral-900 tracking-tight leading-snug mt-1">
+                            {order.customerName}
+                          </h3>
+                        </div>
+
+                        <StatusBadge status={order.status as OrderStatus} lang={lang} />
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-neutral-50">
+                        <span className="text-neutral-500 text-[11px]">
+                          {dict.commissionNetteLabel}
+                        </span>
+                        <span
+                          data-testid="affiliate-order-payout"
+                          className={`font-mono font-bold text-xs ${
+                            isDelivered
+                              ? "text-emerald-600"
+                              : isFailed
+                              ? "text-neutral-400 line-through"
+                              : "text-blue-600"
+                          }`}
+                        >
+                          {formatDZD(Number(order.cpaCommission || 0), lang)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-neutral-600">
+                        <span className="font-mono" dir="ltr">
+                          {maskPhone(order.customerPhone)}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-neutral-400" />
+                          <span>
+                            {wilayaInfo ? (isAr ? wilayaInfo.nameAr : wilayaInfo.name) : `W.${order.wilaya}`}{" "}
+                            ({order.commune})
+                          </span>
+                        </span>
+                      </div>
+
+                      {order.trackingNumber && (
+                        <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-[11px]">
+                          <span className="text-neutral-500 font-medium">
+                            {order.courier || "YALIDINE"}:
+                          </span>
+                          <div className="flex items-center gap-1.5 font-mono">
+                            <span className="font-semibold text-neutral-800">{order.trackingNumber}</span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(order.trackingNumber!, `track-${order.id}`);
+                              }}
+                              data-testid="copy-tracking-number-btn"
+                              className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                            >
+                              {copiedId === `track-${order.id}` ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setSelectedOrder(order)}
+                        data-testid="view-order-details-btn"
+                        className="w-full text-xs py-1.5"
+                      >
+                        <Eye className="w-3.5 h-3.5 me-1" />
+                        <span>{dict.viewDetails}</span>
+                      </Button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
+                  <Package className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
+                  <p className="font-semibold text-neutral-700">
+                    {dict.emptyTitle}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* ORDER DETAIL ACCESSIBLE MODAL */}
             {selectedOrder && (
-              <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-                <div className="bg-white rounded-3xl border border-neutral-200 max-w-lg w-full p-6 space-y-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+              <div
+                role="dialog"
+                aria-modal="true"
+                data-testid="affiliate-order-detail-modal"
+                className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
+              >
+                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-lg w-full p-6 space-y-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
                     <div>
-                      <span className="text-xs font-mono font-bold text-sky-600 uppercase">
+                      <span className="text-xs font-mono font-semibold text-neutral-800">
                         #{selectedOrder.id.slice(0, 8).toUpperCase()}
                       </span>
                       <h3 className="text-lg font-bold text-neutral-900 mt-0.5">
-                        {isAr ? "تفاصيل الطلب والتوصيل" : "Détails de la commande"}
+                        {dict.modal.title}
                       </h3>
                     </div>
                     <button
                       type="button"
                       onClick={() => setSelectedOrder(null)}
+                      data-testid="close-order-modal-btn"
                       className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 cursor-pointer"
                     >
                       <X className="w-5 h-5" />
@@ -649,14 +963,14 @@ export default function AffiliateLeadsPage() {
                   <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-neutral-500">
-                        {isAr ? "حالة الطلب الحالية" : "Statut actuel"}
+                        {dict.modal.statusLabel}
                       </span>
                       <StatusBadge status={selectedOrder.status as OrderStatus} lang={lang} />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-neutral-500">
-                        {isAr ? "العمولة الصافية المستحقة (80%)" : "Commission nette (80%)"}
+                        {dict.modal.commissionLabel}
                       </span>
                       <span className="font-mono text-sm font-bold text-emerald-600">
                         {formatDZD(Number(selectedOrder.cpaCommission || 0), lang)}
@@ -666,7 +980,7 @@ export default function AffiliateLeadsPage() {
                     {selectedOrder.trackingNumber && (
                       <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
                         <span className="text-xs font-semibold text-neutral-500">
-                          {isAr ? "رقم بوليصة الشحن" : "Numéro de suivi"}
+                          {dict.modal.trackingLabel}
                         </span>
                         <span className="font-mono text-xs font-bold text-neutral-900">
                           {selectedOrder.courier || "YALIDINE"} • {selectedOrder.trackingNumber}
@@ -678,27 +992,27 @@ export default function AffiliateLeadsPage() {
                   {/* Customer Info */}
                   <div className="space-y-2 text-xs">
                     <p className="font-bold text-neutral-900 uppercase text-[11px] tracking-wider">
-                      {isAr ? "معلومات الزبون" : "Coordonnées Client"}
+                      {dict.modal.customerSection}
                     </p>
                     <div className="p-3.5 rounded-2xl bg-white border border-neutral-200 space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-neutral-500">{isAr ? "الاسم:" : "Nom:"}</span>
-                        <span className="font-semibold">{selectedOrder.customerName}</span>
+                        <span className="text-neutral-500">{dict.modal.name}</span>
+                        <span className="font-semibold text-neutral-900">{selectedOrder.customerName}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-neutral-500">{isAr ? "الهاتف:" : "Téléphone:"}</span>
-                        <span className="font-mono font-semibold" dir="ltr">
+                        <span className="text-neutral-500">{dict.modal.phone}</span>
+                        <span className="font-mono font-semibold text-neutral-900" dir="ltr">
                           {maskPhone(selectedOrder.customerPhone)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-neutral-500">{isAr ? "الوجهة:" : "Destination:"}</span>
-                        <span className="font-semibold">
+                        <span className="text-neutral-500">{dict.modal.destination}</span>
+                        <span className="font-semibold text-neutral-900">
                           Wilaya {selectedOrder.wilaya} ({selectedOrder.commune})
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-neutral-500">{isAr ? "العنوان:" : "Adresse:"}</span>
+                        <span className="text-neutral-500">{dict.modal.address}</span>
                         <span className="text-neutral-700 text-end max-w-[240px] truncate">
                           {selectedOrder.address}
                         </span>
@@ -708,14 +1022,19 @@ export default function AffiliateLeadsPage() {
 
                   {selectedOrder.cancellationReason && (
                     <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
-                      <p className="font-semibold mb-0.5">{isAr ? "سبب الإلغاء:" : "Motif de l'annulation:"}</p>
+                      <p className="font-semibold mb-0.5">{dict.modal.cancellationReason}</p>
                       <p>{selectedOrder.cancellationReason}</p>
                     </div>
                   )}
 
                   <div className="pt-2 flex justify-end">
-                    <Button variant="secondary" size="sm" onClick={() => setSelectedOrder(null)}>
-                      {isAr ? "إغلاق" : "Fermer"}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSelectedOrder(null)}
+                      data-testid="close-order-modal-btn"
+                    >
+                      {dict.modal.close}
                     </Button>
                   </div>
                 </div>

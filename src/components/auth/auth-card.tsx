@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowLeft, ArrowRight, ShieldCheck, Globe } from "lucide-react";
-import { Language, isRTL, translations } from "@/lib/locales";
+import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import { Language, isRTL } from "@/lib/locales";
 
 interface AuthCardProps {
   children: (props: { lang: Language; setLang: (l: Language) => void }) => React.ReactNode;
@@ -14,12 +14,30 @@ interface AuthCardProps {
 export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
   const [lang, setLang] = useState<Language>(initialLang);
   const rtl = isRTL(lang);
-  const t = translations[lang];
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const saved = localStorage.getItem("vitedrop_lang") as Language;
+        if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
+          setLang(saved);
+        }
+      } catch {}
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  const handleLangChange = (newLang: Language) => {
+    setLang(newLang);
+    try {
+      localStorage.setItem("vitedrop_lang", newLang);
+    } catch {}
+  };
 
   return (
     <div
       dir={rtl ? "rtl" : "ltr"}
-      className="min-h-screen bg-[#fafafa] flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8 font-sans antialiased selection:bg-sky-500 selection:text-white"
+      className="min-h-screen bg-[#f8f7f4] flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8 font-sans antialiased selection:bg-sky-500 selection:text-white"
     >
       {/* Top Bar: Back to Home + Language Selector */}
       <div className="w-full max-w-md mx-auto flex items-center justify-between">
@@ -28,7 +46,13 @@ export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
           className="inline-flex items-center gap-2 text-xs font-semibold text-[#6b6b6b] hover:text-black transition-colors"
         >
           {rtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-          <span>{lang === "ar" ? "العودة للرئيسية" : "Retour à l'accueil"}</span>
+          <span>
+            {lang === "ar"
+              ? "العودة للرئيسية"
+              : lang === "en"
+              ? "Back to home"
+              : "Retour à l'accueil"}
+          </span>
         </Link>
 
         {/* Language Switcher */}
@@ -36,7 +60,8 @@ export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
           {(["fr", "ar", "en"] as Language[]).map((l) => (
             <button
               key={l}
-              onClick={() => setLang(l)}
+              data-testid={`auth-lang-${l}`}
+              onClick={() => handleLangChange(l)}
               className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
                 lang === l
                   ? "bg-white text-black shadow-xs font-bold"
@@ -57,9 +82,12 @@ export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0284c7] to-[#2563eb] flex items-center justify-center text-white font-bold text-base shadow-md shadow-sky-500/25 group-hover:scale-105 transition-transform">
               VD
             </div>
-            <span className="font-bold text-2xl tracking-tight text-neutral-900">
-              ViteDrop
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-serif-luxury text-2xl sm:text-3xl font-semibold italic tracking-[-0.08em] text-neutral-950">
+                ViteDrop
+              </span>
+              <sup className="text-xs font-semibold text-neutral-950 -top-2">®</sup>
+            </div>
           </Link>
         </div>
 
@@ -68,18 +96,20 @@ export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 450, damping: 35 }}
-          className="bg-white rounded-3xl border border-black/[0.08] p-6 sm:p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)]"
+          className="bg-white rounded-3xl border border-[#e7e5df] p-6 sm:p-8 shadow-xl shadow-neutral-900/5"
         >
-          {children({ lang, setLang })}
+          {children({ lang, setLang: handleLangChange })}
         </motion.div>
 
         {/* Security badge footer */}
-        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-[#6b6b6b]">
+        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-neutral-500 font-mono text-center">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
             {lang === "ar"
-              ? "نظام مشفر ومحمي بروتوكولياً 100%"
-              : "Connexion sécurisée SSL 256-bit • Réseau ViteDrop Algérie"}
+              ? "محمي بمحرك القيد المزدوج لمنصة ViteDrop · شبكة 58 ولاية"
+              : lang === "en"
+              ? "Secured by ViteDrop Double-Entry Escrow Engine · DZ-58 Network"
+              : "Sécurisé par le moteur double-entrée ViteDrop · Réseau DZ-58"}
           </span>
         </div>
       </div>

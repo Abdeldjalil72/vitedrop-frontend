@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/types";
 import { Language, translations } from "@/lib/locales";
+import { formatDZD } from "@/lib/formatters";
 import { getCurrentUser } from "@/lib/api-client";
 import { Copy, Check, ExternalLink, Link2, Sparkles } from "lucide-react";
 
@@ -64,7 +65,7 @@ export function TrackingLinkModal({
       description={t.marketplace.linkModalDesc}
       maxWidth="md"
     >
-      <div className="space-y-5 text-start">
+      <div data-testid="tracking-link-modal" className="space-y-5 text-start">
         {/* Product summary card */}
         <div className="p-3.5 rounded-2xl bg-[#fafafa] border border-black/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -82,14 +83,14 @@ export function TrackingLinkModal({
               <p className="text-[11px] text-[#6b6b6b]">
                 {t.marketplace.netPayout}:{" "}
                 <strong className="text-emerald-700 font-mono">
-                  {product.affiliateNetPayout} DZD
+                  {formatDZD(product.affiliateNetPayout, lang)}
                 </strong>
               </p>
             </div>
           </div>
 
           <div className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-[10px] font-semibold shrink-0">
-            80% Net Payout
+            {lang === "ar" ? "عمولة صافية" : "Net CPA"}
           </div>
         </div>
 
@@ -100,6 +101,7 @@ export function TrackingLinkModal({
             value={campaign}
             onChange={(e) => setCampaign(e.target.value)}
             placeholder="fb_summer_sale"
+            data-testid="tracking-campaign-input"
           />
 
           <Input
@@ -107,6 +109,7 @@ export function TrackingLinkModal({
             value={subId}
             onChange={(e) => setSubId(e.target.value)}
             placeholder="video_hook_2"
+            data-testid="tracking-subid-input"
           />
         </div>
 
@@ -120,6 +123,7 @@ export function TrackingLinkModal({
               type="text"
               readOnly
               value={trackingUrl}
+              data-testid="generated-link-input"
               className="w-full font-mono text-xs bg-[#fafafa] border border-black/10 rounded-2xl px-3.5 py-2.5 text-neutral-800 focus:outline-none"
             />
             <Button
@@ -128,6 +132,7 @@ export function TrackingLinkModal({
               size="md"
               onClick={handleCopy}
               className="shrink-0"
+              data-testid="copy-tracking-link-btn"
             >
               {copied ? (
                 <>
@@ -168,7 +173,7 @@ export function TrackingLinkModal({
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
-          <Button variant="secondary" size="sm" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose} data-testid="close-link-modal-btn">
             {t.common.cancel}
           </Button>
         </div>

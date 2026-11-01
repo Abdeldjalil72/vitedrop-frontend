@@ -53,7 +53,9 @@ export default function RegisterPage() {
 
     const phoneCheck = validateAlgerianPhone(phone);
     if (!phoneCheck.isValid) {
-      setPhoneError("Format algérien invalide (ex: 0550123456)");
+      const msg = "Format algérien invalide (ex: 0550123456)";
+      setPhoneError(msg);
+      setError(msg);
       return;
     }
 
@@ -130,21 +132,22 @@ export default function RegisterPage() {
 
             {/* Error / Success */}
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+              <div data-testid="register-error-banner" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {success && (
-              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
+              <div data-testid="register-success-banner" className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{t.auth.registerSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form noValidate onSubmit={handleSubmit} className="space-y-3.5">
               <Input
+                data-testid="register-name-input"
                 label={t.auth.fullName}
                 type="text"
                 placeholder="Karim Mansouri"
@@ -155,6 +158,7 @@ export default function RegisterPage() {
               />
 
               <Input
+                data-testid="register-email-input"
                 label={t.auth.email}
                 type="email"
                 placeholder="karim@exemple.dz"
@@ -165,6 +169,8 @@ export default function RegisterPage() {
               />
 
               <Input
+                data-testid="register-phone-input"
+                dir="ltr"
                 label={t.auth.phone}
                 type="tel"
                 placeholder="0550 12 34 56"
@@ -177,6 +183,7 @@ export default function RegisterPage() {
               />
 
               <Input
+                data-testid="register-password-input"
                 label={t.auth.password}
                 type="password"
                 placeholder="Minimum 6 caractères"
@@ -195,6 +202,7 @@ export default function RegisterPage() {
                   </div>
 
                   <Input
+                    data-testid="register-company-input"
                     label={t.auth.company}
                     type="text"
                     placeholder="Atlas Distribution SARL"
@@ -209,12 +217,14 @@ export default function RegisterPage() {
                     value={wilaya}
                     onChange={(code) => setWilaya(code)}
                     lang={lang}
+                    data-testid="register-wilaya-select"
                   />
                 </div>
               )}
 
               <div className="pt-2">
                 <Button
+                  data-testid="register-submit-btn"
                   type="submit"
                   size="md"
                   isLoading={isLoading}
@@ -228,6 +238,7 @@ export default function RegisterPage() {
             <div className="text-center pt-2 border-t border-black/[0.06] text-xs text-[#6b6b6b]">
               <span>{t.auth.alreadyHaveAccount} </span>
               <Link
+                data-testid="register-login-link"
                 href="/login"
                 className="font-semibold text-neutral-900 hover:text-sky-600 transition-colors"
               >

@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --color-sandstone: #f8f7f4;
+  --color-stone-border: #e7e5df;
+  --color-racing-green: #064e3b;
+  --color-brushed-gold: #d97706;
+  --color-vitedrop-blue: #0284c7;
+}
+
 @layer base {
   :root {
     --bg: #ffffff;
@@ -9,7 +19,8 @@
     --button-text: #ffffff;
     --border-soft: rgba(0, 0, 0, 0.08);
     --green: #17c964;
-    --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-primary: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   * {
@@ -21,24 +32,17 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code, kbd, samp, pre, .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: 'tnum' on, 'zero' on;
   }
 
   [dir="rtl"] {
     letter-spacing: normal;
-  }
-
-  .dashboard-ui {
-    font-size: 1.0625rem;
-  }
-
-  .dashboard-ui .text-xs {
-    font-size: 0.8125rem !important;
-    line-height: 1.35 !important;
-  }
-
-  .dashboard-ui .text-sm {
-    font-size: 0.9375rem !important;
-    line-height: 1.45 !important;
   }
 }
 

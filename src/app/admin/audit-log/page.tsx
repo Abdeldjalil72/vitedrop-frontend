@@ -62,17 +62,20 @@ export default function AdminAuditLogPage() {
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isArabic = lang === "ar";
+        const isEnglish = lang === "en";
 
         return (
           <div className="space-y-5 sm:space-y-6 lg:space-y-8 text-start">
             {/* Header */}
             <AdminPageHeader
-              badge={isArabic ? "سجل الرقابة والأمان" : "Immutable Audit Trail"}
+              badge={isArabic ? "سجل الرقابة والأمان" : isEnglish ? "Audit Trail & Security" : "Journal de Contrôle & Sécurité"}
               badgeVariant="rose"
-              title={isArabic ? "سجل تدقيق العمليات الإدارية" : "Journal d'Audit des Administrateurs"}
+              title={isArabic ? "سجل تدقيق العمليات الإدارية" : isEnglish ? "Admin Action Audit Trail" : "Journal d'Audit des Administrateurs"}
               description={
                 isArabic
                   ? "سجل غير قابل للتعديل يوثق كافة التدخلات الإدارية: الموافقة على السحوبات، تغيير الأدوار، وتعليق المنتجات."
+                  : isEnglish
+                  ? "Immutable ledger recording all administrative actions: withdrawal approvals, role changes, and account suspensions."
                   : "Traçabilité complète des actions sensibles : approbations, suspensions et régularisations."
               }
               actions={
@@ -84,7 +87,7 @@ export default function AdminAuditLogPage() {
                   className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-                  {isArabic ? "تحديث" : "Actualiser"}
+                  {isArabic ? "تحديث" : isEnglish ? "Refresh" : "Actualiser"}
                 </Button>
               }
             />
@@ -103,7 +106,7 @@ export default function AdminAuditLogPage() {
                   }
                   className="w-full min-h-[40px] sm:min-h-0 px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:bg-white focus:outline-hidden"
                 >
-                  <option value="">{isArabic ? "جميع العمليات" : "Toutes les actions"}</option>
+                  <option value="">{isArabic ? "جميع العمليات" : isEnglish ? "All Actions" : "Toutes les actions"}</option>
                   <option value="WITHDRAWAL_APPROVE">WITHDRAWAL_APPROVE</option>
                   <option value="WITHDRAWAL_REJECT">WITHDRAWAL_REJECT</option>
                   <option value="WITHDRAWAL_PAID">WITHDRAWAL_PAID</option>
@@ -127,7 +130,7 @@ export default function AdminAuditLogPage() {
                   }
                   className="w-full min-h-[40px] sm:min-h-0 px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:bg-white focus:outline-hidden"
                 >
-                  <option value="">{isArabic ? "جميع الكيانات" : "Toutes les entités"}</option>
+                  <option value="">{isArabic ? "جميع الكيانات" : isEnglish ? "All Entities" : "Toutes les entités"}</option>
                   <option value="Withdrawal">Withdrawal</option>
                   <option value="User">User</option>
                   <option value="Product">Product</option>
@@ -145,7 +148,7 @@ export default function AdminAuditLogPage() {
                   <span>{error}</span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={loadLogs} className="text-xs text-rose-800">
-                  {isArabic ? "إعادة المحاولة" : "Réessayer"}
+                  {isArabic ? "إعادة المحاولة" : isEnglish ? "Retry" : "Réessayer"}
                 </Button>
               </div>
             )}
@@ -156,11 +159,11 @@ export default function AdminAuditLogPage() {
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-neutral-500" />
                   <span className="text-xs font-semibold text-neutral-800">
-                    {total} {isArabic ? "عملية مسجلة" : "événements d'audit"}
+                    {total} {isArabic ? "عملية مسجلة" : isEnglish ? "audit events" : "événements d'audit"}
                   </span>
                 </div>
                 <span className="text-xs text-neutral-400 font-mono">
-                  {isArabic ? `الصفحة ${currentPage} من ${totalPages}` : `Page ${currentPage} sur ${totalPages}`}
+                  {isArabic ? `الصفحة ${currentPage} من ${totalPages}` : isEnglish ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage} sur ${totalPages}`}
                 </span>
               </div>
 
@@ -174,7 +177,7 @@ export default function AdminAuditLogPage() {
                 <div className="p-12 text-center text-neutral-500 space-y-2">
                   <FileText className="w-8 h-8 mx-auto text-neutral-300" />
                   <p className="text-sm font-medium">
-                    {isArabic ? "لا توجد عمليات تطابق البحث" : "Aucun événement d'audit trouvé."}
+                    {isArabic ? "لا توجد عمليات تطابق البحث" : isEnglish ? "No audit events found." : "Aucun événement d'audit trouvé."}
                   </p>
                 </div>
               ) : (
@@ -182,7 +185,11 @@ export default function AdminAuditLogPage() {
                   {/* Mobile Cards (Phone / Small Screens) */}
                   <div className="block sm:hidden divide-y divide-neutral-100">
                     {logs.map((log) => (
-                      <div key={log.id} className="p-3.5 space-y-2.5">
+                      <div
+                        key={log.id}
+                        className="p-3.5 space-y-2.5"
+                        data-testid="admin-audit-card"
+                      >
                         <div className="flex items-start justify-between gap-2">
                           <span className="inline-block px-2 py-0.5 rounded bg-neutral-100 font-mono text-xs text-neutral-900 font-bold">
                             {log.action}
@@ -195,7 +202,7 @@ export default function AdminAuditLogPage() {
                         <div className="space-y-1 text-xs">
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-neutral-500 text-[11px]">
-                              {isArabic ? "المسؤول:" : "Opérateur:"}
+                              {isArabic ? "المسؤول:" : isEnglish ? "Operator:" : "Opérateur:"}
                             </span>
                             <span className="font-medium text-neutral-900 font-sans truncate max-w-[180px]">
                               {log.adminEmail || log.adminId.slice(0, 8)}
@@ -204,7 +211,7 @@ export default function AdminAuditLogPage() {
 
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-neutral-500 text-[11px]">
-                              {isArabic ? "الكيان:" : "Cible:"}
+                              {isArabic ? "الكيان:" : isEnglish ? "Target:" : "Cible:"}
                             </span>
                             <span className="font-mono text-neutral-700 text-[11px] truncate max-w-[180px]">
                               {log.entityType} ({log.entityId.slice(0, 8)}...)
@@ -213,7 +220,9 @@ export default function AdminAuditLogPage() {
 
                           {log.reason && (
                             <div className="text-[11px] text-neutral-600 bg-neutral-50 p-2 rounded border border-neutral-100">
-                              <span className="font-semibold text-neutral-700 me-1">Motif:</span>
+                              <span className="font-semibold text-neutral-700 me-1">
+                                {isArabic ? "السبب:" : isEnglish ? "Reason:" : "Motif:"}
+                              </span>
                               {log.reason}
                             </div>
                           )}
@@ -225,9 +234,10 @@ export default function AdminAuditLogPage() {
                             size="sm"
                             onClick={() => setSelectedLog(log)}
                             className="min-h-[36px] px-3 text-xs text-neutral-700 font-medium flex items-center justify-center gap-1.5 w-full"
+                            data-testid="view-diff-btn"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            {isArabic ? "فحص التغييرات (Diff)" : "Examiner le Diff"}
+                            {isArabic ? "فحص التغييرات (Diff)" : isEnglish ? "Inspect Diff" : "Examiner le Diff"}
                           </Button>
                         </div>
                       </div>
@@ -239,17 +249,21 @@ export default function AdminAuditLogPage() {
                     <table className="w-full text-xs text-start">
                       <thead className="bg-neutral-50 text-neutral-500 font-medium border-b border-neutral-200">
                         <tr>
-                          <th className="px-4 py-3 text-start">{isArabic ? "العملية" : "Action"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "المسؤول (Admin)" : "Opérateur"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "الكيان والمعرف" : "Entité Cible"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "السبب / الملاحظة" : "Motif"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "التاريخ والوقت" : "Horodatage"}</th>
-                          <th className="px-4 py-3 text-end">{isArabic ? "فحص الحالة" : "Inspection"}</th>
+                          <th className="px-4 py-3 text-start">{isArabic ? "العملية" : isEnglish ? "Action" : "Action"}</th>
+                          <th className="px-4 py-3 text-start">{isArabic ? "المسؤول (Admin)" : isEnglish ? "Operator (Admin)" : "Opérateur"}</th>
+                          <th className="px-4 py-3 text-start">{isArabic ? "الكيان والمعرف" : isEnglish ? "Target Entity" : "Entité Cible"}</th>
+                          <th className="px-4 py-3 text-start">{isArabic ? "السبب / الملاحظة" : isEnglish ? "Reason / Note" : "Motif"}</th>
+                          <th className="px-4 py-3 text-start">{isArabic ? "التاريخ والوقت" : isEnglish ? "Timestamp" : "Horodatage"}</th>
+                          <th className="px-4 py-3 text-end">{isArabic ? "فحص الحالة" : isEnglish ? "Inspection" : "Inspection"}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-100 font-mono">
                         {logs.map((log) => (
-                          <tr key={log.id} className="hover:bg-neutral-50/60">
+                          <tr
+                            key={log.id}
+                            className="hover:bg-neutral-50/60"
+                            data-testid="admin-audit-row"
+                          >
                             <td className="px-4 py-3 font-bold text-neutral-900 font-sans">
                               <span className="inline-block px-2 py-0.5 rounded bg-neutral-100 font-mono text-[11px] text-neutral-800">
                                 {log.action}
@@ -285,9 +299,10 @@ export default function AdminAuditLogPage() {
                                 size="sm"
                                 onClick={() => setSelectedLog(log)}
                                 className="h-7 px-2 text-xs text-neutral-600 hover:text-neutral-900"
+                                data-testid="view-diff-btn"
                               >
                                 <Eye className="w-3.5 h-3.5 me-1" />
-                                Diff
+                                {isArabic ? "فحص" : "Diff"}
                               </Button>
                             </td>
                           </tr>
@@ -295,6 +310,7 @@ export default function AdminAuditLogPage() {
                       </tbody>
                     </table>
                   </div>
+
                 </>
               )}
 
@@ -314,7 +330,7 @@ export default function AdminAuditLogPage() {
                     className="min-h-[40px] sm:min-h-0 text-xs flex items-center gap-1"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
-                    {isArabic ? "السابق" : "Précédent"}
+                    {isArabic ? "السابق" : isEnglish ? "Previous" : "Précédent"}
                   </Button>
                   <span className="text-xs text-neutral-600 font-mono">
                     {currentPage} / {totalPages}
@@ -331,7 +347,7 @@ export default function AdminAuditLogPage() {
                     }
                     className="min-h-[40px] sm:min-h-0 text-xs flex items-center gap-1"
                   >
-                    {isArabic ? "التالي" : "Suivant"}
+                    {isArabic ? "التالي" : isEnglish ? "Next" : "Suivant"}
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -342,21 +358,21 @@ export default function AdminAuditLogPage() {
             <Modal
               isOpen={!!selectedLog}
               onClose={() => setSelectedLog(null)}
-              title={isArabic ? "تفاصيل التغيير وحالة الكيان" : "Inspection du Changement d'État"}
+              title={isArabic ? "تفاصيل التغيير وحالة الكيان" : isEnglish ? "State Change Inspection" : "Inspection du Changement d'État"}
               maxWidth="lg"
             >
               {selectedLog && (
                 <div className="space-y-4 pt-2 text-start text-xs font-mono">
                   <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200 font-sans space-y-1">
                     <div>
-                      <strong>Action:</strong> {selectedLog.action}
+                      <strong>{isArabic ? "العملية:" : isEnglish ? "Action:" : "Action :"}</strong> {selectedLog.action}
                     </div>
                     <div>
-                      <strong>Entity:</strong> {selectedLog.entityType} ({selectedLog.entityId})
+                      <strong>{isArabic ? "الكيان:" : isEnglish ? "Entity:" : "Entité :"}</strong> {selectedLog.entityType} ({selectedLog.entityId})
                     </div>
                     {selectedLog.reason && (
                       <div>
-                        <strong>Motif:</strong> {selectedLog.reason}
+                        <strong>{isArabic ? "السبب:" : isEnglish ? "Reason:" : "Motif :"}</strong> {selectedLog.reason}
                       </div>
                     )}
                   </div>
@@ -364,7 +380,7 @@ export default function AdminAuditLogPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <span className="font-sans font-bold text-neutral-600 block mb-1">
-                        État Précédent (Before)
+                        {isArabic ? "الحالة السابقة (قبل)" : isEnglish ? "Previous State (Before)" : "État Précédent (Before)"}
                       </span>
                       <pre className="p-3 bg-neutral-900 text-rose-300 rounded-lg text-[11px] overflow-x-auto max-h-64">
                         {JSON.stringify(selectedLog.beforeState, null, 2) || "{}"}
@@ -373,7 +389,7 @@ export default function AdminAuditLogPage() {
 
                     <div>
                       <span className="font-sans font-bold text-neutral-600 block mb-1">
-                        Nouvel État (After)
+                        {isArabic ? "الحالة الجديدة (بعد)" : isEnglish ? "New State (After)" : "Nouvel État (After)"}
                       </span>
                       <pre className="p-3 bg-neutral-900 text-emerald-300 rounded-lg text-[11px] overflow-x-auto max-h-64">
                         {JSON.stringify(selectedLog.afterState, null, 2) || "{}"}

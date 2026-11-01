@@ -126,17 +126,20 @@ export default function AdminAgentsPage() {
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isArabic = lang === "ar";
+        const isEnglish = lang === "en";
 
         return (
           <div className="space-y-5 sm:space-y-6 lg:space-y-8 text-start">
             {/* Header */}
             <AdminPageHeader
-              badge={isArabic ? "إدارة فرق التأكيد الهاتفي" : "Call Center Multi-Tenant"}
+              badge={isArabic ? "إدارة فرق التأكيد الهاتفي" : isEnglish ? "Call Center Operations" : "Call Center Multi-Tenant"}
               badgeVariant="rose"
-              title={isArabic ? "وكلاء مركز الاتصال والتأكيد" : "Agents Call Center"}
+              title={isArabic ? "وكلاء مركز الاتصال والتأكيد" : isEnglish ? "Call Center Agents" : "Agents Call Center"}
               description={
                 isArabic
                   ? "إدارة حسابات تأكيد الطلبيات وتخصيص كل وكيل للمورد المناسب (Tenant Isolation)."
+                  : isEnglish
+                  ? "Create and assign confirmation call center agents to partner suppliers."
                   : "Création et rattachement des agents de confirmation aux fournisseurs partenaires."
               }
               actions={
@@ -149,17 +152,17 @@ export default function AdminAgentsPage() {
                     className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-                    {isArabic ? "تحديث" : "Actualiser"}
+                    {isArabic ? "تحديث" : isEnglish ? "Refresh" : "Actualiser"}
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
+                  <button
+                    type="button"
                     onClick={() => setIsCreateOpen(true)}
-                    className="min-h-[40px] sm:min-h-0 text-xs bg-neutral-900 hover:bg-neutral-800 text-white flex items-center justify-center gap-1.5 w-full sm:w-auto"
+                    className="min-h-[40px] sm:min-h-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#064e3b] hover:bg-[#085a44] border border-[#0a5e47] text-amber-200 text-xs font-semibold shadow-xs active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-amber-300 w-full sm:w-auto cursor-pointer"
+                    data-testid="create-agent-header-btn"
                   >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    {isArabic ? "إضافة وكيل جديد" : "Créer un Agent"}
-                  </Button>
+                    <UserPlus className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
+                    <span>{isArabic ? "إضافة وكيل جديد" : isEnglish ? "Create Agent" : "Créer un Agent"}</span>
+                  </button>
                 </div>
               }
             />
@@ -172,7 +175,7 @@ export default function AdminAgentsPage() {
                   <span>{error}</span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={loadData} className="text-xs text-rose-800">
-                  {isArabic ? "إعادة المحاولة" : "Réessayer"}
+                  {isArabic ? "إعادة المحاولة" : isEnglish ? "Retry" : "Réessayer"}
                 </Button>
               </div>
             )}
@@ -183,7 +186,7 @@ export default function AdminAgentsPage() {
                 <div className="flex items-center gap-2">
                   <Headphones className="w-4 h-4 text-neutral-500" />
                   <span className="text-xs font-semibold text-neutral-800">
-                    {agents.length} {isArabic ? "وكيل مسجل" : "agents enregistrés"}
+                    {agents.length} {isArabic ? "وكيل مسجل" : isEnglish ? "registered agents" : "agents enregistrés"}
                   </span>
                 </div>
               </div>
@@ -198,7 +201,7 @@ export default function AdminAgentsPage() {
                 <div className="p-12 text-center text-neutral-500 space-y-2">
                   <Headphones className="w-8 h-8 mx-auto text-neutral-300" />
                   <p className="text-sm font-medium">
-                    {isArabic ? "لا يوجد أي وكلاء مسجلين حالياً" : "Aucun agent de call center configuré."}
+                    {isArabic ? "لا يوجد أي وكلاء مسجلين حالياً" : isEnglish ? "No call center agents configured." : "Aucun agent de call center configuré."}
                   </p>
                 </div>
               ) : (
@@ -216,12 +219,12 @@ export default function AdminAgentsPage() {
                             {agent.isActive ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                {isArabic ? "نشط" : "Actif"}
+                                {isArabic ? "نشط" : isEnglish ? "Active" : "Actif"}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                {isArabic ? "معلق" : "Suspendu"}
+                                {isArabic ? "معلق" : isEnglish ? "Suspended" : "Suspendu"}
                               </span>
                             )}
                           </div>
@@ -235,18 +238,22 @@ export default function AdminAgentsPage() {
                             </div>
                           )}
                           <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-neutral-500 text-[11px]">{isArabic ? "المورد:" : "Fournisseur:"}</span>
+                            <span className="text-neutral-500 text-[11px]">
+                              {isArabic ? "المورد:" : isEnglish ? "Supplier:" : "Fournisseur:"}
+                            </span>
                             {agent.tenantId ? (
                               <div className="flex items-center gap-1 text-purple-700 font-medium">
                                 <Building className="w-3 h-3" />
                                 <span>
                                   {suppliers.find((s) => s.id === agent.tenantId)?.fullName ||
-                                    `Fournisseur ${agent.tenantId.slice(0, 8)}...`}
+                                    (isEnglish
+                                      ? `Supplier ${agent.tenantId.slice(0, 8)}...`
+                                      : `Fournisseur ${agent.tenantId.slice(0, 8)}...`)}
                                 </span>
                               </div>
                             ) : (
                               <span className="text-amber-600 font-medium text-[11px]">
-                                {isArabic ? "غير مخصص لمورد" : "Non rattaché"}
+                                {isArabic ? "غير مخصص لمورد" : isEnglish ? "Unassigned" : "Non rattaché"}
                               </span>
                             )}
                           </div>
@@ -263,7 +270,7 @@ export default function AdminAgentsPage() {
                             className="min-h-[40px] text-xs flex items-center justify-center gap-1 w-full"
                           >
                             <Building className="w-3 h-3" />
-                            {isArabic ? "تعيين مورد" : "Rattacher"}
+                            {isArabic ? "تعيين مورد" : isEnglish ? "Assign" : "Rattacher"}
                           </Button>
 
                           <Button
@@ -277,8 +284,8 @@ export default function AdminAgentsPage() {
                             }`}
                           >
                             {agent.isActive
-                              ? isArabic ? "تعليق" : "Suspendre"
-                              : isArabic ? "تفعيل" : "Activer"}
+                              ? isArabic ? "تعليق" : isEnglish ? "Suspend" : "Suspendre"
+                              : isArabic ? "تفعيل" : isEnglish ? "Activate" : "Activer"}
                           </Button>
                         </div>
                       </div>
@@ -290,11 +297,21 @@ export default function AdminAgentsPage() {
                     <table className="w-full text-xs text-start">
                       <thead className="bg-neutral-50 text-neutral-500 font-medium border-b border-neutral-200">
                         <tr>
-                          <th className="px-4 py-3 text-start">{isArabic ? "الاسم والبريد" : "Agent & Email"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "الهاتف" : "Téléphone"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "المورد المخصص (Tenant)" : "Fournisseur Rattaché"}</th>
-                          <th className="px-4 py-3 text-start">{isArabic ? "الحالة" : "Statut"}</th>
-                          <th className="px-4 py-3 text-end">{isArabic ? "إجراءات" : "Actions"}</th>
+                          <th className="px-4 py-3 text-start">
+                            {isArabic ? "الاسم والبريد" : isEnglish ? "Agent & Email" : "Agent & Email"}
+                          </th>
+                          <th className="px-4 py-3 text-start">
+                            {isArabic ? "الهاتف" : isEnglish ? "Phone" : "Téléphone"}
+                          </th>
+                          <th className="px-4 py-3 text-start">
+                            {isArabic ? "المورد المخصص (Tenant)" : isEnglish ? "Assigned Supplier" : "Fournisseur Rattaché"}
+                          </th>
+                          <th className="px-4 py-3 text-start">
+                            {isArabic ? "الحالة" : isEnglish ? "Status" : "Statut"}
+                          </th>
+                          <th className="px-4 py-3 text-end">
+                            {isArabic ? "إجراءات" : isEnglish ? "Actions" : "Actions"}
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-100 font-mono">
@@ -315,12 +332,14 @@ export default function AdminAgentsPage() {
                                   <Building className="w-3.5 h-3.5" />
                                   <span>
                                     {suppliers.find((s) => s.id === agent.tenantId)?.fullName ||
-                                      `Fournisseur ${agent.tenantId.slice(0, 8)}...`}
+                                      (isEnglish
+                                        ? `Supplier ${agent.tenantId.slice(0, 8)}...`
+                                        : `Fournisseur ${agent.tenantId.slice(0, 8)}...`)}
                                   </span>
                                 </div>
                               ) : (
                                 <span className="text-amber-600 font-medium text-[11px]">
-                                  {isArabic ? "غير مخصص لمورد" : "Non rattaché"}
+                                  {isArabic ? "غير مخصص لمورد" : isEnglish ? "Unassigned" : "Non rattaché"}
                                 </span>
                               )}
                             </td>
@@ -328,12 +347,12 @@ export default function AdminAgentsPage() {
                               {agent.isActive ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  {isArabic ? "نشط" : "Actif"}
+                                  {isArabic ? "نشط" : isEnglish ? "Active" : "Actif"}
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">
                                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                  {isArabic ? "معلق" : "Suspendu"}
+                                  {isArabic ? "معلق" : isEnglish ? "Suspended" : "Suspendu"}
                                 </span>
                               )}
                             </td>
@@ -349,7 +368,7 @@ export default function AdminAgentsPage() {
                                   className="h-7 text-xs flex items-center gap-1"
                                 >
                                   <Building className="w-3 h-3" />
-                                  {isArabic ? "تعيين مورد" : "Rattacher"}
+                                  {isArabic ? "تعيين مورد" : isEnglish ? "Assign" : "Rattacher"}
                                 </Button>
 
                                 <Button
@@ -363,9 +382,13 @@ export default function AdminAgentsPage() {
                                   {agent.isActive
                                     ? isArabic
                                       ? "تعليق"
+                                      : isEnglish
+                                      ? "Suspend"
                                       : "Suspendre"
                                     : isArabic
                                     ? "تفعيل"
+                                    : isEnglish
+                                    ? "Activate"
                                     : "Activer"}
                                 </Button>
                               </div>
@@ -383,13 +406,13 @@ export default function AdminAgentsPage() {
             <Modal
               isOpen={isCreateOpen}
               onClose={() => setIsCreateOpen(false)}
-              title={isArabic ? "إنشاء حساب وكيل جديد" : "Créer un Agent Call Center"}
+              title={isArabic ? "إنشاء حساب وكيل جديد" : isEnglish ? "Create Call Center Agent" : "Créer un Agent Call Center"}
               maxWidth="md"
             >
               <form onSubmit={handleCreateSubmit} className="space-y-4 pt-2 text-start">
                 <div>
                   <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    {isArabic ? "الاسم الكامل" : "Nom & Prénom"}
+                    {isArabic ? "الاسم الكامل" : isEnglish ? "Full Name" : "Nom & Prénom"}
                   </label>
                   <input
                     type="text"
@@ -402,7 +425,7 @@ export default function AdminAgentsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    {isArabic ? "البريد الإلكتروني" : "Adresse Email"}
+                    {isArabic ? "البريد الإلكتروني" : isEnglish ? "Email Address" : "Adresse Email"}
                   </label>
                   <input
                     type="email"
@@ -415,7 +438,7 @@ export default function AdminAgentsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    {isArabic ? "كلمة المرور" : "Mot de Passe"}
+                    {isArabic ? "كلمة المرور" : isEnglish ? "Password" : "Mot de Passe"}
                   </label>
                   <input
                     type="password"
@@ -429,7 +452,7 @@ export default function AdminAgentsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    {isArabic ? "رقم الهاتف" : "Téléphone (Optionnel)"}
+                    {isArabic ? "رقم الهاتف" : isEnglish ? "Phone Number (Optional)" : "Téléphone (Optionnel)"}
                   </label>
                   <input
                     type="tel"
@@ -441,14 +464,16 @@ export default function AdminAgentsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    {isArabic ? "المورد المخصص (Tenant)" : "Fournisseur de Rattachement"}
+                    {isArabic ? "المورد المخصص (Tenant)" : isEnglish ? "Assigned Supplier (Tenant)" : "Fournisseur de Rattachement"}
                   </label>
                   <select
                     value={createForm.tenantId}
                     onChange={(e) => setCreateForm({ ...createForm, tenantId: e.target.value })}
                     className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-lg focus:bg-white"
                   >
-                    <option value="">{isArabic ? "اختر مورداً..." : "Sélectionner un fournisseur..."}</option>
+                    <option value="">
+                      {isArabic ? "اختر مورداً..." : isEnglish ? "Select a supplier..." : "Sélectionner un fournisseur..."}
+                    </option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.fullName || s.email} ({s.id.slice(0, 8)}...)
@@ -465,10 +490,12 @@ export default function AdminAgentsPage() {
                     onClick={() => setIsCreateOpen(false)}
                     disabled={isSubmittingCreate}
                   >
-                    {isArabic ? "إلغاء" : "Annuler"}
+                    {isArabic ? "إلغاء" : isEnglish ? "Cancel" : "Annuler"}
                   </Button>
                   <Button type="submit" variant="primary" size="sm" disabled={isSubmittingCreate}>
-                    {isSubmittingCreate ? "Création..." : isArabic ? "إنشاء الوكيل" : "Créer"}
+                    {isSubmittingCreate
+                      ? isEnglish ? "Creating..." : "Création..."
+                      : isArabic ? "إنشاء الوكيل" : isEnglish ? "Create Agent" : "Créer"}
                   </Button>
                 </div>
               </form>
@@ -478,13 +505,15 @@ export default function AdminAgentsPage() {
             <Modal
               isOpen={!!assignAgent}
               onClose={() => setAssignAgent(null)}
-              title={isArabic ? "تخصيص وكيل لمورد" : "Rattacher l'Agent à un Fournisseur"}
+              title={isArabic ? "تخصيص وكيل لمورد" : isEnglish ? "Assign Agent to Supplier" : "Rattacher l'Agent à un Fournisseur"}
               maxWidth="sm"
             >
               <form onSubmit={handleAssignSubmit} className="space-y-4 pt-2 text-start">
                 <p className="text-xs text-neutral-600">
                   {isArabic
                     ? `تخصيص الوكيل "${assignAgent?.fullName || assignAgent?.email}" لقائمة طلبيات مورد محدد:`
+                    : isEnglish
+                    ? `Select the supplier account whose orders agent "${assignAgent?.fullName || assignAgent?.email}" will confirm:`
                     : `Sélectionnez le compte fournisseur dont l'agent "${assignAgent?.fullName || assignAgent?.email}" pourra confirmer les leads :`}
                 </p>
 
@@ -495,7 +524,9 @@ export default function AdminAgentsPage() {
                     onChange={(e) => setSelectedTenantId(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-300 rounded-lg focus:bg-white"
                   >
-                    <option value="">{isArabic ? "اختر مورداً..." : "Sélectionner un fournisseur..."}</option>
+                    <option value="">
+                      {isArabic ? "اختر مورداً..." : isEnglish ? "Select a supplier..." : "Sélectionner un fournisseur..."}
+                    </option>
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.fullName || s.email}
@@ -512,10 +543,12 @@ export default function AdminAgentsPage() {
                     onClick={() => setAssignAgent(null)}
                     disabled={isSubmittingAssign}
                   >
-                    {isArabic ? "إلغاء" : "Annuler"}
+                    {isArabic ? "إلغاء" : isEnglish ? "Cancel" : "Annuler"}
                   </Button>
                   <Button type="submit" variant="primary" size="sm" disabled={isSubmittingAssign}>
-                    {isSubmittingAssign ? "Enregistrement..." : isArabic ? "حفظ" : "Enregistrer"}
+                    {isSubmittingAssign
+                      ? isEnglish ? "Saving..." : "Enregistrement..."
+                      : isArabic ? "حفظ" : isEnglish ? "Save" : "Enregistrer"}
                   </Button>
                 </div>
               </form>

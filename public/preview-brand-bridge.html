@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViteDrop — Brand Bridge & Two-Mode System Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-serif: 'Source Serif 4', Georgia, serif;
+    }
+    body {
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      background-color: #0b1120;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .font-serif-luxury {
+      font-family: var(--font-serif);
+      font-style: italic;
+    }
+    .font-mono {
+      font-family: var(--font-mono);
+      font-feature-settings: 'tnum' on, 'zero' on;
+    }
+    .sandstone-canvas {
+      background-color: #f8f7f4;
+    }
+    .stone-border {
+      border-color: #e7e5df;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Native smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+  <!-- ============================================================== -->
+  <!-- 0. TOP META CONTROLLER BAR (Interactive Director Console)      -->
+  <!-- ============================================================== -->
+  <header class="bg-slate-900 border-b border-slate-800 text-white px-3 sm:px-6 py-2.5 sticky top-0 z-50 shadow-2xl">
+    <div class="max-w-[1700px] mx-auto flex flex-col gap-2.5">
+      
+      <!-- Top Row: Logo, Brand Meta, Actions -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <!-- Brand & Tagline -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white font-bold text-xs flex items-center justify-center shadow-md shadow-sky-500/20 shrink-0">
+            VD
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-serif-luxury text-lg sm:text-xl font-semibold tracking-tight text-white leading-none">
+                ViteDrop
+              </span>
+              <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                Brand Bridge 2.0
+              </span>
+            </div>
+            <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 hidden sm:block">
+              <span class="text-sky-300 font-medium" data-i18n="taglineGrowth">Mode Croissance (Extérieur)</span> · <span class="text-emerald-300 font-medium" data-i18n="taglineTreasury">Mode Trésorerie (Intérieur)</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Toolbelt: Viewport simulation + Language + Rationale Toggle -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Design Rationale Toggle Button -->
+          <button id="btn-toggle-notes" onclick="toggleRationaleNotes()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="label-toggle-notes">Notes de Design : ON</span>
+          </button>
+
+          <!-- Breakpoint Device Picker -->
+          <div class="inline-flex items-center p-0.5 bg-slate-800 rounded-lg border border-slate-700 text-[11px] font-mono">
+            <button id="btn-bp-desktop" onclick="setDevice('100%')" class="px-2 py-1 rounded bg-slate-700 text-white font-bold cursor-pointer transition-all" title="Desktop 1440px">1440px</button>
+            <button id="btn-bp-tablet" onclick="setDevice('768px')" class="px-2 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all" title="Tablette 768px">768px</button>
+            <button id="btn-bp-mobile" onclick="setDevice('390px')" class="px-2 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all" title="Mobile 390px">390px</button>
+          </div>
+
+          <!-- Multilingual Parity Switcher -->
+          <div class="inline-flex items-center p-0.5 bg-slate-800 rounded-lg border border-slate-700 text-[11px] font-semibold">
+            <button id="btn-lang-fr" onclick="setLang('fr')" class="px-2.5 py-1 rounded bg-sky-600 text-white font-bold cursor-pointer transition-all">FR</button>
+            <button id="btn-lang-en" onclick="setLang('en')" class="px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all">EN</button>
+            <button id="btn-lang-ar" onclick="setLang('ar')" class="px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all">العربية</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Explicit Horizontal Scrollable Mode Selector (Zero Mobile Cutoff) -->
+      <div class="w-full overflow-x-auto scrollbar-none py-0.5">
+        <div class="inline-flex items-center gap-1.5 p-1 bg-slate-800/90 rounded-full border border-slate-700 text-xs font-semibold whitespace-nowrap min-w-max">
+          <!-- Tab 1: Side by Side -->
+          <button id="tab-btn-side" onclick="switchView('side')" class="px-3 py-1.5 rounded-full transition-all text-white bg-sky-600 shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
+            <span data-i18n="tabSide">Vue Comparative</span>
+          </button>
+
+          <!-- Tab 2: Public Growth -->
+          <button id="tab-btn-home" onclick="switchView('home')" class="px-3 py-1.5 rounded-full transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span data-i18n="tabHome">1. Accueil Public (Growth)</span>
+          </button>
+
+          <!-- Tab 3: Auth Gateway -->
+          <button id="tab-btn-login" onclick="switchView('login')" class="px-3 py-1.5 rounded-full transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            <span data-i18n="tabAuth">2. Passerelle Auth (/login)</span>
+          </button>
+
+          <!-- Tab 4: Admin Treasury -->
+          <button id="tab-btn-admin" onclick="switchView('admin')" class="px-3 py-1.5 rounded-full transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+            </svg>
+            <span data-i18n="tabAdmin">3. Admin Trésorerie (Overview)</span>
+          </button>
+
+          <!-- Tab 5: Admin Withdrawals Queue -->
+          <button id="tab-btn-withdrawals" onclick="switchView('withdrawals')" class="px-3 py-1.5 rounded-full transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <span data-i18n="tabWithdrawals">4. File des Décaissements</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============================================================== -->
+  <!-- MAIN PREVIEW CONTAINER (Wraps responsive frame)               -->
+  <!-- ============================================================== -->
+  <main class="flex-1 p-2 sm:p-4 lg:p-6 flex justify-center bg-slate-950 overflow-x-hidden">
+    
+    <div id="device-wrapper" class="w-full transition-all duration-300 max-w-[1700px] flex flex-col rounded-2xl shadow-2xl overflow-hidden bg-slate-900 border border-slate-800">
+
+      <!-- ============================================================== -->
+      <!-- VIEW 1: SIDE-BY-SIDE PANORAMIC COMPARISON                      -->
+      <!-- ============================================================== -->
+      <div id="view-side" class="grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-slate-800">
+
+        <!-- Left Pane: PUBLIC GROWTH MODE (Exterior) -->
+        <div class="bg-white p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <!-- Banner Mode Identifier -->
+            <div class="flex items-center justify-between pb-3 mb-5 border-b border-black/[0.06] flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-sky-800" data-i18n="sideGrowthBanner">
+                  Mode 1 : ViteDrop Growth (Public)
+                </span>
+              </div>
+              <span class="text-[10px] font-mono text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
+                Canvas : Blanc #ffffff · Accent : Bleu Électrique
+              </span>
+            </div>
+
+            <!-- Public Header Simulation -->
+            <div class="flex items-center justify-between py-2 mb-6">
+              <div class="flex items-center gap-1.5">
+                <span class="font-serif-luxury text-2xl font-semibold tracking-[-0.08em] text-black">
+                  ViteDrop
+                </span>
+                <sup class="text-[10px] font-bold -top-2">®</sup>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="text-xs font-semibold text-neutral-600 hover:text-black px-3 py-1.5 rounded-full" data-i18n="navLogin">
+                  Connexion
+                </button>
+                <button class="text-xs font-semibold text-white bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] px-4 py-2 rounded-full shadow-md shadow-sky-500/25 cursor-pointer hover:brightness-105" data-i18n="navJoin">
+                  Rejoindre le Réseau
+                </button>
+              </div>
+            </div>
+
+            <!-- Marketing Hero Mini -->
+            <div class="text-center py-6 relative overflow-hidden rounded-2xl bg-gradient-to-b from-sky-50/60 via-white to-transparent p-4 sm:p-6 border border-sky-100/70 mb-6">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-sky-200 text-sky-700 text-xs font-semibold mb-3 shadow-2xs">
+                <svg class="w-3.5 h-3.5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span data-i18n="heroPill">Réseau d'Affiliation COD n°1 en Algérie</span>
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-950 mb-2 leading-tight" data-i18n="heroTitle">
+                Scalez vos Campagnes COD sur 58 Wilayas
+              </h2>
+              <p class="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto mb-5 leading-relaxed" data-i18n="heroSub">
+                Produits gagnants testés, synchronisation Yalidine/ZR en temps réel, et décaissements garantis en 24h.
+              </p>
+              
+              <!-- Refinement Showcase: SPACE MONO + PROOF OF SETTLEMENT VOUCHER -->
+              <div class="bg-white rounded-2xl border border-black/[0.08] p-4 text-start shadow-lg shadow-black/5 max-w-md mx-auto">
+                <div class="flex items-center justify-between border-b border-black/[0.06] pb-2.5 mb-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-neutral-900 text-white flex items-center justify-center font-bold text-[10px]">
+                      VD
+                    </div>
+                    <div>
+                      <strong class="text-xs font-bold text-neutral-900 block leading-tight" data-i18n="econProductTitle">Mini Projecteur 4K Pro</strong>
+                      <span class="text-[10px] text-neutral-500 font-mono" data-i18n="econStock">Stock Blida · Yalidine J+1</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                    LIVRAISON 88.4%
+                  </span>
+                </div>
+
+                <!-- Unit Economics in Space Mono -->
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex justify-between text-neutral-500">
+                    <span data-i18n="econSalePrice">Prix Vente Client (Encaissé COD) :</span>
+                    <span class="font-mono font-semibold text-neutral-900">4 800 DZD</span>
+                  </div>
+                  <div class="flex justify-between text-neutral-500">
+                    <span data-i18n="econProductCost">Coût Produit Fournisseur :</span>
+                    <span class="font-mono text-neutral-600">- 2 400 DZD</span>
+                  </div>
+                  <div class="flex justify-between text-neutral-500">
+                    <span data-i18n="econDeliveryFee">Frais Expédition Yalidine :</span>
+                    <span class="font-mono text-neutral-600">- 800 DZD</span>
+                  </div>
+                  <div class="pt-2 border-t border-black/[0.06] flex justify-between items-center">
+                    <span class="font-bold text-neutral-900 text-xs" data-i18n="econNetComm">Votre Commission Nette CPA :</span>
+                    <span class="font-mono font-extrabold text-emerald-600 text-sm sm:text-base">
+                      + 1 600 DZD
+                    </span>
+                  </div>
+                </div>
+
+                <!-- The Crucial Proof-of-Settlement Connection Badge -->
+                <div class="mt-3 pt-2.5 border-t border-dashed border-neutral-200 flex items-center justify-between text-[10px] bg-neutral-50 p-2 rounded-xl">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="font-semibold text-neutral-700" data-i18n="econRailsLabel">Rails de Paiement Garantis :</span>
+                  </div>
+                  <div class="flex items-center gap-1 font-mono">
+                    <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 border border-sky-300 font-bold">BARIDIMOB</span>
+                    <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold">CCP 24H</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Annotation for Reviewer -->
+          <div class="rationale-note mt-6 p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-sky-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong data-i18n="notePublicTitle">Ce qui a été subtilement unifié sur le public :</strong>
+              <p class="text-[11px] text-sky-800 mt-0.5" data-i18n="notePublicDesc">
+                La typographie Space Mono est désormais appliquée aux montants monétaires réels (4 800 DZD, 1 600 DZD) et le badge de paiement BaridiMob/CCP connecte directement la promesse marketing au registre de trésorerie interne.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Pane: AUTHENTICATED TREASURY MODE (Interior) -->
+        <div class="sandstone-canvas p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <!-- Banner Mode Identifier -->
+            <div class="flex items-center justify-between pb-3 mb-5 border-b stone-border flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-900" data-i18n="sideTreasuryBanner">
+                  Mode 2 : ViteDrop Treasury (Opérations Admin)
+                </span>
+              </div>
+              <span class="text-[10px] font-mono text-neutral-600 bg-stone-200 px-2 py-0.5 rounded-full">
+                Canvas : Grès Chaud #f8f7f4 · Accent : Vert Racing & Or
+              </span>
+            </div>
+
+            <!-- Admin Header Simulation -->
+            <div class="flex items-center justify-between pb-4 mb-5 border-b stone-border">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#064e3b] to-[#043a2c] text-amber-300 font-bold text-xs flex items-center justify-center shadow-xs border border-emerald-900">
+                  VD
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-neutral-900 leading-none" data-i18n="adminHeaderTitle">
+                    Trésorerie COD & Décaissements
+                  </h3>
+                  <span class="text-[11px] text-neutral-500 font-mono" data-i18n="adminHeaderTelemetry">
+                    DZ-58 WILAYAS · YALIDINE · ZR CONNECTÉS
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="px-2.5 py-1 rounded-full bg-white border stone-border text-[11px] font-semibold text-neutral-700 shadow-2xs" data-i18n="btnRefresh">
+                  Actualiser
+                </span>
+                <span class="px-3 py-1 rounded-full bg-[#064e3b] text-amber-200 text-[11px] font-semibold shadow-xs" data-i18n="btnAudit">
+                  Audit Escrow
+                </span>
+              </div>
+            </div>
+
+            <!-- Signature British Racing Green Hero Card -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#064e3b] via-[#07533f] to-[#043a2c] text-white p-5 border border-[#0a5e47] shadow-lg shadow-emerald-950/15 mb-4">
+              <!-- Watermark VD Monogram -->
+              <span class="absolute -right-2 -bottom-4 text-7xl font-bold font-mono text-white/[0.04] select-none pointer-events-none">
+                VD
+              </span>
+
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-emerald-200" data-i18n="cardRevTitle">
+                  Revenus Plateforme
+                </span>
+                <span class="px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[10px] font-mono font-bold">
+                  20% SPREAD
+                </span>
+              </div>
+
+              <div class="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
+                1 498 000 <span class="text-xs sm:text-sm font-normal text-emerald-300">DZD</span>
+              </div>
+
+              <div class="pt-2.5 border-t border-emerald-800/80 flex items-center justify-between text-[11px] text-emerald-200">
+                <span class="text-amber-300 font-medium" data-i18n="cardRevFooter">Marge brute livraisons confirmées</span>
+                <span class="font-mono text-emerald-300/80 text-[10px]">LEDGER VERIFIED</span>
+              </div>
+            </div>
+
+            <!-- Solvency Metric & Pending Table Snippet -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-white p-3.5 rounded-2xl border stone-border shadow-2xs">
+                <div class="text-[11px] font-semibold text-neutral-500 mb-1" data-i18n="cardSolvencyTitle">Ratio de Solvabilité</div>
+                <div class="font-mono text-xl font-bold text-neutral-900">5.2× <span class="text-xs text-emerald-600 font-normal">(520%)</span></div>
+                <div class="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden mt-2">
+                  <div class="bg-emerald-600 h-full w-[85%] rounded-full"></div>
+                </div>
+              </div>
+
+              <div class="bg-white p-3.5 rounded-2xl border stone-border shadow-2xs">
+                <div class="text-[11px] font-semibold text-neutral-500 mb-1" data-i18n="cardPendingTitle">En File d'Attente</div>
+                <div class="font-mono text-xl font-bold text-amber-600" data-i18n="cardPendingVal">3 demandes</div>
+                <div class="text-[10px] font-mono text-neutral-400 mt-1">BARIDIMOB · CCP</div>
+              </div>
+            </div>
+
+            <!-- Clearinghouse Table Preview -->
+            <div class="bg-white rounded-2xl border stone-border shadow-2xs overflow-hidden text-xs">
+              <div class="p-2.5 bg-stone-50/70 border-b stone-border flex items-center justify-between font-semibold text-neutral-700 text-[11px]">
+                <span data-i18n="tableHeaderBen">Bénéficiaire & Rail</span>
+                <span data-i18n="tableHeaderAmt">Montant à Décaisser</span>
+              </div>
+              <div class="divide-y stone-border">
+                <div class="p-2.5 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-neutral-900">Karim Media Ads</div>
+                    <span class="px-1.5 py-0.2 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[9px] font-mono font-bold">BARIDIMOB 007999</span>
+                  </div>
+                  <div class="text-end">
+                    <span class="font-mono font-bold text-neutral-900">45 000 DZD</span>
+                    <span class="block text-[9px] text-amber-600 font-bold" data-i18n="tagPriority">PRIORITAIRE</span>
+                  </div>
+                </div>
+                <div class="p-2.5 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-neutral-900">Sofiane E-com</div>
+                    <span class="px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[9px] font-mono font-bold">CCP 1829304 Clé 44</span>
+                  </div>
+                  <div class="text-end">
+                    <span class="font-mono font-bold text-neutral-900">18 500 DZD</span>
+                    <span class="block text-[9px] text-neutral-400 font-mono">14:15 DZ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Annotation for Reviewer -->
+          <div class="rationale-note mt-6 p-3 rounded-xl bg-stone-200/60 border stone-border text-xs text-neutral-700 flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-emerald-800 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <div>
+              <strong data-i18n="noteTreasuryTitle">Pourquoi le vert & grès fonctionne à l'intérieur :</strong>
+              <p class="text-[11px] text-neutral-600 mt-0.5" data-i18n="noteTreasuryDesc">
+                Le fond grès doux #f8f7f4 évite la fatigue visuelle des administrateurs gérant des millions de dinars toute la journée, tout en conférant une autorité fiduciaire absolue (style banque privée suisse).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 2: AUTHENTICATION BRIDGE (/login)                         -->
+      <!-- ============================================================== -->
+      <div id="view-login" class="hidden sandstone-canvas p-4 sm:p-10 lg:p-16 flex flex-col items-center justify-center min-h-[700px]">
+        <div class="w-full max-w-md bg-white rounded-3xl border stone-border p-6 sm:p-8 shadow-xl shadow-neutral-900/5 text-center relative">
+          
+          <!-- Brand Anchor -->
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white font-bold text-sm flex items-center justify-center mx-auto mb-3 shadow-md shadow-sky-500/20">
+            VD
+          </div>
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="font-serif-luxury text-2xl font-semibold tracking-[-0.08em] text-neutral-950">
+              ViteDrop
+            </span>
+            <sup class="text-xs font-semibold text-neutral-950 -top-2">®</sup>
+          </div>
+          <p class="text-xs text-neutral-500 mb-6" data-i18n="loginSub">
+            Accès sécurisé à la trésorerie et aux opérations COD
+          </p>
+
+          <!-- Input fields -->
+          <div class="space-y-3.5 text-start mb-6">
+            <div>
+              <label class="block text-xs font-semibold text-neutral-700 mb-1" data-i18n="loginEmailLabel">Identifiant ou Email Pro</label>
+              <input type="email" value="admin@vitedrop.com" readonly class="w-full px-3.5 py-2.5 rounded-xl border stone-border bg-stone-50/50 text-sm font-mono text-neutral-800 focus:outline-none cursor-default">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-neutral-700 mb-1" data-i18n="loginPasswordLabel">Code d'accès Sécurisé</label>
+              <input type="password" value="••••••••••••" readonly class="w-full px-3.5 py-2.5 rounded-xl border stone-border bg-stone-50/50 text-sm font-mono text-neutral-800 focus:outline-none cursor-default">
+            </div>
+          </div>
+
+          <!-- ViteDrop Blue CTA (Bridging element) -->
+          <button class="w-full py-3 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-xs font-bold shadow-md shadow-sky-500/25 hover:brightness-105 transition-all mb-4 cursor-pointer" data-i18n="loginSubmitBtn">
+            Connexion au Tableau de Bord
+          </button>
+
+          <!-- Decompression Security Note -->
+          <div class="pt-4 border-t border-black/[0.06] flex items-center justify-center gap-2 text-[11px] text-neutral-500 font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span data-i18n="loginSecurityNote">Sécurisé par ViteDrop Double-Entry Engine · DZ-58</span>
+          </div>
+        </div>
+
+        <div class="rationale-note max-w-md text-center mt-6 text-xs text-neutral-500">
+          <strong data-i18n="noteDecompTitle">La chambre de décompression :</strong> <span data-i18n="noteDecompDesc">Le fond passe au grès chaud #f8f7f4, mais le bouton conserve le bleu ViteDrop pour rassurer l'utilisateur avant d'entrer dans la console de trésorerie verte.</span>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 3: ADMIN WITHDRAWALS CLEARINGHOUSE QUEUE                  -->
+      <!-- ============================================================== -->
+      <div id="view-withdrawals" class="hidden sandstone-canvas p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+        <div class="max-w-[1400px] mx-auto w-full space-y-6">
+          
+          <!-- Withdrawals Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b stone-border">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#064e3b] to-[#043a2c] text-amber-300 font-bold text-xs flex items-center justify-center shadow-xs border border-emerald-900">
+                VD
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-neutral-900 leading-tight" data-i18n="withTitle">
+                  File des Décaissements
+                </h2>
+                <p class="text-xs text-neutral-500 mt-0.5" data-i18n="withSubtitle">
+                  Régularisation des virements BaridiMob & CCP Algérie Poste
+                </p>
+              </div>
+            </div>
+
+            <!-- Header Quick Stats -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <div class="px-3 py-1.5 rounded-xl bg-white border stone-border text-xs font-mono shadow-2xs">
+                <span class="text-neutral-400">Total en Attente :</span> <strong class="text-amber-600">81 500 DZD</strong>
+              </div>
+              <button class="px-3 py-1.5 rounded-xl bg-[#064e3b] text-amber-200 text-xs font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span data-i18n="btnSyncRails">Synchroniser Rails</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Tabs Strip (Horizontal Scroll Protected) -->
+          <div class="w-full overflow-x-auto scrollbar-none py-1">
+            <div class="inline-flex items-center p-1 bg-white rounded-full border stone-border text-xs font-semibold whitespace-nowrap min-w-max shadow-2xs">
+              <button class="px-3.5 py-1.5 rounded-full bg-neutral-900 text-white font-bold" data-i18n="tabWithAll">Toutes les demandes</button>
+              <button class="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-black" data-i18n="tabWithPending">En attente (Pending)</button>
+              <button class="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-black" data-i18n="tabWithApproved">Approuvées (À virer)</button>
+              <button class="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-black" data-i18n="tabWithPaid">Payées</button>
+              <button class="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-black" data-i18n="tabWithRejected">Rejetées</button>
+            </div>
+          </div>
+
+          <!-- Clearinghouse Table Container (Overflow Protected) -->
+          <div class="w-full overflow-x-auto rounded-2xl border stone-border bg-white shadow-xs">
+            <table class="w-full text-xs text-start min-w-[760px]">
+              <thead class="bg-stone-50/80 text-neutral-500 font-semibold border-b stone-border">
+                <tr>
+                  <th class="px-4 py-3 text-start" data-i18n="thBen">Bénéficiaire & Email</th>
+                  <th class="px-4 py-3 text-start" data-i18n="thAmt">Montant à Décaisser</th>
+                  <th class="px-4 py-3 text-start" data-i18n="thMethod">Rail & Coordonnées</th>
+                  <th class="px-4 py-3 text-start" data-i18n="thStatus">Statut</th>
+                  <th class="px-4 py-3 text-start" data-i18n="thDate">Date / Horodatage</th>
+                  <th class="px-4 py-3 text-end" data-i18n="thActions">Action de Virement</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y stone-border">
+                <!-- Row 1: High Priority BaridiMob -->
+                <tr class="hover:bg-stone-50/50 transition-colors">
+                  <td class="px-4 py-3.5">
+                    <div class="font-bold text-neutral-900">Karim Media Ads</div>
+                    <div class="text-[11px] text-neutral-500 font-mono">karim.ads@gmail.com</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="font-mono font-extrabold text-neutral-900 text-sm">45 000 DZD</span>
+                    <span class="block text-[9px] text-amber-600 font-bold" data-i18n="tagPriority">PRIORITAIRE</span>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-mono font-bold mb-0.5">
+                      BARIDIMOB
+                    </span>
+                    <div class="font-mono text-[11px] text-neutral-600">00799999001829304192</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      <span data-i18n="statusPending">En attente</span>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3.5 text-neutral-500 font-mono text-[11px]">
+                    <div>07 Oct 2026 14:15</div>
+                    <div class="text-neutral-400 text-[10px]">DZ-16 Alger</div>
+                  </td>
+                  <td class="px-4 py-3.5 text-end">
+                    <div class="inline-flex items-center gap-1.5">
+                      <button class="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold cursor-pointer" data-i18n="btnReject">
+                        Rejeter
+                      </button>
+                      <button class="px-3 py-1 rounded-lg bg-[#064e3b] hover:bg-[#085a44] text-amber-200 text-xs font-semibold shadow-2xs cursor-pointer" data-i18n="btnApprove">
+                        Valider Virement
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Standard CCP Payout -->
+                <tr class="hover:bg-stone-50/50 transition-colors">
+                  <td class="px-4 py-3.5">
+                    <div class="font-bold text-neutral-900">Sofiane E-com</div>
+                    <div class="text-[11px] text-neutral-500 font-mono">sofiane.dz@yahoo.com</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="font-mono font-extrabold text-neutral-900 text-sm">18 500 DZD</span>
+                    <span class="block text-[9px] text-neutral-400 font-mono">Standard</span>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-mono font-bold mb-0.5">
+                      CCP ALGÉRIE POSTE
+                    </span>
+                    <div class="font-mono text-[11px] text-neutral-600">Compte: 1829304 Clé: 44</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      <span data-i18n="statusPending">En attente</span>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3.5 text-neutral-500 font-mono text-[11px]">
+                    <div>07 Oct 2026 13:40</div>
+                    <div class="text-neutral-400 text-[10px]">DZ-09 Blida</div>
+                  </td>
+                  <td class="px-4 py-3.5 text-end">
+                    <div class="inline-flex items-center gap-1.5">
+                      <button class="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold cursor-pointer" data-i18n="btnReject">
+                        Rejeter
+                      </button>
+                      <button class="px-3 py-1 rounded-lg bg-[#064e3b] hover:bg-[#085a44] text-amber-200 text-xs font-semibold shadow-2xs cursor-pointer" data-i18n="btnApprove">
+                        Valider Virement
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Paid Historical Record -->
+                <tr class="hover:bg-stone-50/50 transition-colors bg-stone-50/20">
+                  <td class="px-4 py-3.5">
+                    <div class="font-bold text-neutral-900">Yacine Affiliate Pro</div>
+                    <div class="text-[11px] text-neutral-500 font-mono">yacine@affiliate.dz</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="font-mono font-extrabold text-neutral-900 text-sm">62 000 DZD</span>
+                    <span class="block text-[9px] text-emerald-600 font-mono">Payé</span>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-mono font-bold mb-0.5">
+                      BARIDIMOB
+                    </span>
+                    <div class="font-mono text-[11px] text-neutral-600">00799999008819203910</div>
+                  </td>
+                  <td class="px-4 py-3.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+                      <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span data-i18n="statusPaid">Virement Effectué</span>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3.5 text-neutral-500 font-mono text-[11px]">
+                    <div>07 Oct 2026 11:10</div>
+                    <div class="text-emerald-700 font-bold text-[10px]">Ref: TXN-BM-99201</div>
+                  </td>
+                  <td class="px-4 py-3.5 text-end">
+                    <span class="text-neutral-400 text-xs font-mono">Archivé</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT LOGIC (Interactive Switching, Breakpoints & i18n)  -->
+  <!-- ============================================================== -->
+  <script>
+    let currentView = 'side';
+    let currentLang = 'fr';
+    let currentDevice = '100%';
+    let showNotes = true;
+
+    function toggleRationaleNotes() {
+      showNotes = !showNotes;
+      const notes = document.querySelectorAll('.rationale-note');
+      notes.forEach(el => {
+        el.style.display = showNotes ? 'flex' : 'none';
+      });
+      const label = document.getElementById('label-toggle-notes');
+      label.innerText = showNotes ? 'Notes de Design : ON' : 'Notes de Design : OFF';
+    }
+
+    function switchView(view) {
+      currentView = view;
+      const viewSide = document.getElementById('view-side');
+      const viewLogin = document.getElementById('view-login');
+      const viewWithdrawals = document.getElementById('view-withdrawals');
+
+      // Update button highlights
+      ['side', 'home', 'login', 'admin', 'withdrawals'].forEach(v => {
+        const btn = document.getElementById('tab-btn-' + v);
+        if (btn) {
+          if (v === view) {
+            btn.className = 'px-3 py-1.5 rounded-full transition-all text-white bg-sky-600 shadow-xs flex items-center gap-1.5 cursor-pointer';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-full transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer';
+          }
+        }
+      });
+
+      // Handle visibility
+      if (view === 'side') {
+        viewSide.classList.remove('hidden');
+        viewSide.className = 'grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-slate-800';
+        viewSide.children[0].classList.remove('hidden');
+        viewSide.children[1].classList.remove('hidden');
+        viewLogin.classList.add('hidden');
+        viewWithdrawals.classList.add('hidden');
+      } else if (view === 'home') {
+        viewSide.classList.remove('hidden');
+        viewSide.className = 'grid grid-cols-1';
+        viewSide.children[0].classList.remove('hidden');
+        viewSide.children[1].classList.add('hidden');
+        viewLogin.classList.add('hidden');
+        viewWithdrawals.classList.add('hidden');
+      } else if (view === 'admin') {
+        viewSide.classList.remove('hidden');
+        viewSide.className = 'grid grid-cols-1';
+        viewSide.children[0].classList.add('hidden');
+        viewSide.children[1].classList.remove('hidden');
+        viewLogin.classList.add('hidden');
+        viewWithdrawals.classList.add('hidden');
+      } else if (view === 'login') {
+        viewSide.classList.add('hidden');
+        viewLogin.classList.remove('hidden');
+        viewWithdrawals.classList.add('hidden');
+      } else if (view === 'withdrawals') {
+        viewSide.classList.add('hidden');
+        viewLogin.classList.add('hidden');
+        viewWithdrawals.classList.remove('hidden');
+      }
+    }
+
+    function setDevice(width) {
+      currentDevice = width;
+      const wrapper = document.getElementById('device-wrapper');
+      wrapper.style.maxWidth = width;
+
+      ['desktop', 'tablet', 'mobile'].forEach(b => {
+        const btn = document.getElementById('btn-bp-' + b);
+        btn.className = 'px-2 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all';
+      });
+      if (width === '100%') document.getElementById('btn-bp-desktop').className = 'px-2 py-1 rounded bg-slate-700 text-white font-bold cursor-pointer transition-all';
+      if (width === '768px') document.getElementById('btn-bp-tablet').className = 'px-2 py-1 rounded bg-slate-700 text-white font-bold cursor-pointer transition-all';
+      if (width === '390px') document.getElementById('btn-bp-mobile').className = 'px-2 py-1 rounded bg-slate-700 text-white font-bold cursor-pointer transition-all';
+    }
+
+    const i18n = {
+      fr: {
+        taglineGrowth: "Mode Croissance (Extérieur)",
+        taglineTreasury: "Mode Trésorerie (Intérieur)",
+        tabSide: "Vue Comparative",
+        tabHome: "1. Accueil Public (Growth)",
+        tabAuth: "2. Passerelle Auth (/login)",
+        tabAdmin: "3. Admin Trésorerie (Overview)",
+        tabWithdrawals: "4. File des Décaissements",
+        sideGrowthBanner: "Mode 1 : ViteDrop Growth (Public)",
+        sideTreasuryBanner: "Mode 2 : ViteDrop Treasury (Opérations Admin)",
+        navLogin: "Connexion",
+        navJoin: "Rejoindre le Réseau",
+        heroPill: "Réseau d'Affiliation COD n°1 en Algérie",
+        heroTitle: "Scalez vos Campagnes COD sur 58 Wilayas",
+        heroSub: "Produits gagnants testés, synchronisation Yalidine/ZR en temps réel, et décaissements garantis en 24h.",
+        econProductTitle: "Mini Projecteur 4K Pro",
+        econStock: "Stock Blida · Yalidine J+1",
+        econSalePrice: "Prix Vente Client (Encaissé COD) :",
+        econProductCost: "Coût Produit Fournisseur :",
+        econDeliveryFee: "Frais Expédition Yalidine :",
+        econNetComm: "Votre Commission Nette CPA :",
+        econRailsLabel: "Rails de Paiement Garantis :",
+        notePublicTitle: "Ce qui a été subtilement unifié sur le public :",
+        notePublicDesc: "La typographie Space Mono est désormais appliquée aux montants monétaires réels (4 800 DZD, 1 600 DZD) et le badge de paiement BaridiMob/CCP connecte directement la promesse marketing au registre de trésorerie interne.",
+        adminHeaderTitle: "Trésorerie COD & Décaissements",
+        adminHeaderTelemetry: "DZ-58 WILAYAS · YALIDINE · ZR CONNECTÉS",
+        btnRefresh: "Actualiser",
+        btnAudit: "Audit Escrow",
+        cardRevTitle: "Revenus Plateforme",
+        cardRevFooter: "Marge brute livraisons confirmées",
+        cardSolvencyTitle: "Ratio de Solvabilité",
+        cardPendingTitle: "En File d'Attente",
+        cardPendingVal: "3 demandes",
+        tableHeaderBen: "Bénéficiaire & Rail",
+        tableHeaderAmt: "Montant à Décaisser",
+        tagPriority: "PRIORITAIRE",
+        noteTreasuryTitle: "Pourquoi le vert & grès fonctionne à l'intérieur :",
+        noteTreasuryDesc: "Le fond grès doux #f8f7f4 évite la fatigue visuelle des administrateurs gérant des millions de dinars toute la journée, tout en conférant une autorité fiduciaire absolue (style banque privée suisse).",
+        loginSub: "Accès sécurisé à la trésorerie et aux opérations COD",
+        loginEmailLabel: "Identifiant ou Email Pro",
+        loginPasswordLabel: "Code d'accès Sécurisé",
+        loginSubmitBtn: "Connexion au Tableau de Bord",
+        loginSecurityNote: "Sécurisé par ViteDrop Double-Entry Engine · DZ-58",
+        noteDecompTitle: "La chambre de décompression :",
+        noteDecompDesc: "Le fond passe au grès chaud #f8f7f4, mais le bouton conserve le bleu ViteDrop pour rassurer l'utilisateur avant d'entrer dans la console de trésorerie verte.",
+        withTitle: "File des Décaissements",
+        withSubtitle: "Régularisation des virements BaridiMob & CCP Algérie Poste",
+        btnSyncRails: "Synchroniser Rails",
+        tabWithAll: "Toutes les demandes",
+        tabWithPending: "En attente (Pending)",
+        tabWithApproved: "Approuvées (À virer)",
+        tabWithPaid: "Payées",
+        tabWithRejected: "Rejetées",
+        thBen: "Bénéficiaire & Email",
+        thAmt: "Montant à Décaisser",
+        thMethod: "Rail & Coordonnées",
+        thStatus: "Statut",
+        thDate: "Date / Horodatage",
+        thActions: "Action de Virement",
+        statusPending: "En attente",
+        statusPaid: "Virement Effectué",
+        btnReject: "Rejeter",
+        btnApprove: "Valider Virement"
+      },
+      en: {
+        taglineGrowth: "Growth Mode (Exterior)",
+        taglineTreasury: "Treasury Mode (Interior)",
+        tabSide: "Comparative View",
+        tabHome: "1. Public Growth",
+        tabAuth: "2. Auth Gateway (/login)",
+        tabAdmin: "3. Admin Treasury (Overview)",
+        tabWithdrawals: "4. Disbursements Queue",
+        sideGrowthBanner: "Mode 1 : ViteDrop Growth (Public)",
+        sideTreasuryBanner: "Mode 2 : ViteDrop Treasury (Admin Operations)",
+        navLogin: "Login",
+        navJoin: "Join Network",
+        heroPill: "#1 COD Affiliate Network in Algeria",
+        heroTitle: "Scale Your COD Ad Spend Across 58 Wilayas",
+        heroSub: "Vetted winning products, realtime Yalidine/ZR sync, and guaranteed 24h disbursements.",
+        econProductTitle: "Mini Projector 4K Pro",
+        econStock: "Blida Central Stock · Yalidine D+1",
+        econSalePrice: "Customer Selling Price (COD Collected):",
+        econProductCost: "Supplier Base Product Cost:",
+        econDeliveryFee: "Yalidine Delivery Courier Fee:",
+        econNetComm: "Your Net CPA Commission:",
+        econRailsLabel: "Guaranteed Payout Rails:",
+        notePublicTitle: "What has been unified on the public side:",
+        notePublicDesc: "Space Mono typography is now applied to actual monetary amounts (4,800 DZD, 1,600 DZD) and the BaridiMob/CCP trust badge anchors the marketing directly to internal treasury rails.",
+        adminHeaderTitle: "COD Treasury & Disbursements",
+        adminHeaderTelemetry: "DZ-58 WILAYAS · YALIDINE · ZR SYNCED",
+        btnRefresh: "Refresh",
+        btnAudit: "Escrow Audit",
+        cardRevTitle: "Platform Revenue",
+        cardRevFooter: "Gross spread on delivered orders",
+        cardSolvencyTitle: "Solvency Coverage Ratio",
+        cardPendingTitle: "In Payout Queue",
+        cardPendingVal: "3 requests",
+        tableHeaderBen: "Beneficiary & Rail",
+        tableHeaderAmt: "Disbursement Amount",
+        tagPriority: "HIGH PRIORITY",
+        noteTreasuryTitle: "Why racing green & sandstone works inside:",
+        noteTreasuryDesc: "The warm sandstone #f8f7f4 canvas prevents ocular fatigue for operators managing millions of dinars all day, imparting Swiss private banking authority.",
+        loginSub: "Secure access to COD operations and treasury",
+        loginEmailLabel: "Work Email or User ID",
+        loginPasswordLabel: "Security Passcode",
+        loginSubmitBtn: "Sign In to Operations Console",
+        loginSecurityNote: "Secured by ViteDrop Double-Entry Engine · DZ-58",
+        noteDecompTitle: "The decompression chamber:",
+        noteDecompDesc: "The background shifts to warm sandstone #f8f7f4, while the button retains ViteDrop Blue to reassure the user before entering the green treasury console.",
+        withTitle: "Disbursement Clearinghouse",
+        withSubtitle: "Settlement of BaridiMob & Algérie Poste CCP transfers",
+        btnSyncRails: "Sync Courier Rails",
+        tabWithAll: "All Requests",
+        tabWithPending: "Pending Review",
+        tabWithApproved: "Approved (To Pay)",
+        tabWithPaid: "Paid",
+        tabWithRejected: "Rejected",
+        thBen: "Beneficiary & Email",
+        thAmt: "Disbursement Amount",
+        thMethod: "Payment Rail & RIP",
+        thStatus: "Status",
+        thDate: "Date / Timestamp",
+        thActions: "Disbursement Action",
+        statusPending: "Pending Review",
+        statusPaid: "Transfer Settled",
+        btnReject: "Reject",
+        btnApprove: "Approve Transfer"
+      },
+      ar: {
+        taglineGrowth: "نمط النمو (الواجهة العامة)",
+        taglineTreasury: "نمط الخزينة (العمليات الداخلية)",
+        tabSide: "مقارنة شاملة",
+        tabHome: "1. الواجهة العامة (النمو)",
+        tabAuth: "2. بوابة الدخول (/login)",
+        tabAdmin: "3. خزينة الإدارة (نظرة عامة)",
+        tabWithdrawals: "4. طابور السحوبات (التصفية)",
+        sideGrowthBanner: "النمط 1 : منصة النمو (عام)",
+        sideTreasuryBanner: "النمط 2 : خزينة العمليات (إدارة)",
+        navLogin: "تسجيل الدخول",
+        navJoin: "انضم للشبكة",
+        heroPill: "شبكة الأفلييت الأولى للدفع عند الاستلام في الجزائر",
+        heroTitle: "ضاعف حملاتك الإعلانية عبر 58 ولاية جزائرية",
+        heroSub: "منتجات رابحة مجربة، ربط مباشر مع ياليدين وZR Express، وتصفية أرباح مضمونة خلال 24 ساعة.",
+        econProductTitle: "جهاز عرض ميني 4K برو",
+        econStock: "مخزن البليدة · توصيل ياليدين 24-48 ساعة",
+        econSalePrice: "سعر بيع الزبون (تحصيل COD) :",
+        econProductCost: "تكلفة منتج المورد :",
+        econDeliveryFee: "رسوم توصيل ياليدين :",
+        econNetComm: "عمولتك الصافية (CPA) :",
+        econRailsLabel: "قنوات الدفع المضمونة :",
+        notePublicTitle: "ما تم توحيده بدقة على الواجهة العامة :",
+        notePublicDesc: "تم اعتماد خط Space Mono للأرقام المالية الحقيقية (4,800 دج، 1,600 دج) وشارة بريدي موب / CCP لربط الوعود التسويقية بنظام الخزينة الداخلي مباشرة.",
+        adminHeaderTitle: "خزينة الدفع عند الاستلام والسحوبات",
+        adminHeaderTelemetry: "58 ولاية جزائرية · ربط ياليدين وZR متزامن",
+        btnRefresh: "تحديث",
+        btnAudit: "تدقيق الضمان",
+        cardRevTitle: "عائدات المنصة",
+        cardRevFooter: "الهامش الإجمالي على الطرود المسلمة",
+        cardSolvencyTitle: "نسبة تغطية الالتزامات",
+        cardPendingTitle: "في طابور الصرف",
+        cardPendingVal: "3 طلبات",
+        tableHeaderBen: "المستفيد والوسيلة",
+        tableHeaderAmt: "المبلغ المراد صرفه",
+        tagPriority: "أولوية قصوى",
+        noteTreasuryTitle: "لماذا يناسب اللون الأخضر والرمال الدافئة العمليات :",
+        noteTreasuryDesc: "خلفية الرمال الدافئة #f8f7f4 تمنع إجهاد العين لمديري العمليات الذين يراجعون ملايين الدنانير يومياً، مع منح هيبة مصرفية تشبه البنوك السويسرية الخاصة.",
+        loginSub: "وصول آمن للعمليات وخزينة الدفع عند الاستلام",
+        loginEmailLabel: "المعرف أو البريد المهني",
+        loginPasswordLabel: "رمز المرور السري",
+        loginSubmitBtn: "الدخول إلى لوحة التحكم",
+        loginSecurityNote: "محمي بمحرك القيد المزدوج لمنصة ViteDrop · شبكة 58 ولاية",
+        noteDecompTitle: "غرفة التكيّف البصري :",
+        noteDecompDesc: "تتحول الخلفية إلى لون الرمال الدافئ #f8f7f4، مع الحفاظ على الزر باللون الأزرق المألوف لتأكيد الأمان قبل دخول غرفة العمليات الخضراء.",
+        withTitle: "سجل تصفية السحوبات",
+        withSubtitle: "تسوية حوالات بريدي موب والحساب الجاري البريدي CCP",
+        btnSyncRails: "مزامنة قنوات التوصيل",
+        tabWithAll: "كافة الطلبات",
+        tabWithPending: "قيد المراجعة",
+        tabWithApproved: "معتمدة للدفع",
+        tabWithPaid: "مدفوعة",
+        tabWithRejected: "مرفوضة",
+        thBen: "المستفيد والبريد",
+        thAmt: "المبلغ المراد صرفه",
+        thMethod: "وسيلة الدفع وبيانات الحساب",
+        thStatus: "الحالة",
+        thDate: "التاريخ / التوقيت",
+        thActions: "إجراء التحويل",
+        statusPending: "قيد المراجعة",
+        statusPaid: "تم التحويل بنجاح",
+        btnReject: "رفض",
+        btnApprove: "تأكيد التحويل"
+      }
+    };
+
+    function setLang(lang) {
+      currentLang = lang;
+      const html = document.getElementById('html-root');
+      html.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+      ['fr', 'en', 'ar'].forEach(l => {
+        const btn = document.getElementById('btn-lang-' + l);
+        btn.className = (l === lang) ? 'px-2.5 py-1 rounded bg-sky-600 text-white font-bold cursor-pointer transition-all' : 'px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer transition-all';
+      });
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang] && i18n[lang][key]) {
+          el.innerText = i18n[lang][key];
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -19,10 +19,13 @@ import {
   Globe,
   Share2,
   Copy,
+  AlertCircle,
+  MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 import { CodCheckoutForm } from "@/components/checkout/cod-checkout-form";
 import { formatDZD } from "@/lib/formatters";
-import { apiGetPublicProduct, PublicCheckoutProduct } from "@/lib/api-client";
+import { apiGetPublicProduct, apiRecordClick, PublicCheckoutProduct } from "@/lib/api-client";
 
 interface PageProps {
   params: Promise<{ productId: string }>;
@@ -34,11 +37,37 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   const searchParams = useSearchParams();
 
   // Affiliate & Ad Tracking parameters
-  const affiliateId = searchParams.get("ref") || "cdc56d60-c4dd-48ed-be17-d637bcb392ae";
+  const rawRef = searchParams.get("ref");
+  const isValidRef = typeof rawRef === "string" && /^[a-zA-Z0-9_-]{3,64}$/.test(rawRef);
+  const affiliateId = isValidRef ? rawRef : "cdc56d60-c4dd-48ed-be17-d637bcb392ae";
   const fbclid = searchParams.get("fbclid") || undefined;
   const ttclid = searchParams.get("ttclid") || undefined;
+  const utmSource = searchParams.get("utm_source") || undefined;
   const utmCampaign = searchParams.get("utm_campaign") || undefined;
   const subId = searchParams.get("sub_id") || undefined;
+
+  useEffect(() => {
+    if (rawRef && !isValidRef) {
+      console.warn(
+        `[ViteDrop Tracking] Malformed affiliate ref "${rawRef}". Defaulting attribution to system fallback affiliate (${affiliateId}).`
+      );
+    }
+  }, [rawRef, isValidRef, affiliateId]);
+
+  // Non-blocking Click Telemetry
+  useEffect(() => {
+    if (productId && affiliateId) {
+      apiRecordClick({
+        productId,
+        affiliateId,
+        utmSource,
+        utmCampaign,
+        subId,
+      }).catch((err) => {
+        console.debug("[ViteDrop Telemetry] Click capture skipped:", err);
+      });
+    }
+  }, [productId, affiliateId, utmSource, utmCampaign, subId]);
 
   // Language state (Default: Arabic for highest conversion in Algeria)
   const [lang, setLang] = useState<"ar" | "fr">("ar");
@@ -72,20 +101,21 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
     async function loadProduct() {
       try {
         setIsLoading(true);
+        setError(null);
         const data = await apiGetPublicProduct(productId);
+        if (!data || !data.id) {
+          throw new Error(isAr ? "المنتج غير متوفر أو تعذر العثور عليه" : "Produit non disponible ou introuvable");
+        }
         setProduct(data);
       } catch (err: any) {
-        console.warn("Backend fetch failed or product not found, using fallback showcase data:", err);
-        // Resilient fallback for preview/testing
-        setProduct({
-          id: productId,
-          name: isAr ? "ساعة ذكية رياضية Ultra Pro المقاومة للماء" : "Montre Connectée Sport Ultra Pro Étanche",
-          description: isAr 
-            ? "شاشة AMOLED فائقة الوضوح، قياس نبضات القلب والأكسجين في الدم، بطارية تدوم حتى 7 أيام، متوافقة مع جميع الهواتف (Android & iOS). تصميم أنيق وهيكل متين من سبائك التيتانيوم."
-            : "Écran AMOLED haute définition, suivi cardiaque et SpO2, autonomie longue durée de 7 jours, compatible avec tous les smartphones Android et iOS.",
-          retailPrice: 4900,
-          stock: 14,
-        });
+        console.error("Public product fetch failed:", err);
+        setError(
+          err?.message ||
+            (isAr
+              ? "تعذر تحميل المنتج المطلوب، يرجى التأكد من الرابط أو المحاولة لاحقاً."
+              : "Impossible de charger le produit demandé. Veuillez vérifier le lien ou réessayer.")
+        );
+        setProduct(null);
       } finally {
         setIsLoading(false);
       }
@@ -129,10 +159,55 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
     );
   }
 
+  // ERROR / PRODUCT NOT FOUND VIEW (Hardened against phantom orders)
+  if (error || !product) {
+    return (
+      <div
+        data-testid="product-unavailable-view"
+        dir={isAr ? "rtl" : "ltr"}
+        className={`min-h-screen bg-[#f8fafc] flex items-center justify-center p-4 ${isAr ? "rtl font-sans" : "ltr"}`}
+      >
+        <div className="max-w-md w-full bg-white rounded-3xl border border-neutral-200/80 shadow-xl p-8 text-center space-y-5">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-100">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+
+          <div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold mb-2 border border-rose-200/60">
+              {isAr ? "تنبيه" : "Indisponible"}
+            </span>
+            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">
+              {isAr ? "عذراً، هذا المنتج غير متوفر" : "Produit non disponible"}
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 mt-2 leading-relaxed">
+              {error || (isAr
+                ? "قد يكون الرابط غير صحيح أو تم إيقاف هذا العرض الترويجي من طرف المورد."
+                : "Le lien est peut-être erroné ou cette offre a été désactivée par le fournisseur.")}
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="w-full py-3 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer"
+            >
+              {isAr ? "إعادة المحاولة" : "Réessayer"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // SUCCESS CONFIRMATION VIEW
   if (completedOrder) {
     return (
-      <div className={`min-h-screen bg-[#f8fafc] py-8 sm:py-16 px-4 ${isAr ? "rtl font-sans" : "ltr"}`}>
+      <div
+        data-testid="checkout-success-view"
+        dir={isAr ? "rtl" : "ltr"}
+        className={`min-h-screen bg-[#f8fafc] py-8 sm:py-16 px-4 ${isAr ? "rtl font-sans" : "ltr"}`}
+      >
         <div className="max-w-xl mx-auto space-y-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -167,12 +242,13 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
                 <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
                   {isAr ? "رقم الطلب المرجعي" : "N° de commande"}
                 </p>
-                <p className="text-sm sm:text-base font-mono font-bold text-neutral-900">
-                  #{completedOrder.orderId.slice(0, 8).toUpperCase()}
+                <p data-testid="checkout-success-order-id" className="text-sm sm:text-base font-mono font-bold text-neutral-900">
+                  #{completedOrder.orderId.toUpperCase()}
                 </p>
               </div>
               <button
                 type="button"
+                data-testid="copy-order-id-btn"
                 onClick={() => handleCopyOrderId(completedOrder.orderId)}
                 className="px-3 py-1.5 rounded-xl bg-white border border-neutral-200 text-xs font-medium text-neutral-700 hover:bg-neutral-100 flex items-center gap-1.5 cursor-pointer"
               >
@@ -188,6 +264,16 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
                   </>
                 )}
               </button>
+            </div>
+
+            {/* Estimated Delivery Time */}
+            <div className="flex items-center gap-2 text-xs text-blue-700 bg-blue-50/80 px-4 py-2.5 rounded-xl border border-blue-200/60 mb-6 text-start">
+              <Clock className="w-4 h-4 shrink-0 text-blue-600" />
+              <span>
+                {isAr
+                  ? `مدة التوصيل التقديرية لولاية ${completedOrder.wilayaName}: 24 إلى 48 ساعة`
+                  : `Délai estimé de livraison (${completedOrder.wilayaName}) : 24h à 48h`}
+              </span>
             </div>
 
             {/* Summary details */}
@@ -214,7 +300,7 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
               </div>
               <div className="pt-2 border-t border-blue-200/60 flex items-center justify-between text-base font-bold text-neutral-900">
                 <span>{isAr ? "المبلغ المطلوب عند الاستلام:" : "Montant à payer au livreur:"}</span>
-                <span className="font-mono text-emerald-600 text-lg">
+                <span data-testid="checkout-success-total" className="font-mono text-emerald-600 text-lg">
                   {formatDZD(completedOrder.totalAmount, lang)}
                 </span>
               </div>
@@ -275,11 +361,37 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center gap-3">
+            <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <a
+                  href={`/track?id=${completedOrder.orderId}`}
+                  data-testid="track-my-order-btn"
+                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                >
+                  <Truck className="w-4 h-4" />
+                  <span>{isAr ? "تتبع طلبي مباشرة" : "Suivre ma commande en direct"}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
+                <a
+                  href={`sms:?body=${encodeURIComponent(
+                    isAr
+                      ? `طلب فيت دروب #${completedOrder.orderId} - الرابط: https://vitedrop.dz/track?id=${completedOrder.orderId}`
+                      : `Commande ViteDrop #${completedOrder.orderId} - Suivi: https://vitedrop.dz/track?id=${completedOrder.orderId}`
+                  )}`}
+                  data-testid="sms-reminder-btn"
+                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4 text-neutral-600" />
+                  <span>{isAr ? "تذكير بالطلب عبر SMS" : "Rappel de commande par SMS"}</span>
+                </a>
+              </div>
+
               <button
                 type="button"
+                data-testid="order-again-btn"
                 onClick={() => setCompletedOrder(null)}
-                className="w-full py-3 px-4 rounded-xl border border-neutral-200 text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-50 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-50 cursor-pointer"
               >
                 {isAr ? "طلب قطعة إضافية" : "Passer une autre commande"}
               </button>
@@ -291,7 +403,10 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   }
 
   return (
-    <div className={`min-h-screen bg-[#fafbfc] text-neutral-900 ${isAr ? "rtl font-sans" : "ltr"}`}>
+    <div
+      dir={isAr ? "rtl" : "ltr"}
+      className={`min-h-screen bg-[#fafbfc] text-neutral-900 ${isAr ? "rtl font-sans" : "ltr"}`}
+    >
       {/* 1. TOP URGENCY & TRUST BANNER */}
       <div className="bg-slate-900 text-white text-xs py-2.5 px-4 sticky top-0 z-40 shadow-sm">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
@@ -313,6 +428,7 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
             <Globe className="w-3.5 h-3.5 text-neutral-400" />
             <button
               type="button"
+              data-testid="landing-lang-toggle"
               onClick={() => setLang(lang === "ar" ? "fr" : "ar")}
               className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
             >
@@ -380,7 +496,10 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight leading-tight">
+            <h1
+              data-testid="product-landing-title"
+              className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight leading-tight"
+            >
               {product?.name}
             </h1>
 
@@ -391,7 +510,10 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
                   {isAr ? "سعر العرض الترويجي" : "Prix promotionnel"}
                 </p>
                 <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-black font-mono text-blue-700">
+                  <span
+                    data-testid="product-landing-price"
+                    className="text-3xl font-black font-mono text-blue-700"
+                  >
                     {product ? formatDZD(product.retailPrice, lang) : "4,900 DZD"}
                   </span>
                   <span className="text-sm font-mono text-neutral-400 line-through">
@@ -406,14 +528,28 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
             </div>
 
             {/* Stock Scarcity */}
-            <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center gap-2.5 text-xs text-amber-900">
-              <Flame className="w-4 h-4 text-amber-600 shrink-0" />
-              <span>
-                {isAr 
-                  ? "سارع بالطلب: باقي 14 قطعة فقط في مستودع الجزائر العاصمة."
-                  : "Dépêchez-vous : plus que 14 pièces en stock à l'entrepôt d'Alger."}
-              </span>
-            </div>
+            {product && product.stock > 0 ? (
+              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center gap-2.5 text-xs text-amber-900">
+                <Flame className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  {isAr 
+                    ? `سارع بالطلب: باقي ${product.stock} قطع فقط في مستودع الجزائر العاصمة.`
+                    : `Dépêchez-vous : plus que ${product.stock} pièces en stock à l'entrepôt d'Alger.`}
+                </span>
+              </div>
+            ) : (
+              <div
+                data-testid="product-out-of-stock-banner"
+                className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center gap-2.5 text-xs text-rose-800 font-semibold"
+              >
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>
+                  {isAr 
+                    ? "نفد المخزون: هذا المنتج غير متوفر حالياً في المستودع."
+                    : "Rupture de stock : ce produit est actuellement indisponible à l'entrepôt."}
+                </span>
+              </div>
+            )}
 
             {/* Description */}
             <div className="text-sm text-neutral-600 leading-relaxed space-y-2 border-t border-neutral-100 pt-4">
@@ -423,11 +559,21 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
             {/* Fast Order Trigger Button */}
             <button
               type="button"
+              data-testid="scroll-to-checkout-btn"
               onClick={scrollToCheckout}
-              className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-xl shadow-blue-600/25 flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.99]"
+              disabled={!product || product.stock <= 0}
+              className={`w-full py-4 px-6 rounded-2xl font-bold text-base shadow-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.99] ${
+                !product || product.stock <= 0
+                  ? "bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25 cursor-pointer"
+              }`}
             >
-              <span>{isAr ? "اضغط هنا للطلب الآن" : "Commander maintenant"}</span>
-              <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />
+              <span>
+                {!product || product.stock <= 0
+                  ? (isAr ? "نفد المخزون حالياً" : "Actuellement en rupture de stock")
+                  : (isAr ? "اضغط هنا للطلب الآن" : "Commander maintenant")}
+              </span>
+              {product && product.stock > 0 && <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />}
             </button>
 
             {/* Trust Bullet Points */}
@@ -637,11 +783,21 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
 
           <button
             type="button"
+            data-testid="mobile-sticky-checkout-btn"
             onClick={scrollToCheckout}
-            className="flex-1 py-3 px-4 rounded-2xl bg-blue-600 active:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-1.5 cursor-pointer"
+            disabled={!product || product.stock <= 0}
+            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-sm shadow-lg flex items-center justify-center gap-1.5 ${
+              !product || product.stock <= 0
+                ? "bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none"
+                : "bg-blue-600 active:bg-blue-700 text-white shadow-blue-600/25 cursor-pointer"
+            }`}
           >
-            <span>{isAr ? "اطلب الآن (الدفع عند الاستلام)" : "Commander"}</span>
-            <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />
+            <span>
+              {!product || product.stock <= 0
+                ? (isAr ? "نفد المخزون" : "Épuisé")
+                : (isAr ? "اطلب الآن (الدفع عند الاستلام)" : "Commander")}
+            </span>
+            {product && product.stock > 0 && <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />}
           </button>
         </div>
       </div>

@@ -23,13 +23,22 @@ export function AdminPageHeader({
 }: AdminPageHeaderProps) {
   const badgeText = eyebrow || badge;
 
+  const variantStyles: Record<string, string> = {
+    rose: "text-rose-700 bg-rose-50 border-rose-200",
+    emerald: "text-emerald-800 bg-emerald-50 border-emerald-200",
+    amber: "text-amber-900 bg-amber-50 border-amber-200",
+    cyan: "text-sky-800 bg-sky-50 border-sky-200",
+    neutral: "text-neutral-700 bg-stone-100 border-stone-200",
+  };
+  const activeBadgeClass = (badgeVariant && variantStyles[badgeVariant]) || variantStyles.amber;
+
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-start ${className}`}
+      className={`flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 text-start ${className}`}
     >
       <div className="space-y-1 min-w-0">
         {badgeText && (
-          <span className="inline-block text-[11px] font-mono uppercase tracking-wider text-rose-700 font-bold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+          <span className={`inline-block text-[11px] font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border ${activeBadgeClass}`}>
             {badgeText}
           </span>
         )}
@@ -44,7 +53,7 @@ export function AdminPageHeader({
       </div>
 
       {actions && (
-        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap pt-1 sm:pt-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap pt-1 lg:pt-0">
           {actions}
         </div>
       )}

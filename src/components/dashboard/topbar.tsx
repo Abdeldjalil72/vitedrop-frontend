@@ -38,14 +38,16 @@ export function Topbar({
   const roleStyles = {
     affiliate: "bg-sky-50 text-sky-700 border-sky-200",
     supplier: "bg-purple-50 text-purple-700 border-purple-200",
-    admin: "bg-neutral-100 text-neutral-800 border-neutral-300",
+    admin: "bg-emerald-50 text-emerald-800 border-emerald-200/80",
   };
 
   const badgeClass = roleStyles[role];
   const roleLabel = t.roles[role] || role;
 
   return (
-    <header className="h-14 sm:h-16 bg-white border-b border-black/[0.08] px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+    <header className={`h-14 sm:h-16 ${
+      role === "admin" ? "bg-[#fdfdfc] border-b border-[#e7e5df]" : "bg-white border-b border-black/[0.08]"
+    } px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30`}>
       {/* Start side: Hamburger + Role Badge */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
