@@ -95,6 +95,19 @@ async function setupOnboardingRoutes(
       body: JSON.stringify([]),
     });
   });
+
+  // Intercept forgot password
+  await page.route(new RegExp(`^${apiBase}/auth/forgot-password`), async (route) => {
+    if (route.request().method() === "POST") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Password reset instructions sent" }),
+      });
+    } else {
+      await route.fallback();
+    }
+  });
 }
 
 test.describe("Public Marketing & Registration Onboarding Funnel", () => {
@@ -255,6 +268,7 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
   test("executes forgot password recovery flow with success confirmation and login return", async ({
     page,
   }) => {
+    await setupOnboardingRoutes(page);
     await page.goto("/forgot-password");
 
     const emailInput = page.locator('[data-testid="forgot-email-input"]');

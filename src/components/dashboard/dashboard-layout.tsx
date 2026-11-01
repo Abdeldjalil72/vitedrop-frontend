@@ -106,9 +106,12 @@ export function DashboardLayout({
     }
 
     const expectedRole = initialRole.toUpperCase();
+    const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const isSpecialAdminExemption = user.role === "ADMIN" && searchParams?.get("from") === "admin";
+
     const isMatchingRole =
       user.role === expectedRole ||
-      user.role === "ADMIN" ||
+      isSpecialAdminExemption ||
       (expectedRole === "SUPPLIER" && user.role === "CALL_CENTER_AGENT");
 
     if (!isMatchingRole) {
