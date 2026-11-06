@@ -1435,4 +1435,73 @@ export async function apiUpdateAdminPlatformSettings(
   }
 }
 
+// ==========================================
+// Notifications API
+// ==========================================
+
+export type NotificationType =
+  | "COMMISSION_EARNED"
+  | "ORDER_DELIVERED"
+  | "ORDER_RETURNED"
+  | "WITHDRAWAL_APPROVED"
+  | "WITHDRAWAL_PAID"
+  | "WITHDRAWAL_REJECTED"
+  | "ORDER_CREATED"
+  | "DEPOSIT_APPROVED"
+  | "DEPOSIT_REJECTED"
+  | "STOCK_ALERT"
+  | "ADMIN_NEW_WITHDRAWAL"
+  | "ADMIN_NEW_DEPOSIT"
+  | "SYSTEM_NOTICE";
+
+export type NotificationCategory = "FINANCIAL" | "OPERATIONAL" | "STOCK" | "SYSTEM";
+
+export interface NotificationItem {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  linkUrl?: string | null;
+  data?: Record<string, any> | null;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+}
+
+export async function apiGetNotifications(
+  limit = 20,
+  offset = 0,
+  unreadOnly = false
+): Promise<{ data: NotificationItem[]; total: number; unreadCount: number }> {
+  const params = new URLSearchParams();
+  params.set("limit", String(limit));
+  params.set("offset", String(offset));
+  if (unreadOnly) params.set("unreadOnly", "true");
+  return apiRequest(`/notifications?${params.toString()}`);
+}
+
+export async function apiGetUnreadNotificationCount(): Promise<{ unreadCount: number }> {
+  return apiRequest("/notifications/unread-count");
+}
+
+export async function apiMarkNotificationRead(id: string): Promise<NotificationItem> {
+  return apiRequest(`/notifications/${id}/read`, {
+    method: "PATCH",
+  });
+}
+
+export async function apiMarkAllNotificationsRead(): Promise<{ success: boolean; updatedCount: number }> {
+  return apiRequest("/notifications/mark-all-read", {
+    method: "PATCH",
+  });
+}
+
+export async function apiDeleteNotification(id: string): Promise<{ success: boolean }> {
+  return apiRequest(`/notifications/${id}`, {
+    method: "DELETE",
+  });
+}
+
 

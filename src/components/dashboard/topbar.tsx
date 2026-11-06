@@ -2,11 +2,12 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Menu, Bell, Wallet as WalletIcon, LogOut, Shield } from "lucide-react";
+import { Menu, Wallet as WalletIcon, LogOut, Shield } from "lucide-react";
 import { UserRole } from "@/types";
 import { Language, translations } from "@/lib/locales";
 import { formatDZD } from "@/lib/formatters";
 import { removeAuthToken } from "@/lib/api-client";
+import { NotificationPopover } from "./notification-popover";
 
 interface TopbarProps {
   role: UserRole;
@@ -116,15 +117,8 @@ export function Topbar({
           </div>
         </div>
 
-        {/* Notifications */}
-        <button
-          type="button"
-          className="p-1.5 sm:p-2 rounded-full text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors relative cursor-pointer"
-          aria-label="Notifications"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1 end-1 w-2 h-2 rounded-full bg-sky-500" />
-        </button>
+        {/* Notifications Popover */}
+        <NotificationPopover lang={lang} />
 
         {/* Logout Button */}
         <button
