@@ -684,6 +684,7 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
                 affiliateId={affiliateId}
                 fbclid={fbclid}
                 ttclid={ttclid}
+                utmSource={utmSource}
                 utmCampaign={utmCampaign}
                 subId={subId}
                 lang={lang}

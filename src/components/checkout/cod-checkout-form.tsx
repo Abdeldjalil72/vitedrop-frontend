@@ -29,6 +29,7 @@ export interface CodCheckoutFormProps {
   affiliateId?: string;
   fbclid?: string;
   ttclid?: string;
+  utmSource?: string;
   utmCampaign?: string;
   subId?: string;
   lang?: "ar" | "fr";
@@ -51,6 +52,7 @@ export function CodCheckoutForm({
   affiliateId = "00000000-0000-0000-0000-000000000000",
   fbclid,
   ttclid,
+  utmSource,
   utmCampaign,
   subId,
   lang = "ar",
@@ -175,6 +177,8 @@ export function CodCheckoutForm({
         affiliateId,
         fbclid,
         ttclid,
+        utmSource,
+        utm_source: utmSource,
         utmCampaign,
         utm_campaign: utmCampaign,
         subId,

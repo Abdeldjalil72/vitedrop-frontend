@@ -340,6 +340,8 @@ export interface CreateCheckoutPayload {
   affiliateId: string;
   fbclid?: string;
   ttclid?: string;
+  utmSource?: string;
+  utm_source?: string;
   utmCampaign?: string;
   utm_campaign?: string;
   subId?: string;
