@@ -38,9 +38,10 @@ export function TrackingLinkModal({
   if (!product) return null;
 
   const currentUser = getCurrentUser();
-  const affiliateId = currentUser?.sub || "aff-101";
+  const affiliateId = currentUser?.sub || "b1e484ee-951a-4386-b016-17217e5ebbf2";
 
   const searchParams = new URLSearchParams();
+  searchParams.set("ref", affiliateId);
   searchParams.set("aff", affiliateId);
   if (campaign.trim()) searchParams.set("utm_campaign", campaign.trim());
   if (subId.trim()) searchParams.set("sub_id", subId.trim());

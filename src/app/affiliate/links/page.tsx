@@ -196,11 +196,11 @@ export default function AffiliateLinksPage() {
     loadProducts();
   }, []);
 
-  const affiliateId = currentUser?.sub || "aff-qa-uuid";
+  const affiliateId = currentUser?.sub || "b1e484ee-951a-4386-b016-17217e5ebbf2";
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://vitedrop.dz";
 
   const generatedLink = selectedProductId
-    ? `${baseUrl}/p/${selectedProductId}?aff=${affiliateId}&utm_source=${encodeURIComponent(
+    ? `${baseUrl}/p/${selectedProductId}?ref=${affiliateId}&aff=${affiliateId}&utm_source=${encodeURIComponent(
         utmSource
       )}&utm_medium=${encodeURIComponent(utmMedium)}&utm_campaign=${encodeURIComponent(
         utmCampaign

@@ -37,9 +37,18 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   const searchParams = useSearchParams();
 
   // Affiliate & Ad Tracking parameters
-  const rawRef = searchParams.get("ref");
+  const rawRef =
+    searchParams.get("ref") ||
+    searchParams.get("aff") ||
+    searchParams.get("affiliateId") ||
+    searchParams.get("affiliate_id");
   const isValidRef = typeof rawRef === "string" && /^[a-zA-Z0-9_-]{3,64}$/.test(rawRef);
-  const affiliateId = isValidRef ? rawRef : "cdc56d60-c4dd-48ed-be17-d637bcb392ae";
+  const currentUser = typeof window !== "undefined" ? getCurrentUser() : null;
+  const affiliateId = isValidRef
+    ? rawRef
+    : currentUser?.role === "AFFILIATE" && currentUser?.sub
+      ? currentUser.sub
+      : "b1e484ee-951a-4386-b016-17217e5ebbf2";
   const fbclid = searchParams.get("fbclid") || undefined;
   const ttclid = searchParams.get("ttclid") || undefined;
   const utmSource = searchParams.get("utm_source") || undefined;

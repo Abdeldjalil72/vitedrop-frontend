@@ -49,7 +49,7 @@ export function CodCheckoutForm({
   productName,
   retailPrice,
   stock = 10,
-  affiliateId = "00000000-0000-0000-0000-000000000000",
+  affiliateId = "b1e484ee-951a-4386-b016-17217e5ebbf2",
   fbclid,
   ttclid,
   utmSource,
