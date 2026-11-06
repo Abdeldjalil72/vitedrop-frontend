@@ -46,9 +46,9 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   const affiliateId = isValidRef ? rawRef : "b1e484ee-951a-4386-b016-17217e5ebbf2";
   const fbclid = searchParams.get("fbclid") || undefined;
   const ttclid = searchParams.get("ttclid") || undefined;
-  const utmSource = searchParams.get("utm_source") || undefined;
-  const utmCampaign = searchParams.get("utm_campaign") || undefined;
-  const subId = searchParams.get("sub_id") || undefined;
+  const utmSource = searchParams.get("utm_source") || searchParams.get("utmSource") || undefined;
+  const utmCampaign = searchParams.get("utm_campaign") || searchParams.get("utmCampaign") || undefined;
+  const subId = searchParams.get("sub_id") || searchParams.get("subId") || undefined;
 
   useEffect(() => {
     if (rawRef && !isValidRef) {
