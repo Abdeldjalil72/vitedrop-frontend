@@ -48,7 +48,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-export default function SupplierDashboardPage({
+function SupplierDashboardView({
   defaultTab = "queue",
   isCallCenterOnly = false,
 }: {
@@ -1796,4 +1796,8 @@ export default function SupplierDashboardPage({
       }}
     </DashboardLayout>
   );
+}
+
+export default function SupplierDashboardPage() {
+  return <SupplierDashboardView defaultTab="queue" isCallCenterOnly={false} />;
 }

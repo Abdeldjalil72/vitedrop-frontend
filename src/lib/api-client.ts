@@ -578,6 +578,9 @@ export interface AdminWithdrawal {
   fullName?: string | null;
   userPhone?: string | null;
   userRole?: string;
+  walletBalance?: number;
+  reviewerName?: string | null;
+  reviewerEmail?: string | null;
   amount: number;
   method: WithdrawalMethod;
   recipientDetailsMasked: string;
@@ -590,6 +593,7 @@ export interface AdminWithdrawal {
   paidAt?: string | null;
   rejectedAt?: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export async function apiGetAdminWithdrawals(

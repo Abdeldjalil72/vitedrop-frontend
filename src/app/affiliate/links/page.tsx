@@ -306,7 +306,7 @@ export default function AffiliateLinksPage() {
                     </div>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="secondary"
                       onClick={loadProducts}
                       className="h-7 px-2 text-xs border-rose-200 text-rose-700 hover:bg-rose-100 shrink-0"
                     >

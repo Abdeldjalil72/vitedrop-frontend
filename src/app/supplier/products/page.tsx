@@ -32,6 +32,7 @@ export interface SupplierProductItem {
   id: string;
   name: string;
   description?: string | null;
+  imageUrl?: string | null;
   stock: number;
   retailPrice: number;
   supplierTotalCpa: number;
@@ -560,7 +561,7 @@ export default function SupplierProductsPage() {
                                 </span>
                                 <Button
                                   size="sm"
-                                  variant="outline"
+                                  variant="secondary"
                                   onClick={() => {
                                     setEditingProduct(p);
                                     setIsProductModalOpen(true);

@@ -9,6 +9,7 @@ import {
   WithdrawalActionModal,
   WithdrawalModalAction,
 } from "@/components/admin/withdrawal-action-modal";
+import { WithdrawalDetailModal } from "@/components/admin/withdrawal-detail-modal";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { ResponsiveAdminList } from "@/components/admin/responsive-admin-list";
 import {
@@ -25,6 +26,7 @@ import {
   CreditCard,
   AlertTriangle,
   Copy,
+  Eye,
 } from "lucide-react";
 
 const PRIORITY_THRESHOLD_DZD = 20000;
@@ -56,6 +58,7 @@ const translations = {
     copyBtn: "Copier les coordonnées",
     userFallback: "Utilisateur",
     actions: {
+      details: "Détails",
       approve: "Approuver",
       reject: "Rejeter",
       markPaid: "Marquer Payé",
@@ -90,6 +93,7 @@ const translations = {
     copyBtn: "Copy details",
     userFallback: "User",
     actions: {
+      details: "Details",
       approve: "Approve",
       reject: "Reject",
       markPaid: "Mark as Paid",
@@ -124,6 +128,7 @@ const translations = {
     copyBtn: "نسخ البيانات",
     userFallback: "مستخدم",
     actions: {
+      details: "التفاصيل",
       approve: "موافقة",
       reject: "رفض",
       markPaid: "تسجيل الدفع",
@@ -150,6 +155,9 @@ export default function AdminWithdrawalsPage() {
   // Action Modal State
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<AdminWithdrawal | null>(null);
   const [modalAction, setModalAction] = useState<WithdrawalModalAction | null>(null);
+
+  // Detail Modal State
+  const [detailWithdrawal, setDetailWithdrawal] = useState<AdminWithdrawal | null>(null);
 
   const handleCopyRecipient = (id: string, text: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -300,8 +308,18 @@ export default function AdminWithdrawalsPage() {
             </div>
 
             {/* Actions on phone */}
-            {(w.status === "PENDING" || w.status === "APPROVED") && (
-              <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-neutral-100">
+            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-neutral-100">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setDetailWithdrawal(w)}
+                className="h-7 text-xs text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 px-2"
+              >
+                <Eye className="w-3.5 h-3.5 me-1" />
+                <span>{t.actions.details}</span>
+              </Button>
+
+              <div className="flex items-center gap-1.5">
                 {w.status === "PENDING" && (
                   <>
                     <Button
@@ -347,7 +365,7 @@ export default function AdminWithdrawalsPage() {
                   </>
                 )}
               </div>
-            )}
+            </div>
           </div>
         );
 
@@ -365,9 +383,15 @@ export default function AdminWithdrawalsPage() {
             </thead>
             <tbody className="divide-y divide-neutral-100 font-mono">
               {filteredWithdrawals.map((w) => (
-                <tr key={w.id} className="hover:bg-neutral-50/60 transition-colors">
+                <tr
+                  key={w.id}
+                  onClick={() => setDetailWithdrawal(w)}
+                  className="hover:bg-neutral-50/80 transition-colors cursor-pointer group"
+                >
                   <td className="px-4 py-3 font-sans">
-                    <div className="font-bold text-neutral-900">{w.fullName || "—"}</div>
+                    <div className="font-bold text-neutral-900 group-hover:text-emerald-950 transition-colors">
+                      {w.fullName || "—"}
+                    </div>
                     <div className="text-[11px] text-neutral-500 font-mono mt-0.5">{w.userEmail}</div>
                   </td>
                   <td className="px-4 py-3 font-bold text-neutral-900 text-sm">
@@ -401,7 +425,10 @@ export default function AdminWithdrawalsPage() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleCopyRecipient(w.id, w.recipientDetailsMasked)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyRecipient(w.id, w.recipientDetailsMasked);
+                        }}
                         title={t.copyBtn}
                         aria-label={t.copyBtn}
                         className="p-0.5 rounded text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
@@ -426,13 +453,30 @@ export default function AdminWithdrawalsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-end font-sans">
-                    <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailWithdrawal(w);
+                        }}
+                        className="h-7 text-xs text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 px-2"
+                        title={t.actions.details}
+                      >
+                        <Eye className="w-3.5 h-3.5 me-1" />
+                        <span>{t.actions.details}</span>
+                      </Button>
+
                       {w.status === "PENDING" && (
                         <>
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => openModal(w, "APPROVE")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal(w, "APPROVE");
+                            }}
                             className="h-7 text-xs bg-[#064e3b] hover:bg-[#085a44] text-amber-200 border border-emerald-900 shadow-2xs font-semibold px-2.5"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 me-1 text-amber-300" />
@@ -441,7 +485,10 @@ export default function AdminWithdrawalsPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => openModal(w, "REJECT")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal(w, "REJECT");
+                            }}
                             className="h-7 text-xs text-rose-700 hover:bg-rose-50"
                           >
                             <XCircle className="w-3.5 h-3.5 me-1" />
@@ -454,7 +501,10 @@ export default function AdminWithdrawalsPage() {
                           <Button
                             size="sm"
                             variant="primary"
-                            onClick={() => openModal(w, "PAID")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal(w, "PAID");
+                            }}
                             className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
                           >
                             <CreditCard className="w-3.5 h-3.5 me-1" />
@@ -463,7 +513,10 @@ export default function AdminWithdrawalsPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => openModal(w, "FAILED")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal(w, "FAILED");
+                            }}
                             className="h-7 text-xs text-amber-700 hover:bg-amber-50"
                           >
                             <AlertTriangle className="w-3.5 h-3.5 me-1" />
@@ -542,6 +595,20 @@ export default function AdminWithdrawalsPage() {
               lang={lang}
               title={t.listTitle}
             />
+
+            {/* Detail Modal */}
+            {detailWithdrawal && (
+              <WithdrawalDetailModal
+                withdrawal={detailWithdrawal}
+                isOpen={!!detailWithdrawal}
+                onClose={() => setDetailWithdrawal(null)}
+                onAction={(w, act) => {
+                  setDetailWithdrawal(null);
+                  openModal(w, act);
+                }}
+                lang={lang}
+              />
+            )}
 
             {/* Action Modal */}
             {selectedWithdrawal && modalAction && (
