@@ -56,9 +56,13 @@ export default function ProductDetailPage({
             affiliateNetPayout: Number(live.affiliateNetPayout) || 0,
             platformFee: 0,
             image:
+              live.imageUrl ||
+              live.image ||
               "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
             gallery: [
-              "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
+              live.imageUrl ||
+                live.image ||
+                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
             ],
             stock: live.stock ?? 100,
             category: "Électronique & Soins",

@@ -127,11 +127,13 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   }, [productId, isAr]);
 
   // Gallery images (product or placeholder mockups)
-  const productImages = [
-    "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1000&q=80",
-  ];
+  const productImages = product?.imageUrl
+    ? [product.imageUrl]
+    : [
+        "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1000&q=80",
+      ];
 
   const scrollToCheckout = () => {
     const el = document.getElementById("checkout-section");

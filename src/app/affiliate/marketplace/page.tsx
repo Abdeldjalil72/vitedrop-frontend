@@ -52,10 +52,12 @@ export default function AffiliateMarketplacePage() {
             affiliateNetPayout: Number(p.affiliateNetPayout) || 0,
             platformFee: 0,
             image:
+              p.imageUrl ||
               p.image ||
               "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
             gallery: [
-              p.image ||
+              p.imageUrl ||
+                p.image ||
                 "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
             ],
             stock: p.stock ?? 100,

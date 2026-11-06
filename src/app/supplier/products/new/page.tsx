@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDZD } from "@/lib/formatters";
 import { Language } from "@/lib/locales";
-import { apiCreateSupplierProduct, apiGetMyWallet, getCurrentUser } from "@/lib/api-client";
+import {
+  apiCreateSupplierProduct,
+  apiGetMyWallet,
+  apiUploadImage,
+  getCurrentUser,
+} from "@/lib/api-client";
 import { SupplierTopUpModal } from "@/components/supplier/supplier-topup-modal";
 import {
   ArrowLeft,
@@ -348,10 +353,16 @@ export default function NewProductPage() {
     setIsProcessingImage(true);
     try {
       setImageName(file.name);
-      const compressed = await processImageFile(file);
-      setImageUrl(compressed);
+      try {
+        const uploadRes = await apiUploadImage(file);
+        setImageUrl(uploadRes.url);
+      } catch (uploadErr) {
+        console.warn("Direct upload failed, falling back to local compression:", uploadErr);
+        const compressed = await processImageFile(file);
+        setImageUrl(compressed);
+      }
     } catch (err) {
-      console.error("Failed to compress image:", err);
+      console.error("Failed to process image:", err);
     } finally {
       setIsProcessingImage(false);
     }

@@ -320,6 +320,7 @@ export interface PublicCheckoutProduct {
   id: string;
   name: string;
   description: string | null;
+  imageUrl?: string;
   retailPrice: number;
   stock: number;
 }

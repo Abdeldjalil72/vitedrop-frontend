@@ -466,8 +466,12 @@ export default function SupplierProductsPage() {
                             {/* Product Info */}
                             <TableCell>
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
-                                  <Box className="w-5 h-5" />
+                                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0 overflow-hidden">
+                                  {p.imageUrl ? (
+                                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <Box className="w-5 h-5" />
+                                  )}
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                   <span className="font-semibold text-neutral-900 text-sm tracking-tight leading-snug truncate">
