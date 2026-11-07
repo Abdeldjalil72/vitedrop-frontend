@@ -285,14 +285,29 @@ function VerifyEmailContent() {
               </div>
             </div>
 
-            {/* Back to Login Link */}
-            <div className="text-center text-xs text-[#6b6b6b]">
-              <Link
-                href="/login"
-                className="font-medium text-neutral-800 hover:text-sky-600 transition-colors"
-              >
-                {isAr ? "العودة إلى تسجيل الدخول" : isEn ? "Back to login" : "Retour à la page de connexion"}
-              </Link>
+            {/* Correction / Re-register Link */}
+            <div className="text-center text-xs text-[#6b6b6b] space-y-2.5">
+              <div>
+                <Link
+                  href={`/register?email=${encodeURIComponent(email)}`}
+                  className="font-medium text-emerald-700 hover:text-emerald-800 hover:underline transition-colors"
+                >
+                  {isAr
+                    ? "هل أخطأت في البريد أو تريد تعديل بياناتك؟ اضغط هنا"
+                    : isEn
+                    ? "Wrong email or need to modify details? Click here"
+                    : "Mauvaise adresse ou informations à modifier ? Cliquez ici"}
+                </Link>
+              </div>
+
+              <div>
+                <Link
+                  href="/login"
+                  className="font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+                >
+                  {isAr ? "العودة إلى تسجيل الدخول" : isEn ? "Back to login" : "Retour à la page de connexion"}
+                </Link>
+              </div>
             </div>
           </div>
         );

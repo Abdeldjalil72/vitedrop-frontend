@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -185,16 +185,31 @@ const getMonthlyVolumeOptions = (isAr: boolean): ModernSelectOption[] => [
   },
 ];
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
-  const [role, setRole] = useState<"affiliate" | "supplier">("affiliate");
+  const searchParams = useSearchParams();
+  const urlEmail = searchParams.get("email") || "";
+  const urlRole = searchParams.get("role") || "";
+
+  const [role, setRole] = useState<"affiliate" | "supplier">(
+    urlRole === "supplier" ? "supplier" : "affiliate"
+  );
 
   // Common Fields
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(urlEmail);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [phoneError, setPhoneError] = useState("");
+
+  useEffect(() => {
+    if (urlEmail && !email) {
+      setEmail(urlEmail);
+    }
+    if (urlRole === "supplier" || urlRole === "affiliate") {
+      setRole(urlRole);
+    }
+  }, [urlEmail, urlRole]);
 
   // Affiliate Fields (Option 1)
   const [affiliateWilaya, setAffiliateWilaya] = useState("16"); // Alger default
@@ -546,5 +561,13 @@ export default function RegisterPage() {
         );
       }}
     </AuthCard>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Chargement...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }
