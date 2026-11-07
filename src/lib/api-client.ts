@@ -47,9 +47,13 @@ export function getCurrentUser(): DecodedToken | null {
   return parseJwt(token);
 }
 
+export interface ApiRequestOptions extends RequestInit {
+  silentAuthFail?: boolean;
+}
+
 export async function apiRequest<T = any>(
   path: string,
-  options: RequestInit = {}
+  options: ApiRequestOptions = {}
 ): Promise<T> {
   const token = getAuthToken();
   const headers: Record<string, string> = {
@@ -70,7 +74,7 @@ export async function apiRequest<T = any>(
 
   if (!response.ok) {
     const isAuthRequest = path.startsWith("/auth/");
-    if (response.status === 401 && !isAuthRequest) {
+    if (response.status === 401 && !isAuthRequest && !options.silentAuthFail) {
       removeAuthToken();
       if (typeof window !== "undefined" && window.location.pathname !== "/login") {
         const returnUrl = window.location.pathname + window.location.search;
@@ -291,7 +295,7 @@ export interface PayoutSettings {
 }
 
 export async function apiGetPayoutSettings(): Promise<PayoutSettings> {
-  return apiRequest<PayoutSettings>("/users/payout-settings");
+  return apiRequest<PayoutSettings>("/users/payout-settings", { silentAuthFail: true });
 }
 
 export async function apiUpdatePayoutSettings(
@@ -331,7 +335,7 @@ export async function apiRecordClick(data: {
 }
 
 export async function apiGetAffiliateAnalytics(): Promise<AffiliateAnalytics> {
-  return apiRequest<AffiliateAnalytics>("/affiliate/analytics");
+  return apiRequest<AffiliateAnalytics>("/affiliate/analytics", { silentAuthFail: true });
 }
 
 export function updateGlobalWalletBalance(balance: number): void {
@@ -1534,11 +1538,11 @@ export async function apiGetNotifications(
   params.set("limit", String(limit));
   params.set("offset", String(offset));
   if (unreadOnly) params.set("unreadOnly", "true");
-  return apiRequest(`/notifications?${params.toString()}`);
+  return apiRequest(`/notifications?${params.toString()}`, { silentAuthFail: true });
 }
 
 export async function apiGetUnreadNotificationCount(): Promise<{ unreadCount: number }> {
-  return apiRequest("/notifications/unread-count");
+  return apiRequest("/notifications/unread-count", { silentAuthFail: true });
 }
 
 export async function apiMarkNotificationRead(id: string): Promise<NotificationItem> {

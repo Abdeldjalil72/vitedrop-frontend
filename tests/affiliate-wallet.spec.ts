@@ -121,6 +121,28 @@ async function setupAffiliateWalletSession(
     });
   });
 
+  // Intercept notifications
+  await page.route(new RegExp(`^${apiBase}/notifications`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ unreadCount: 0, data: [], total: 0 }),
+    });
+  });
+
+  // Intercept payout settings
+  await page.route(new RegExp(`^${apiBase}/users/payout-settings`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        payoutMethod: "BARIDIMOB",
+        payoutRip: "00799999002194829345",
+        payoutFullName: "Karim Brahimi",
+      }),
+    });
+  });
+
   // Inject token and language
   await page.addInitScript(
     ({ token, selectedLang }) => {

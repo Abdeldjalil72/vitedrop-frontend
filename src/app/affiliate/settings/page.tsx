@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, apiGetPayoutSettings, apiUpdatePayoutSettings } from "@/lib/api-client";
 import { translations } from "@/lib/locales";
+import { validateBaridiMobRip, validateCcpAccount } from "@/lib/algerian-banking";
 import {
   Settings,
   User,
@@ -129,15 +130,33 @@ export default function AffiliateSettingsPage() {
     setSaveError(null);
 
     try {
+      // Validate banking format
+      if (method === "BARIDIMOB") {
+        const ripCheck = validateBaridiMobRip(ripOrCcp);
+        if (!ripCheck.isValid) {
+          setSaveError(ripCheck.error || "Numéro RIP BaridiMob invalide.");
+          setIsSaving(false);
+          return;
+        }
+      } else if (method === "CCP") {
+        const ccpCheck = validateCcpAccount(ripOrCcp);
+        if (!ccpCheck.isValid) {
+          setSaveError(ccpCheck.error || "Numéro de compte CCP ou clé invalide.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
       // Parse CCP vs RIP
       const isCcp = method === "CCP";
       const ccpParts = ripOrCcp.trim().split(/\s+/);
       const ccpNumber = isCcp ? ccpParts[0] || "" : "";
       const ccpKey = isCcp ? ccpParts[1] || "" : "";
+      const cleanRip = !isCcp ? ripOrCcp.replace(/[\s\-_.]/g, "") : "";
 
       await apiUpdatePayoutSettings({
         payoutMethod: method,
-        payoutRip: isCcp ? "" : ripOrCcp.trim(),
+        payoutRip: cleanRip,
         payoutCcpNumber: ccpNumber,
         payoutCcpKey: ccpKey,
         payoutFullName: fullName.trim(),
@@ -297,6 +316,32 @@ export default function AffiliateSettingsPage() {
                       placeholder={method === "BARIDIMOB" ? "00799999002345678901" : "12345678 99"}
                       className="w-full text-xs rounded-xl border border-black/10 bg-white px-3 py-2 font-mono text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                     />
+                    {method === "BARIDIMOB" && ripOrCcp.replace(/[\s-]/g, "").length > 0 && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 pt-1">
+                        {validateBaridiMobRip(ripOrCcp).isValid ? (
+                          <span className="text-emerald-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Format valide: {validateBaridiMobRip(ripOrCcp).formatted}
+                          </span>
+                        ) : (
+                          <span className="text-amber-600">
+                            {ripOrCcp.replace(/[\s-]/g, "").length}/20 chiffres (BaridiMob Algérie Poste)
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {method === "CCP" && ripOrCcp.trim().length > 0 && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 pt-1">
+                        {validateCcpAccount(ripOrCcp).isValid ? (
+                          <span className="text-emerald-600 font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {validateCcpAccount(ripOrCcp).formatted}
+                          </span>
+                        ) : (
+                          <span className="text-neutral-400">Format: N° Compte + Clé (ex: 12345678 99)</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>

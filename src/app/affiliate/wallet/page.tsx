@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { formatDZD } from "@/lib/formatters";
 import { translations } from "@/lib/locales";
+import { validateBaridiMobRip, validateCcpAccount } from "@/lib/algerian-banking";
 import {
   apiGetMyWallet,
   apiGetTransactions,
@@ -175,9 +176,37 @@ export default function AffiliateWalletPage() {
       return;
     }
 
+    if (withdrawMethod === "BARIDIMOB") {
+      const ripCheck = validateBaridiMobRip(recipientRip);
+      if (!ripCheck.isValid) {
+        setWithdrawError(ripCheck.error || "Numéro RIP BaridiMob invalide.");
+        return;
+      }
+    } else if (withdrawMethod === "CCP") {
+      const ccpCheck = validateCcpAccount(recipientRip);
+      if (!ccpCheck.isValid) {
+        setWithdrawError(ccpCheck.error || "Numéro de compte CCP ou clé invalide.");
+        return;
+      }
+    } else if (withdrawMethod === "BANK") {
+      const bankCheck = validateBaridiMobRip(recipientRip);
+      if (!bankCheck.isValid) {
+        setWithdrawError("Le RIB bancaire doit comporter exactement 20 chiffres.");
+        return;
+      }
+    }
+
     setIsSubmittingWithdraw(true);
     try {
-      const details = `${withdrawMethod}: ${recipientRip.trim()} (${recipientName.trim()})`;
+      let cleanAccount = recipientRip.trim();
+      if (withdrawMethod === "BARIDIMOB" || withdrawMethod === "BANK") {
+        cleanAccount = cleanAccount.replace(/[\s\-_.]/g, "");
+      } else if (withdrawMethod === "CCP") {
+        const ccp = validateCcpAccount(cleanAccount);
+        if (ccp.isValid) cleanAccount = ccp.formatted;
+      }
+
+      const details = `${withdrawMethod}: ${cleanAccount} (${recipientName.trim()})`;
       let withdrawRes: { success: boolean; newBalance?: number } | null = null;
       try {
         withdrawRes = await apiWithdrawWallet(withdrawAmount, withdrawMethod, details);
@@ -611,7 +640,7 @@ export default function AffiliateWalletPage() {
                 data-testid="affiliate-withdraw-modal"
                 className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
               >
-                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-md w-full p-6 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -759,6 +788,32 @@ export default function AffiliateWalletPage() {
                           }
                           className="w-full p-2.5 rounded-xl border border-neutral-200 font-mono text-xs focus:outline-hidden focus:border-emerald-600"
                         />
+                        {withdrawMethod === "BARIDIMOB" && recipientRip.replace(/[\s-]/g, "").length > 0 && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 pt-0.5">
+                            {validateBaridiMobRip(recipientRip).isValid ? (
+                              <span className="text-emerald-600 font-medium flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                RIP valide: {validateBaridiMobRip(recipientRip).formatted}
+                              </span>
+                            ) : (
+                              <span className="text-amber-600">
+                                {recipientRip.replace(/[\s-]/g, "").length}/20 chiffres (BaridiMob Algérie Poste)
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {withdrawMethod === "CCP" && recipientRip.trim().length > 0 && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 pt-0.5">
+                            {validateCcpAccount(recipientRip).isValid ? (
+                              <span className="text-emerald-600 font-medium flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                {validateCcpAccount(recipientRip).formatted}
+                              </span>
+                            ) : (
+                              <span className="text-neutral-400">Format: N° Compte + Clé (ex: 12345678 Clé 90)</span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* Account holder name */}

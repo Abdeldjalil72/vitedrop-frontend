@@ -128,6 +128,15 @@ async function setupAffiliateOrdersSession(
     });
   });
 
+  // Intercept notifications
+  await page.route(new RegExp(`^${apiBase}/notifications`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ unreadCount: 0, data: [], total: 0 }),
+    });
+  });
+
   // Inject token and language
   await page.addInitScript(
     ({ token, selectedLang }) => {

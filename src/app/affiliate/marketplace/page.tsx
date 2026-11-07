@@ -167,11 +167,11 @@ export default function AffiliateMarketplacePage() {
                 </div>
 
                 {/* Modern Animated Sort Selector */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                   <span className="text-xs font-semibold text-neutral-600 hidden sm:inline">
                     {t.marketplace.sortBy}:
                   </span>
-                  <div className="min-w-[190px]">
+                  <div className="w-full sm:min-w-[190px]">
                     <ModernSelect
                       value={sortBy}
                       onChange={(val) => setSortBy(val as any)}
@@ -202,7 +202,7 @@ export default function AffiliateMarketplacePage() {
                       icon={<ArrowUpDown className="w-3.5 h-3.5 text-sky-600" />}
                       nativeSelectTestId="marketplace-sort-select"
                       data-testid="marketplace-sort-dropdown"
-                      triggerClassName="py-2 px-3 rounded-2xl bg-[#fafafa] hover:bg-white text-xs border-black/10"
+                      triggerClassName="w-full py-2 px-3 rounded-2xl bg-[#fafafa] hover:bg-white text-xs border-black/10"
                       menuClassName="min-w-[220px]"
                       align="end"
                     />

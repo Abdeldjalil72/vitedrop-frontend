@@ -118,6 +118,30 @@ async function setupAffiliateDashboardSession(
     });
   });
 
+  // Intercept notifications
+  await page.route(new RegExp(`^${apiBase}/notifications`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ unreadCount: 0, data: [], total: 0 }),
+    });
+  });
+
+  // Intercept analytics
+  await page.route(new RegExp(`^${apiBase}/affiliate/analytics`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        totalClicks: 1420,
+        totalLeads: 4,
+        deliveredLeads: 1,
+        conversionRate: 0.28,
+        deliveryRate: 50,
+      }),
+    });
+  });
+
   // Inject token and language
   await page.addInitScript(
     ({ token, selectedLang }) => {
