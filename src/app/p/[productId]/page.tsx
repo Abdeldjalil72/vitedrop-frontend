@@ -130,6 +130,23 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
 
   // Copied order ID state
   const [copiedId, setCopiedId] = useState(false);
+  const [isCheckoutInView, setIsCheckoutInView] = useState(false);
+
+  // Auto-hide mobile sticky CTA when user reaches the checkout form
+  useEffect(() => {
+    const el = document.getElementById("checkout-section");
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsCheckoutInView(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [product, completedOrder]);
 
   // Fetch product on mount
   useEffect(() => {
@@ -635,22 +652,22 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* 3. HOW IT WORKS SECTION */}
-        <section className="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-8 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-bold text-center text-neutral-900 mb-6">
+        {/* 3. HOW IT WORKS SECTION (Compact horizontal steps on mobile) */}
+        <section className="bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 p-3.5 sm:p-8 shadow-sm">
+          <h2 className="text-sm sm:text-xl font-bold text-center text-neutral-900 mb-3 sm:mb-6">
             {isAr ? "كيف تعمل عملية الشراء والتوصيل؟" : "Comment se déroule la commande ?"}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50 border border-neutral-100">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-bold text-base flex items-center justify-center shrink-0">
+          <div className="grid grid-cols-3 gap-2 sm:gap-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-start gap-1.5 sm:gap-4 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 border border-neutral-100">
+              <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-2xl bg-blue-600 text-white font-bold text-xs sm:text-base flex items-center justify-center shrink-0">
                 1
               </div>
               <div>
-                <h3 className="font-bold text-sm text-neutral-900 mb-1">
-                  {isAr ? "1. املأ بياناتك" : "1. Remplissez le formulaire"}
+                <h3 className="font-bold text-xs sm:text-sm text-neutral-900">
+                  {isAr ? "1. املأ بياناتك" : "1. Vos données"}
                 </h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">
+                <p className="text-xs text-neutral-500 leading-relaxed hidden sm:block mt-0.5">
                   {isAr
                     ? "أدخل اسمك ورقم هاتفك والولاية في النموذج أدناه في 30 ثانية."
                     : "Entrez votre nom, téléphone et wilaya en moins de 30 secondes."}
@@ -658,15 +675,15 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-neutral-50 border border-neutral-100">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-bold text-base flex items-center justify-center shrink-0">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-start gap-1.5 sm:gap-4 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 border border-neutral-100">
+              <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-2xl bg-blue-600 text-white font-bold text-xs sm:text-base flex items-center justify-center shrink-0">
                 2
               </div>
               <div>
-                <h3 className="font-bold text-sm text-neutral-900 mb-1">
-                  {isAr ? "2. نتصل بك للتأكيد" : "2. Appel de confirmation"}
+                <h3 className="font-bold text-xs sm:text-sm text-neutral-900">
+                  {isAr ? "2. نتصل للتأكيد" : "2. Confirmation"}
                 </h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">
+                <p className="text-xs text-neutral-500 leading-relaxed hidden sm:block mt-0.5">
                   {isAr
                     ? "يتصل بك فريقنا هاتفياً لمراجعة العنوان والكمية قبل الإرسال."
                     : "Notre équipe vous contacte pour confirmer l'adresse avant expédition."}
@@ -674,15 +691,15 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-bold text-base flex items-center justify-center shrink-0">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-start gap-1.5 sm:gap-4 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100">
+              <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-2xl bg-emerald-600 text-white font-bold text-xs sm:text-base flex items-center justify-center shrink-0">
                 3
               </div>
               <div>
-                <h3 className="font-bold text-sm text-emerald-950 mb-1">
-                  {isAr ? "3. استلم وادفع نقداً" : "3. Payez à la réception"}
+                <h3 className="font-bold text-xs sm:text-sm text-emerald-950">
+                  {isAr ? "3. عاين وادفع نقداً" : "3. Payez à réception"}
                 </h3>
-                <p className="text-xs text-emerald-700 leading-relaxed">
+                <p className="text-xs text-emerald-700 leading-relaxed hidden sm:block mt-0.5">
                   {isAr
                     ? "يصلك الطرد لباب منزلك، تفحصه وتدفع للموزع نقداً بكل أمان."
                     : "Le livreur vous remet le colis. Vous payez en espèces après vérification."}
@@ -694,15 +711,15 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
 
         {/* 4. THE COD CHECKOUT FORM SECTION */}
         <section id="checkout-section" className="scroll-mt-16">
-          <div className="text-center mb-6 space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+          <div className="text-center mb-3 sm:mb-6 space-y-1 sm:space-y-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-100 text-blue-700 text-[11px] sm:text-xs font-semibold">
               <Package className="w-3.5 h-3.5" />
               {isAr ? "طلب فوري بدون بطاقة بنكية" : "Commande instantanée sans carte bancaire"}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900">
+            <h2 className="text-xl sm:text-3xl font-extrabold text-neutral-900">
               {isAr ? "استمارة حجز الطلب" : "Formulaire de réservation"}
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto">
+            <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto hidden sm:block">
               {isAr
                 ? "املأ معلوماتك وسنتكفل بالباقي. الدفع عند الاستلام بعد معاينة المنتج."
                 : "Remplissez vos coordonnées ci-dessous. Paiement à la livraison après inspection."}
@@ -807,38 +824,48 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
         </section>
       </main>
 
-      {/* 6. STICKY MOBILE BOTTOM BAR (Converts mobile visitors on scroll) */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/80 p-3 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="text-[10px] text-neutral-500 block">
-              {isAr ? "السعر عند الاستلام:" : "Prix à la livraison:"}
-            </span>
-            <span className="font-mono font-black text-blue-700 text-lg">
-              {product ? formatDZD(product.retailPrice, lang) : "4,900 DZD"}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            data-testid="mobile-sticky-checkout-btn"
-            onClick={scrollToCheckout}
-            disabled={!product || product.stock <= 0}
-            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-sm shadow-lg flex items-center justify-center gap-1.5 ${
-              !product || product.stock <= 0
-                ? "bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none"
-                : "bg-blue-600 active:bg-blue-700 text-white shadow-blue-600/25 cursor-pointer"
-            }`}
+      {/* 6. STICKY MOBILE BOTTOM BAR (Converts mobile visitors on scroll, auto-hides when form is visible) */}
+      <AnimatePresence>
+        {!isCheckoutInView && !completedOrder && product && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
           >
-            <span>
-              {!product || product.stock <= 0
-                ? (isAr ? "نفد المخزون" : "Épuisé")
-                : (isAr ? "اطلب الآن (الدفع عند الاستلام)" : "Commander")}
-            </span>
-            {product && product.stock > 0 && <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />}
-          </button>
-        </div>
-      </div>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] text-neutral-500 block">
+                  {isAr ? "السعر عند الاستلام:" : "Prix à la livraison:"}
+                </span>
+                <span className="font-mono font-black text-blue-700 text-lg">
+                  {formatDZD(product.retailPrice, lang)}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                data-testid="mobile-sticky-checkout-btn"
+                onClick={scrollToCheckout}
+                disabled={product.stock <= 0}
+                className={`flex-1 py-3 px-4 rounded-2xl font-bold text-sm shadow-lg flex items-center justify-center gap-1.5 ${
+                  product.stock <= 0
+                    ? "bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none"
+                    : "bg-blue-600 active:bg-blue-700 text-white shadow-blue-600/25 cursor-pointer"
+                }`}
+              >
+                <span>
+                  {product.stock <= 0
+                    ? (isAr ? "نفد المخزون" : "Épuisé")
+                    : (isAr ? "اطلب الآن (الدفع عند الاستلام)" : "Commander")}
+                </span>
+                {product.stock > 0 && <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

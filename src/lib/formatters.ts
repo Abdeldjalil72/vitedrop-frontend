@@ -42,8 +42,13 @@ export function validateAlgerianPhone(input: string): { isValid: boolean; normal
     cleaned = "0" + cleaned.slice(4);
   } else if (cleaned.startsWith("00213")) {
     cleaned = "0" + cleaned.slice(5);
-  } else if (cleaned.startsWith("213")) {
+  } else if (cleaned.startsWith("213") && cleaned.length > 9) {
     cleaned = "0" + cleaned.slice(3);
+  }
+
+  // Auto-prepend leading 0 if 9 digits starting with 5, 6, or 7
+  if (/^[567][0-9]{8}$/.test(cleaned)) {
+    cleaned = "0" + cleaned;
   }
 
   // Algerian mobile format: 05, 06, or 07 followed by 8 digits (10 digits total)
@@ -61,6 +66,11 @@ export function formatAlgerianPhoneInput(input: string): string {
     cleaned = "0" + cleaned.slice(4);
   } else if (cleaned.startsWith("00213")) {
     cleaned = "0" + cleaned.slice(5);
+  } else if (cleaned.startsWith("213") && cleaned.length > 9) {
+    cleaned = "0" + cleaned.slice(3);
+  } else if (/^[567]/.test(cleaned) && !cleaned.startsWith("0")) {
+    // If user starts typing without leading 0 (e.g. 5, 6, 7), prepend 0!
+    cleaned = "0" + cleaned;
   }
   cleaned = cleaned.replace(/\D/g, "").slice(0, 10);
 

@@ -267,21 +267,21 @@ export function CodCheckoutForm({
   };
 
   return (
-    <div className={`w-full bg-white rounded-3xl border border-neutral-200/80 shadow-xl overflow-hidden ${isAr ? "rtl" : "ltr"}`}>
+    <div className={`w-full bg-white rounded-2xl sm:rounded-3xl border border-neutral-200/80 shadow-xl overflow-hidden ${isAr ? "rtl" : "ltr"}`}>
       {/* Form Header Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-5 sm:p-6 text-center relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-3 sm:p-5 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
         
         <div className="relative z-10 flex flex-col items-center">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide uppercase text-blue-50 mb-2 border border-white/20">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-md text-[10px] sm:text-xs font-semibold tracking-wide uppercase text-blue-50 mb-1 border border-white/20">
+            <Sparkles className="w-3 h-3 text-amber-300" />
             {isAr ? "الدفع عند الاستلام 100%" : "Paiement à la livraison 100%"}
           </span>
 
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-1">
+          <h3 className="text-base sm:text-xl font-bold tracking-tight text-white">
             {isAr ? "املأ استمارة الطلب الآن" : "Formulaire de commande express"}
           </h3>
-          <p className="text-xs sm:text-sm text-blue-100 max-w-md">
+          <p className="text-xs text-blue-100 max-w-md hidden sm:block mt-0.5">
             {isAr 
               ? "الدفع نقدًا عند استلام طلبك ومراجعته. التوصيل متوفر لجميع ولايات الجزائر."
               : "Payez en espèces à la livraison après vérification. Expédition sur 58 wilayas."}
@@ -289,7 +289,7 @@ export function CodCheckoutForm({
         </div>
       </div>
 
-      <form noValidate onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-6">
+      <form noValidate onSubmit={handleSubmit} className="p-3.5 sm:p-7 space-y-3 sm:space-y-4">
         {stock <= 0 && (
           <div
             data-testid="checkout-out-of-stock-alert"
@@ -322,249 +322,253 @@ export function CodCheckoutForm({
           </motion.div>
         )}
 
-        {/* 1. Customer Name */}
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-            <User className="w-4 h-4 text-blue-600" />
-            <span>{isAr ? "الاسم واللقب بالكامل *" : "Nom et prénom complet *"}</span>
-          </label>
-          <input
-            type="text"
-            required
-            data-testid="checkout-customer-name"
-            value={customerName}
-            onChange={(e) => {
-              setCustomerName(e.target.value);
-              if (errors.customerName) setErrors((prev) => ({ ...prev, customerName: "" }));
-            }}
-            placeholder={isAr ? "مثال: كريم براهيمي" : "Ex: Karim Brahimi"}
-            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
-              errors.customerName
-                ? "border-rose-400 focus:ring-rose-500/10"
-                : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
-            }`}
-          />
-          {errors.customerName && (
-            <p data-testid="checkout-error-name" className="text-xs text-rose-600 font-medium">
-              {errors.customerName}
-            </p>
-          )}
-        </div>
-
-        {/* 2. Customer Phone */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-              <Phone className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? "رقم الهاتف للتأكيد *" : "Numéro de téléphone *"}</span>
+        {/* Customer Identity: Name & Phone in 2-col on tablet/desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 1. Customer Name */}
+          <div className="space-y-1">
+            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-blue-600" />
+              <span>{isAr ? "الاسم واللقب بالكامل *" : "Nom et prénom complet *"}</span>
             </label>
-            <div className="flex items-center gap-1.5">
-              {carrier && (
-                <span
-                  data-testid="checkout-carrier-badge"
-                  className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full transition-all ${
-                    carrier === "Mobilis"
-                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                      : carrier === "Djezzy"
-                      ? "bg-rose-100 text-rose-800 border border-rose-300"
-                      : "bg-red-100 text-red-800 border border-red-300"
-                  }`}
-                >
-                  {carrier}
-                </span>
-              )}
-              {phoneValidation && (
-                <span
-                  className={`text-xs font-mono font-medium flex items-center gap-1 ${
-                    phoneValidation.isValid ? "text-emerald-600" : "text-amber-600"
-                  }`}
-                >
-                  {phoneValidation.isValid ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{isAr ? "رقم صحيح" : "Format valide"}</span>
-                    </>
-                  ) : (
-                    <span>{isAr ? "مثال: 0550 12 34 56" : "Ex: 0550 12 34 56"}</span>
-                  )}
-                </span>
-              )}
-            </div>
-          </div>
-          <input
-            type="tel"
-            required
-            dir="ltr"
-            data-testid="checkout-customer-phone"
-            value={customerPhone}
-            onChange={(e) => {
-              const formatted = formatAlgerianPhoneInput(e.target.value);
-              setCustomerPhone(formatted);
-              if (errors.customerPhone) setErrors((prev) => ({ ...prev, customerPhone: "" }));
-            }}
-            placeholder="05 / 06 / 07 XX XX XX XX"
-            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm sm:text-base font-mono tracking-wider transition-all focus:outline-none focus:ring-4 ${
-              errors.customerPhone
-                ? "border-rose-400 focus:ring-rose-500/10"
-                : phoneValidation?.isValid
-                ? "border-emerald-500 focus:ring-emerald-500/10 bg-emerald-50/20"
-                : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
-            }`}
-          />
-          {errors.customerPhone ? (
-            <p data-testid="checkout-error-phone" className="text-xs text-rose-600 font-medium">{errors.customerPhone}</p>
-          ) : (
-            <p className="text-[11px] text-neutral-500">
-              {isAr 
-                ? "سنتصل بك على هذا الرقم لتأكيد عنوانك وموعد التوصيل قبل إرسال الطرد."
-                : "Notre service client vous appellera sur ce numéro pour confirmer l'expédition."}
-            </p>
-          )}
-        </div>
-
-        {/* 3. Wilaya Selection */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? "الولاية (58 ولاية) *" : "Wilaya de livraison (58 Wilayas) *"}</span>
-            </label>
-            {currentWilaya && (
-              <span className="text-[11px] font-mono font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-lg border border-blue-200/60">
-                #{currentWilaya.code} - {isAr ? currentWilaya.nameAr : currentWilaya.name}
-              </span>
-            )}
-          </div>
-          <WilayaSelect
-            value={wilayaCode}
-            onChange={handleWilayaChange}
-            lang={lang}
-            colorScheme="blue"
-            triggerClassName="min-h-[48px] px-4 py-3"
-            error={errors.wilaya}
-            showDeliveryFees={true}
-            data-testid="checkout-wilaya-select"
-            nativeSelectTestId="checkout-wilaya-native-select"
-          />
-        </div>
-
-        {/* 4. Commune Selection */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-blue-600" />
-              <span>{isAr ? "البلدية *" : "Commune *"}</span>
-            </label>
-            {commune && commune !== "Autre" && (
-              <span className="text-[11px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-200/60">
-                {commune}
-              </span>
-            )}
-          </div>
-
-          {currentWilaya.communes && currentWilaya.communes.length > 0 ? (
-            <div className="space-y-2">
-              <ModernSelect
-                value={commune}
-                onChange={(val) => {
-                  setCommune(val);
-                  if (val !== "Autre") setCustomCommune("");
-                  if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
-                }}
-                options={communeOptions}
-                placeholder={isAr ? "اختر بلديتك من القائمة..." : "Sélectionner votre commune..."}
-                icon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
-                searchable={true}
-                searchPlaceholder={
-                  isAr ? "ابحث عن اسم البلدية..." : "Rechercher votre commune..."
-                }
-                colorScheme="blue"
-                triggerClassName="min-h-[48px] px-4 py-3 text-sm"
-                nativeSelectTestId="checkout-commune-select"
-                data-testid="checkout-commune-select-trigger"
-                error={errors.commune}
-              />
-
-              {commune === "Autre" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="pt-1"
-                >
-                  <input
-                    type="text"
-                    required
-                    data-testid="checkout-commune-custom-input"
-                    value={customCommune}
-                    onChange={(e) => {
-                      setCustomCommune(e.target.value);
-                      if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
-                    }}
-                    placeholder={
-                      isAr ? "اكتب اسم بلديتك هنا..." : "Précisez le nom de votre commune..."
-                    }
-                    className="w-full min-h-[48px] px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-                  />
-                </motion.div>
-              )}
-            </div>
-          ) : (
             <input
               type="text"
               required
-              data-testid="checkout-commune-input"
-              value={commune}
+              name="name"
+              autoComplete="name"
+              data-testid="checkout-customer-name"
+              value={customerName}
               onChange={(e) => {
-                setCommune(e.target.value);
-                if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
+                setCustomerName(e.target.value);
+                if (errors.customerName) setErrors((prev) => ({ ...prev, customerName: "" }));
               }}
-              placeholder={isAr ? "اكتب اسم بلديتك" : "Nom de votre commune"}
-              className="w-full min-h-[48px] px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              placeholder={isAr ? "مثال: كريم براهيمي" : "Ex: Karim Brahimi"}
+              className={`w-full min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
+                errors.customerName
+                  ? "border-rose-400 focus:ring-rose-500/10"
+                  : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
+              }`}
             />
-          )}
-          {errors.commune && (
-            <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">
-              {errors.commune}
-            </p>
-          )}
+            {errors.customerName && (
+              <p data-testid="checkout-error-name" className="text-xs text-rose-600 font-medium">
+                {errors.customerName}
+              </p>
+            )}
+          </div>
+
+          {/* 2. Customer Phone */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-blue-600" />
+                <span>{isAr ? "رقم الهاتف للتأكيد *" : "Numéro de téléphone *"}</span>
+              </label>
+              <div className="flex items-center gap-1.5">
+                {carrier && (
+                  <span
+                    data-testid="checkout-carrier-badge"
+                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full transition-all ${
+                      carrier === "Mobilis"
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                        : carrier === "Djezzy"
+                        ? "bg-rose-100 text-rose-800 border border-rose-300"
+                        : "bg-red-100 text-red-800 border border-red-300"
+                    }`}
+                  >
+                    {carrier}
+                  </span>
+                )}
+                {phoneValidation && (
+                  <span
+                    className={`text-[11px] font-mono font-medium flex items-center gap-0.5 ${
+                      phoneValidation.isValid ? "text-emerald-600" : "text-amber-600"
+                    }`}
+                  >
+                    {phoneValidation.isValid ? (
+                      <>
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>{isAr ? "صحيح" : "Valide"}</span>
+                      </>
+                    ) : (
+                      <span>{isAr ? "05/06/07..." : "05/06/07..."}</span>
+                    )}
+                  </span>
+                )}
+              </div>
+            </div>
+            <input
+              type="tel"
+              required
+              dir="ltr"
+              name="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              data-testid="checkout-customer-phone"
+              value={customerPhone}
+              onChange={(e) => {
+                const formatted = formatAlgerianPhoneInput(e.target.value);
+                setCustomerPhone(formatted);
+                if (errors.customerPhone) setErrors((prev) => ({ ...prev, customerPhone: "" }));
+              }}
+              placeholder="05 / 06 / 07 XX XX XX XX"
+              className={`w-full min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border text-sm sm:text-base font-mono tracking-wider transition-all focus:outline-none focus:ring-4 ${
+                errors.customerPhone
+                  ? "border-rose-400 focus:ring-rose-500/10"
+                  : phoneValidation?.isValid
+                  ? "border-emerald-500 focus:ring-emerald-500/10 bg-emerald-50/20"
+                  : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
+              }`}
+            />
+            {errors.customerPhone && (
+              <p data-testid="checkout-error-phone" className="text-xs text-rose-600 font-medium">{errors.customerPhone}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Location Selection: Wilaya & Commune */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 3. Wilaya Selection */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-blue-600" />
+                <span>{isAr ? "الولاية (58 ولاية) *" : "Wilaya (58 Wilayas) *"}</span>
+              </label>
+              {currentWilaya && (
+                <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-100/60 px-1.5 py-0.2 rounded border border-blue-200/60">
+                  #{currentWilaya.code}
+                </span>
+              )}
+            </div>
+            <WilayaSelect
+              value={wilayaCode}
+              onChange={handleWilayaChange}
+              lang={lang}
+              name="wilaya"
+              colorScheme="blue"
+              triggerClassName="min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm"
+              error={errors.wilaya}
+              showDeliveryFees={false}
+              data-testid="checkout-wilaya-select"
+              nativeSelectTestId="checkout-wilaya-native-select"
+            />
+          </div>
+
+          {/* 4. Commune Selection */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                <span>{isAr ? "البلدية *" : "Commune *"}</span>
+              </label>
+            </div>
+
+            {currentWilaya.communes && currentWilaya.communes.length > 0 ? (
+              <div className="space-y-1.5">
+                <ModernSelect
+                  value={commune}
+                  onChange={(val) => {
+                    setCommune(val);
+                    if (val !== "Autre") setCustomCommune("");
+                    if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
+                  }}
+                  options={communeOptions}
+                  placeholder={isAr ? "اختر بلديتك..." : "Sélectionner la commune..."}
+                  icon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+                  searchable={true}
+                  searchPlaceholder={
+                    isAr ? "ابحث عن البلدية..." : "Rechercher la commune..."
+                  }
+                  colorScheme="blue"
+                  triggerClassName="min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm"
+                  nativeSelectTestId="checkout-commune-select"
+                  data-testid="checkout-commune-select-trigger"
+                  error={errors.commune}
+                />
+
+                {commune === "Autre" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <input
+                      type="text"
+                      required
+                      name="commune"
+                      autoComplete="address-level2"
+                      data-testid="checkout-commune-custom-input"
+                      value={customCommune}
+                      onChange={(e) => {
+                        setCustomCommune(e.target.value);
+                        if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
+                      }}
+                      placeholder={
+                        isAr ? "اكتب اسم بلديتك هنا..." : "Précisez votre commune..."
+                      }
+                      className="w-full min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border border-neutral-200 text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                    />
+                  </motion.div>
+                )}
+              </div>
+            ) : (
+              <input
+                type="text"
+                required
+                name="commune"
+                autoComplete="address-level2"
+                data-testid="checkout-commune-input"
+                value={commune}
+                onChange={(e) => {
+                  setCommune(e.target.value);
+                  if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
+                }}
+                placeholder={isAr ? "اكتب اسم بلديتك" : "Nom de votre commune"}
+                className="w-full min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border border-neutral-200 text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              />
+            )}
+            {errors.commune && (
+              <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">
+                {errors.commune}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* 5. Delivery Type Selector: Home vs Stop-Desk */}
-        <div className="space-y-2">
-          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-            <Truck className="w-4 h-4 text-blue-600" />
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+            <Truck className="w-3.5 h-3.5 text-blue-600" />
             <span>{isAr ? "طريقة التوصيل المفضلة" : "Mode de livraison"}</span>
           </label>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* Home Delivery */}
             <button
               type="button"
               data-testid="delivery-type-home"
               onClick={() => setDeliveryType("home")}
-              className={`p-3.5 rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
+              className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
                 deliveryType === "home"
                   ? "border-blue-600 bg-blue-50/50 ring-2 ring-blue-600/20"
                   : "border-neutral-200 hover:border-neutral-300 bg-white"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${
                   deliveryType === "home" ? "bg-blue-600 text-white" : "bg-neutral-100 text-neutral-600"
                 }`}>
-                  <Truck className="w-4 h-4" />
+                  <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-neutral-900">
+                <div className="truncate">
+                  <p className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
                     {isAr ? "توصيل للمنزل" : "À Domicile"}
                   </p>
-                  <p className="text-[11px] text-neutral-500">
-                    {isAr ? "إلى باب منزلك أو مكان عملك" : "Jusqu'à votre porte"}
+                  <p className="text-[10px] text-neutral-500 hidden sm:block truncate">
+                    {isAr ? "لباب المنزل" : "À votre porte"}
                   </p>
                 </div>
               </div>
-              <span className="font-mono text-xs font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-lg">
+              <span className="font-mono text-[11px] sm:text-xs font-bold text-blue-700 bg-blue-100/60 px-1.5 py-0.5 rounded-md sm:rounded-lg shrink-0">
                 {formatDZD(currentWilaya.homeDeliveryFee, lang)}
               </span>
             </button>
@@ -574,43 +578,64 @@ export function CodCheckoutForm({
               type="button"
               data-testid="delivery-type-desk"
               onClick={() => setDeliveryType("desk")}
-              className={`p-3.5 rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
+              className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-start transition-all cursor-pointer flex items-center justify-between ${
                 deliveryType === "desk"
                   ? "border-blue-600 bg-blue-50/50 ring-2 ring-blue-600/20"
                   : "border-neutral-200 hover:border-neutral-300 bg-white"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${
                   deliveryType === "desk" ? "bg-blue-600 text-white" : "bg-neutral-100 text-neutral-600"
                 }`}>
-                  <Building2 className="w-4 h-4" />
+                  <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-neutral-900">
-                    {isAr ? "استلام من المكتب (Stop-Desk)" : "Bureau Stop-Desk"}
+                <div className="truncate">
+                  <p className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
+                    {isAr ? "استلام من المكتب" : "Bureau Stop-Desk"}
                   </p>
-                  <p className="text-[11px] text-neutral-500">
-                    {isAr ? "توفير في سعر الشحن" : "Tarif réduit en agence"}
+                  <p className="text-[10px] text-neutral-500 hidden sm:block truncate">
+                    {isAr ? "توفير في الشحن" : "Tarif réduit"}
                   </p>
                 </div>
               </div>
-              <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-lg">
+              <span className="font-mono text-[11px] sm:text-xs font-bold text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded-md sm:rounded-lg shrink-0">
                 {formatDZD(currentWilaya.deskDeliveryFee, lang)}
               </span>
             </button>
           </div>
+
+          {/* Stop-Desk Guidance Notice */}
+          <AnimatePresence>
+            {deliveryType === "desk" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="p-2.5 rounded-xl bg-blue-50/70 border border-blue-200/60 text-[11px] text-blue-900 flex items-start gap-2"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                <p className="leading-snug">
+                  {isAr
+                    ? "ملاحظة: سيتصل بك فريقنا لمساعدتك في تأكيد أقرب وكالة استلام (Stop-Desk Yalidine أو ZR Express) في بلديتك."
+                    : "Note : Notre équipe vous contactera pour convenir de l'agence de retrait (Yalidine ou ZR Express) la plus proche."}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* 6. Exact Address */}
-        <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-blue-600" />
+        <div className="space-y-1">
+          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+            <Building2 className="w-3.5 h-3.5 text-blue-600" />
             <span>{isAr ? "العنوان بالتفصيل *" : "Adresse exacte ou point de repère *"}</span>
           </label>
           <input
             type="text"
             required
+            name="address"
+            autoComplete="street-address"
             data-testid="checkout-address"
             value={address}
             onChange={(e) => {
@@ -622,7 +647,7 @@ export function CodCheckoutForm({
                 ? "الحي، رقم الشارع، أو أقرب مكان معروف (مثال: حي النصر قرب المسجد)"
                 : "Quartier, numéro de rue ou repère connu"
             }
-            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
+            className={`w-full min-h-[44px] sm:min-h-[48px] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl border text-sm transition-all focus:outline-none focus:ring-4 ${
               errors.address
                 ? "border-rose-400 focus:ring-rose-500/10"
                 : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
@@ -636,40 +661,40 @@ export function CodCheckoutForm({
         </div>
 
         {/* 7. Quantity Selector */}
-        <div className="space-y-2 pt-2 border-t border-neutral-100">
+        <div className="space-y-1.5 pt-1 border-t border-neutral-100">
           <div className="flex items-center justify-between">
-            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-blue-600" />
+            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-1.5">
+              <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
               <span>{isAr ? "الكمية المطلوبة" : "Quantité"}</span>
             </label>
-            <span className="text-xs text-neutral-500 font-medium">
+            <span className="text-[11px] sm:text-xs text-neutral-500 font-medium">
               {isAr ? "سعر القطعة:" : "Prix unitaire:"}{" "}
               <strong className="text-neutral-900 font-mono">{formatDZD(retailPrice, lang)}</strong>
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-2">
             {[1, 2, 3].map((qty) => (
               <button
                 key={qty}
                 type="button"
                 data-testid={`checkout-quantity-${qty}`}
                 onClick={() => setQuantity(qty)}
-                className={`py-2.5 px-3 rounded-2xl border font-semibold text-xs sm:text-sm transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 relative ${
+                className={`py-2 px-2.5 rounded-xl border font-semibold text-xs sm:text-sm transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 relative ${
                   quantity === qty
                     ? "border-blue-600 bg-blue-50/60 text-blue-900 ring-2 ring-blue-600/20"
                     : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300"
                 }`}
               >
                 {qty === 2 && (
-                  <span className="absolute -top-2.5 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold shadow-xs">
+                  <span className="absolute -top-2 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[8px] font-bold shadow-xs">
                     {isAr ? "الأكثر طلباً" : "Populaire"}
                   </span>
                 )}
                 <span>
                   {qty} {isAr ? (qty === 1 ? "قطعة" : qty === 2 ? "قطعتان" : "قطع") : "pièce(s)"}
                 </span>
-                <span className="font-mono text-[11px] text-neutral-500 font-normal">
+                <span className="font-mono text-[10px] text-neutral-500 font-normal">
                   {formatDZD(retailPrice * qty, lang)}
                 </span>
               </button>
@@ -678,7 +703,7 @@ export function CodCheckoutForm({
         </div>
 
         {/* 8. Live Financial Summary Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2.5">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-1.5">
           <div className="flex items-center justify-between text-xs text-neutral-600">
             <span>{isAr ? "سعر المنتجات:" : "Total produits:"}</span>
             <span className="font-mono font-medium">{formatDZD(itemsTotal, lang)}</span>
@@ -697,21 +722,21 @@ export function CodCheckoutForm({
             </span>
           </div>
 
-          <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-sm sm:text-base font-bold text-neutral-900">
+          <div className="pt-1.5 border-t border-neutral-200 flex items-center justify-between text-sm sm:text-base font-bold text-neutral-900">
             <span>{isAr ? "المبلغ الإجمالي عند الاستلام:" : "Montant total à payer au livreur:"}</span>
-            <span data-testid="checkout-grand-total" className="font-mono text-lg text-emerald-600">
+            <span data-testid="checkout-grand-total" className="font-mono text-base sm:text-lg text-emerald-600">
               {formatDZD(grandTotal, lang)}
             </span>
           </div>
         </div>
 
         {/* 9. High-Converting Submit CTA Button */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-2 pt-1">
           <button
             type="submit"
             data-testid="checkout-submit-btn"
             disabled={isSubmitting || stock <= 0}
-            className={`w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg text-white shadow-xl transition-all flex items-center justify-center gap-3 relative overflow-hidden group ${
+            className={`w-full py-3.5 sm:py-4 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base text-white shadow-xl transition-all flex items-center justify-center gap-2 relative overflow-hidden group ${
               isSubmitting || stock <= 0
                 ? "bg-neutral-400 cursor-not-allowed shadow-none"
                 : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99] cursor-pointer shadow-blue-600/25"
@@ -719,18 +744,18 @@ export function CodCheckoutForm({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>{isAr ? "جارٍ تسجيل طلبك..." : "Validation de votre commande..."}</span>
+                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                <span>{isAr ? "جارٍ تسجيل طلبك..." : "Validation en cours..."}</span>
               </>
             ) : stock <= 0 ? (
               <>
-                <AlertCircle className="w-5 h-5" />
-                <span>{isAr ? "عذراً، نفد المخزون حالياً" : "Actuellement en rupture de stock"}</span>
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>{isAr ? "عذراً، نفد المخزون حالياً" : "Rupture de stock"}</span>
               </>
             ) : (
               <>
-                <span>{isAr ? "تأكيد الطلب الآن (الدفع عند الاستلام)" : "Commander maintenant (Paiement à la livraison)"}</span>
-                <span className="font-mono text-sm px-2 py-0.5 rounded-lg bg-white/20">
+                <span>{isAr ? "تأكيد الطلب الآن (الدفع عند الاستلام)" : "Commander maintenant"}</span>
+                <span className="font-mono text-xs sm:text-sm px-2 py-0.5 rounded-lg bg-white/20">
                   {formatDZD(grandTotal, lang)}
                 </span>
               </>
@@ -738,18 +763,18 @@ export function CodCheckoutForm({
           </button>
 
           {/* Trust Guarantees */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-[11px] text-neutral-500 text-center">
-            <div className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-neutral-50 border border-neutral-100">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{isAr ? "معاينة المنتج قبل الدفع" : "Inspection avant paiement"}</span>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 text-[10px] sm:text-[11px] text-neutral-600 text-center">
+            <div className="flex items-center justify-center gap-1 p-1.5 rounded-lg sm:rounded-xl bg-neutral-50 border border-neutral-100">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="truncate">{isAr ? "معاينة قبل الدفع" : "Inspection"}</span>
             </div>
-            <div className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-neutral-50 border border-neutral-100">
-              <Truck className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>{isAr ? "توصيل سريع 24-48 ساعة" : "Livraison en 24-48h"}</span>
+            <div className="flex items-center justify-center gap-1.5 p-1.5 rounded-lg sm:rounded-xl bg-neutral-50 border border-neutral-100">
+              <Truck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="truncate">{isAr ? "توصيل 24-48 ساعة" : "Livraison 24-48h"}</span>
             </div>
-            <div className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-neutral-50 border border-neutral-100">
-              <Phone className="w-4 h-4 text-indigo-600 shrink-0" />
-              <span>{isAr ? "تأكيد هاتفي فوري" : "Confirmation par appel"}</span>
+            <div className="flex items-center justify-center gap-1.5 p-1.5 rounded-lg sm:rounded-xl bg-neutral-50 border border-neutral-100">
+              <Phone className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+              <span className="truncate">{isAr ? "تأكيد هاتفي" : "Confirmation appel"}</span>
             </div>
           </div>
         </div>

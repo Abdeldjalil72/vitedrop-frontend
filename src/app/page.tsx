@@ -24,7 +24,7 @@ export default function Home() {
         if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
           setPageLang(saved);
         }
-      } catch {}
+      } catch { }
     };
 
     syncLang();
@@ -42,7 +42,7 @@ export default function Home() {
     try {
       localStorage.setItem("vitedrop_lang", newLang);
       window.dispatchEvent(new Event("vitedrop_lang_changed"));
-    } catch {}
+    } catch { }
   };
 
   const t = pageTranslations[pageLang];
@@ -79,7 +79,7 @@ export default function Home() {
   ];
 
   return (
-    <div 
+    <div
       dir={pageLang === "ar" ? "rtl" : "ltr"}
       className="min-h-screen bg-white text-[#0a0a0a] flex flex-col justify-between relative overflow-x-hidden"
     >
@@ -135,7 +135,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Auth Buttons */}
+            {/* Auth Buttons (Desktop) */}
             <div className="hidden md:flex items-center gap-1.5 border-l border-black/[0.06] pl-3 mr-1">
               {currentUser ? (
                 <Link href={currentUser.role === "SUPPLIER" ? "/supplier" : currentUser.role === "ADMIN" ? "/admin" : "/affiliate"} className="text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors px-5 py-2 rounded-full flex items-center gap-2">
@@ -154,18 +154,40 @@ export default function Home() {
               )}
             </div>
 
+            {/* Mobile Auth Button (Instant Sign In / Dashboard Shortcut) */}
+            <div className="flex md:hidden items-center">
+              {currentUser ? (
+                <Link
+                  data-testid="mobile-nav-dashboard-btn"
+                  href={currentUser.role === "SUPPLIER" ? "/supplier" : currentUser.role === "ADMIN" ? "/admin" : "/affiliate"}
+                  className="px-2.5 py-1.5 rounded-full text-xs font-bold text-white bg-black flex items-center gap-1.5 shadow-xs"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>{t.navDashboard}</span>
+                </Link>
+              ) : (
+                <Link
+                  data-testid="mobile-nav-login-btn"
+                  href="/login"
+                  className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-800 hover:text-black hover:bg-neutral-100 transition-colors"
+                >
+                  {t.navSignIn}
+                </Link>
+              )}
+            </div>
+
             <motion.button
               whileTap={{ scale: 0.95 }}
               type="button"
+              data-testid="nav-menu-toggle-btn"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-[14px] font-medium px-5 py-2.5 rounded-full shadow-md shadow-sky-500/20 hover:shadow-sky-500/35 hover:brightness-105 transition-all"
+              className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-xs sm:text-[14px] font-medium px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md shadow-sky-500/20 hover:shadow-sky-500/35 hover:brightness-105 transition-all cursor-pointer"
               aria-label="Toggle navigation drawer"
             >
               <span>{isMenuOpen ? t.closeLabel : t.navMenu}</span>
               <svg
-                className={`w-3.5 h-3.5 transition-transform duration-300 ${
-                  isMenuOpen ? "rotate-180" : ""
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${isMenuOpen ? "rotate-180" : ""
+                  }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -177,7 +199,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Optimized High-Performance Mega-Menu Panel */}
+      {/* High-Performance Sliding Side Drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <React.Fragment key="menu-container">
@@ -186,107 +208,207 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 z-40 bg-black/30"
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs"
             />
 
-            {/* Floating Menu Card (Hardware Accelerated) */}
-            <div className="fixed inset-0 z-50 pt-20 px-4 sm:px-6 overflow-y-auto pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0, y: -14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                style={{ willChange: "transform, opacity" }}
-                className="pointer-events-auto max-w-[1200px] mx-auto bg-white rounded-3xl border border-black/[0.08] shadow-2xl p-6 sm:p-10 my-4"
-              >
-              {/* Top Bar with Header, Language Selector & Close */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-black/[0.06] mb-8 gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-serif-luxury text-2xl font-semibold italic tracking-[-0.08em] text-black">
-                    ViteDrop
-                  </span>
-                  <span className="text-xs text-[#6b6b6b] font-medium ml-2">
-                    — {t.subtitle}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {/* Language Selector Pill */}
-                  <div
-                    role="group"
-                    aria-label={t.langAria}
-                    className="flex items-center p-1 rounded-full bg-[#f4f4f4] border border-black/[0.06] text-xs font-semibold"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handlePageLangChange("en")}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        pageLang === "en"
-                          ? "bg-white text-black shadow-sm font-bold"
-                          : "text-[#6b6b6b] hover:text-black"
-                      }`}
-                    >
-                      🇬🇧 EN
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handlePageLangChange("fr")}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        pageLang === "fr"
-                          ? "bg-white text-black shadow-sm font-bold"
-                          : "text-[#6b6b6b] hover:text-black"
-                      }`}
-                    >
-                      🇫🇷 FR
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handlePageLangChange("ar")}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        pageLang === "ar"
-                          ? "bg-white text-black shadow-sm font-bold"
-                          : "text-[#6b6b6b] hover:text-black"
-                      }`}
-                    >
-                      🇩🇿 عربي
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-xs font-semibold text-[#6b6b6b] hover:text-black px-3 py-1.5 rounded-full border border-black/10 hover:border-black/30 transition-colors flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <span>{t.closeLabel}</span>
-                    <span className="text-sm leading-none">✕</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 3-Column Structured Layout (Multilingual + RTL Support) */}
-              <div
-                dir={pageLang === "ar" ? "rtl" : "ltr"}
-                className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8"
-              >
-                {/* Col 1: For Media Buyers */}
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+            {/* Sliding Drawer Container */}
+            <motion.div
+              dir={pageLang === "ar" ? "rtl" : "ltr"}
+              initial={{ x: pageLang === "ar" ? "-100%" : "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: pageLang === "ar" ? "-100%" : "100%" }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              style={{ willChange: "transform" }}
+              className="fixed inset-y-0 end-0 z-50 w-full sm:w-[460px] bg-white shadow-2xl flex flex-col justify-between overflow-y-auto"
+            >
+              {/* Drawer Top Section */}
+              <div className="p-5 sm:p-6 space-y-6">
+                {/* Header: Logo, Language Switcher & Tactile Close Button */}
+                <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0284c7] via-[#0ea5e9] to-[#2563eb] flex items-center justify-center text-white font-bold text-xs shadow-md shadow-sky-500/20">
+                      VD
+                    </div>
                     <div>
-                      <strong className="text-xs font-bold text-black uppercase tracking-wider block">
-                        🎯 {t.col1Title}
-                      </strong>
-                      <span className="text-[11px] text-[#6b6b6b]">
-                        {t.col1Subtitle}
+                      <span className="font-serif-luxury text-xl font-semibold italic tracking-[-0.08em] text-black block leading-tight">
+                        ViteDrop
+                      </span>
+                      <span className="text-[10px] text-[#6b6b6b] font-medium block">
+                        {t.subtitle}
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-                      {t.col1Badge}
-                    </span>
                   </div>
 
-                  <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-2">
+                    {/* Compact Language Selector Pill */}
+                    <div
+                      role="group"
+                      aria-label={t.langAria}
+                      className="flex items-center p-0.5 rounded-full bg-[#f4f4f4] border border-black/[0.06] text-[11px] font-semibold"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handlePageLangChange("en")}
+                        className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${pageLang === "en"
+                            ? "bg-white text-black shadow-xs font-bold"
+                            : "text-[#6b6b6b] hover:text-black"
+                          }`}
+                      >
+                        EN
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePageLangChange("fr")}
+                        className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${pageLang === "fr"
+                            ? "bg-white text-black shadow-xs font-bold"
+                            : "text-[#6b6b6b] hover:text-black"
+                          }`}
+                      >
+                        FR
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePageLangChange("ar")}
+                        className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${pageLang === "ar"
+                            ? "bg-white text-black shadow-xs font-bold"
+                            : "text-[#6b6b6b] hover:text-black"
+                          }`}
+                      >
+                        عربي
+                      </button>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                      type="button"
+                      data-testid="drawer-close-btn"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="w-8 h-8 rounded-full border border-black/10 hover:border-black/30 flex items-center justify-center text-neutral-500 hover:text-black transition-colors cursor-pointer"
+                      aria-label={t.closeLabel}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* Primary Authentication Portal Card */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-neutral-50 via-white to-sky-50/40 border border-black/[0.08] shadow-xs">
+                  {currentUser ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider font-bold">
+                          {t.drawerAccountTitle}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>{currentUser.role}</span>
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-neutral-900 truncate">
+                        {currentUser.email || "Utilisateur connecté"}
+                      </p>
+                      <Link
+                        data-testid="drawer-dashboard-btn"
+                        href={currentUser.role === "SUPPLIER" ? "/supplier" : currentUser.role === "ADMIN" ? "/admin" : "/affiliate"}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="w-full py-3 px-4 rounded-xl bg-black hover:bg-neutral-800 text-white font-bold text-sm text-center flex items-center justify-center gap-2 transition-all shadow-md"
+                      >
+                        <span>{t.navDashboard}</span>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div>
+                        <strong className="text-xs font-bold text-neutral-900 uppercase tracking-wider block mb-1">
+                          {t.drawerAccountTitle}
+                        </strong>
+                        <p className="text-xs text-neutral-500 leading-relaxed">
+                          {t.drawerLoggedOutSubtitle}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <Link
+                          data-testid="drawer-login-btn"
+                          href="/login"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="py-2.5 px-3 rounded-xl border border-neutral-300 hover:border-black text-neutral-800 hover:text-black font-bold text-xs text-center transition-colors bg-white shadow-2xs"
+                        >
+                          {t.navSignIn}
+                        </Link>
+                        <Link
+                          data-testid="drawer-register-btn"
+                          href="/register"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white font-bold text-xs text-center shadow-md shadow-sky-500/25 hover:brightness-105 transition-all"
+                        >
+                          {t.navSignUp}
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Role Portals Quick Selector */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold block px-1">
+                    {t.navAudience}
+                  </span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveAudience("buyer");
+                        setIsMenuOpen(false);
+                        const el = document.getElementById("ecosystem");
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="p-3 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 text-start transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-base">🎯</span>
+                        <strong className="text-xs font-bold text-neutral-900 group-hover:text-sky-700">
+                          {t.ecoTabBuyer}
+                        </strong>
+                      </div>
+                      <span className="text-[10px] text-neutral-600 block line-clamp-1">
+                        {t.col1Badge} • BaridiMob
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveAudience("supplier");
+                        setIsMenuOpen(false);
+                        const el = document.getElementById("ecosystem");
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="p-3 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-start transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-base">📦</span>
+                        <strong className="text-xs font-bold text-neutral-900 group-hover:text-black">
+                          {t.ecoTabSupplier}
+                        </strong>
+                      </div>
+                      <span className="text-[10px] text-neutral-600 block line-clamp-1">
+                        {t.col2Badge} • Yalidine
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Fast Navigation Links */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold block px-1">
+                    {t.drawerFastLinks}
+                  </span>
+                  <div className="space-y-1">
                     <button
                       type="button"
                       onClick={() => {
@@ -294,107 +416,15 @@ export default function Home() {
                         const el = document.getElementById("products");
                         if (el) el.scrollIntoView({ behavior: "smooth" });
                       }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-black hover:bg-neutral-50 transition-colors text-start cursor-pointer"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col1Item1Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold text-[#17c964]">
-                          {t.col1Item1Badge}
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">
+                          🔥
                         </span>
+                        <span>{t.navCatalog}</span>
                       </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col1Item1Desc}
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveAudience("buyer");
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("ecosystem");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col1Item2Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black text-white">
-                          {t.col1Item2Badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col1Item2Desc}
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveAudience("buyer");
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("ecosystem");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col1Item3Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          {t.col1Item3Badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col1Item3Desc}
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Col 2: For Warehouse Suppliers */}
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
-                    <div>
-                      <strong className="text-xs font-bold text-black uppercase tracking-wider block">
-                        📦 {t.col2Title}
-                      </strong>
-                      <span className="text-[11px] text-[#6b6b6b]">
-                        {t.col2Subtitle}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-800 border border-black/10">
-                      {t.col2Badge}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 flex-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveAudience("supplier");
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("ecosystem");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col2Item1Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold text-neutral-800">
-                          {t.col2Item1Badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col2Item1Desc}
-                      </p>
+                      <span className="text-[10px] text-neutral-400 font-mono">DZD</span>
                     </button>
 
                     <button
@@ -404,83 +434,15 @@ export default function Home() {
                         const el = document.getElementById("lifecycle");
                         if (el) el.scrollIntoView({ behavior: "smooth" });
                       }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-black hover:bg-neutral-50 transition-colors text-start cursor-pointer"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col2Item2Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
-                          {t.col2Item2Badge}
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                          ⚙️
                         </span>
+                        <span>{t.navLifecycle}</span>
                       </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col2Item2Desc}
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveAudience("supplier");
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("ecosystem");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col2Item3Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          {t.col2Item3Badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col2Item3Desc}
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Col 3: Platform Infrastructure */}
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
-                    <div>
-                      <strong className="text-xs font-bold text-black uppercase tracking-wider block">
-                        ⚡ {t.col3Title}
-                      </strong>
-                      <span className="text-[11px] text-[#6b6b6b]">
-                        {t.col3Subtitle}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                      {t.col3Badge}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 flex-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("lifecycle");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col3Item1Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold text-blue-600">
-                          {t.col3Item1Badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col3Item1Desc}
-                      </p>
+                      <span className="text-[10px] text-neutral-400 font-mono">8 States</span>
                     </button>
 
                     <button
@@ -490,120 +452,61 @@ export default function Home() {
                         const el = document.getElementById("logistics");
                         if (el) el.scrollIntoView({ behavior: "smooth" });
                       }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-black hover:bg-neutral-50 transition-colors text-start cursor-pointer"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col3Item2Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                          {t.col3Item2Badge}
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
+                          🚚
                         </span>
+                        <span>{t.navLogistics}</span>
                       </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col3Item2Desc}
-                      </p>
+                      <span className="text-[10px] text-neutral-400 font-mono">58 Wilayas</span>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        const el = document.getElementById("logistics");
-                        if (el) el.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="w-full text-start group block p-4 rounded-2xl border border-black/[0.06] hover:border-black/20 hover:bg-[#fafafa] transition-all cursor-pointer"
+                    <Link
+                      href="/track"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-neutral-700 hover:text-black hover:bg-neutral-50 transition-colors text-start"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-sm font-semibold text-black group-hover:text-neutral-900">
-                          {t.col3Item3Title}
-                        </strong>
-                        <span className="text-[10px] font-semibold text-neutral-800">
-                          {t.col3Item3Badge}
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                          🔍
                         </span>
+                        <div>
+                          <span className="block font-semibold">{t.drawerQuickTrack}</span>
+                          <span className="text-[10px] text-neutral-400 font-normal">{t.drawerQuickTrackDesc}</span>
+                        </div>
                       </div>
-                      <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                        {t.col3Item3Desc}
-                      </p>
-                    </button>
+                      <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
                   </div>
                 </div>
               </div>
 
-              {/* Direct Access Action Bar */}
-              <div
-                dir={pageLang === "ar" ? "rtl" : "ltr"}
-                className="mt-8 pt-6 border-t border-black/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
-              >
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveAudience("buyer");
-                      setIsMenuOpen(false);
-                      const el = document.getElementById("ecosystem");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-xs font-semibold shadow-md shadow-sky-500/20 hover:brightness-105 transition-all cursor-pointer"
-                  >
-                    <span>🎯</span>
-                    <span>{t.buyerPortalBtn}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveAudience("supplier");
-                      setIsMenuOpen(false);
-                      const el = document.getElementById("ecosystem");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-semibold transition-all cursor-pointer"
-                  >
-                    <span>📦</span>
-                    <span>{t.supplierPortalBtn}</span>
-                  </button>
-                </div>
-
+              {/* Drawer Bottom Section: VIP Desk & Network Badges */}
+              <div className="p-5 sm:p-6 border-t border-black/[0.06] bg-neutral-50/60 space-y-3">
                 <a
-                  href="https://wa.me/"
+                  href="https://wa.me/213550000000"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-black/10 hover:border-black/30 text-xs font-semibold text-black transition-all bg-white hover:bg-neutral-50"
+                  className="w-full inline-flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold text-emerald-900 transition-all shadow-2xs"
                 >
-                  <span className="w-2 h-2 rounded-full bg-[#17c964] animate-pulse"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span>{t.whatsappBtn}</span>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </a>
-              </div>
 
-              {/* Bottom Footer Inside Menu */}
-              <div
-                dir={pageLang === "ar" ? "rtl" : "ltr"}
-                className="mt-6 pt-5 border-t border-black/[0.06] flex flex-wrap items-center justify-between text-xs text-[#6b6b6b] gap-4"
-              >
-                <div className="flex items-center gap-3 sm:gap-6 flex-wrap">
+                <div className="flex flex-col gap-1 text-[11px] text-neutral-400 text-center">
                   <span>{t.footerBadge1}</span>
-                  <span className="hidden sm:inline">•</span>
-                  <span className="hidden sm:inline">{t.footerBadge2}</span>
-                </div>
-                <div className="flex items-center gap-4 text-black font-medium">
-                  <a href="#products" onClick={() => setIsMenuOpen(false)} className="hover:underline">
-                    {t.navCatalog}
-                  </a>
-                  <a href="#ecosystem" onClick={() => setIsMenuOpen(false)} className="hover:underline">
-                    {t.navAudience}
-                  </a>
-                  <a href="#lifecycle" onClick={() => setIsMenuOpen(false)} className="hover:underline">
-                    {t.navLifecycle}
-                  </a>
+                  <span className="text-[10px]">{t.footerBadge2}</span>
                 </div>
               </div>
             </motion.div>
-          </div>
-        </React.Fragment>
+          </React.Fragment>
         )}
       </AnimatePresence>
 
@@ -735,7 +638,7 @@ export default function Home() {
                 transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
               },
             }}
-            className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+            className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
           >
             {/* Primary Action Button */}
             <motion.a
@@ -743,30 +646,30 @@ export default function Home() {
               whileHover={{ y: -2, boxShadow: "0 14px 28px -6px rgba(14, 165, 233, 0.4)" }}
               whileTap={{ scale: 0.98 }}
               href="#products"
-              className="w-full sm:w-auto h-14 px-8 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-[15px] font-semibold flex items-center justify-center shadow-lg shadow-sky-500/25 hover:brightness-105 transition-all"
+              className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-[14px] sm:text-[15px] font-semibold flex items-center justify-center shadow-lg shadow-sky-500/25 hover:brightness-105 transition-all cursor-pointer"
             >
-              Explore Winning Products
+              {pageLang === "ar" ? "تصفح المنتجات الرابحة" : pageLang === "fr" ? "Explorer les Produits Gagnants" : "Explore Winning Products"}
             </motion.a>
 
             {/* VIP WhatsApp Manager Button */}
             <motion.a
               whileHover={{ y: -2, boxShadow: "0 12px 24px -6px rgba(0, 0, 0, 0.08)" }}
               whileTap={{ scale: 0.98 }}
-              href="https://wa.me/"
+              href="https://wa.me/213550000000"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto h-14 pl-2 pr-6 rounded-full bg-white border-4 border-[#f8f8f8] hover:border-black/10 transition-colors flex items-center gap-3 shadow-sm"
+              className="w-full sm:w-auto h-12 sm:h-14 pl-2 pr-5 sm:pr-6 rounded-full bg-white border-2 sm:border-4 border-[#f8f8f8] hover:border-black/10 transition-colors flex items-center gap-3 shadow-sm cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 shadow-2xs">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 shadow-2xs">
                 VD
               </div>
-              <div className="text-left">
-                <div className="text-[14px] font-semibold text-black leading-tight">
-                  Chat with VIP Manager
+              <div className="text-start">
+                <div className="text-[13px] sm:text-[14px] font-semibold text-black leading-tight">
+                  {t.whatsappBtn}
                 </div>
-                <div className="text-[12px] font-medium text-[#6b6b6b] flex items-center gap-1.5 leading-none mt-0.5">
-                  <span className="w-2 h-2 rounded-full bg-[#17c964] shrink-0"></span>
-                  Fast-track approval (🇩🇿)
+                <div className="text-[11px] sm:text-[12px] font-medium text-[#6b6b6b] flex items-center gap-1.5 leading-none mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-[#17c964] shrink-0 animate-pulse"></span>
+                  {pageLang === "ar" ? "تفعيل فوري ودعم مباشر (🇩🇿)" : pageLang === "fr" ? "Validation rapide (🇩🇿)" : "Fast-track approval (🇩🇿)"}
                 </div>
               </div>
             </motion.a>
@@ -824,11 +727,10 @@ export default function Home() {
               type="button"
               data-testid="audience-tab-buyer"
               onClick={() => setActiveAudience("buyer")}
-              className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${
-                activeAudience === "buyer"
+              className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${activeAudience === "buyer"
                   ? "text-white"
                   : "text-[#6b6b6b] hover:text-black"
-              }`}
+                }`}
             >
               {activeAudience === "buyer" && (
                 <motion.div
@@ -844,11 +746,10 @@ export default function Home() {
               type="button"
               data-testid="audience-tab-supplier"
               onClick={() => setActiveAudience("supplier")}
-              className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${
-                activeAudience === "supplier"
+              className={`relative px-6 py-2.5 rounded-full text-xs font-semibold transition-colors z-10 ${activeAudience === "supplier"
                   ? "text-white"
                   : "text-[#6b6b6b] hover:text-black"
-              }`}
+                }`}
             >
               {activeAudience === "supplier" && (
                 <motion.div
@@ -1064,22 +965,22 @@ export default function Home() {
               </p>
 
               {/* Breakdown Table */}
-              <div className="editorial-card p-6 rounded-2xl space-y-3.5 text-sm">
-                <div className="flex justify-between items-center text-[#6b6b6b]">
-                  <span>Customer Selling Price (COD collected at door):</span>
-                  <span className="font-mono font-bold text-neutral-900">4,800 DZD</span>
+              <div className="editorial-card p-5 sm:p-6 rounded-2xl space-y-3.5 text-xs sm:text-sm">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 sm:gap-2 text-[#6b6b6b]">
+                  <span className="leading-snug">Customer Selling Price (COD collected at door):</span>
+                  <span className="font-mono font-bold text-neutral-900 shrink-0">4,800 DZD</span>
                 </div>
-                <div className="flex justify-between items-center text-[#6b6b6b]">
-                  <span>Supplier Base Inventory Cost:</span>
-                  <span className="font-mono text-neutral-600">- 2,400 DZD</span>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 sm:gap-2 text-[#6b6b6b]">
+                  <span className="leading-snug">Supplier Base Inventory Cost:</span>
+                  <span className="font-mono text-neutral-600 shrink-0">- 2,400 DZD</span>
                 </div>
-                <div className="flex justify-between items-center text-[#6b6b6b]">
-                  <span>Average Yalidine Courier Delivery Fee:</span>
-                  <span className="font-mono text-neutral-600">- 800 DZD</span>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 sm:gap-2 text-[#6b6b6b]">
+                  <span className="leading-snug">Average Yalidine Courier Delivery Fee:</span>
+                  <span className="font-mono text-neutral-600 shrink-0">- 800 DZD</span>
                 </div>
-                <div className="pt-3 border-t border-black/[0.08] flex justify-between items-center">
-                  <span className="font-bold text-black text-base">Your Net CPA Commission:</span>
-                  <span className="font-mono text-xl font-extrabold text-emerald-600">
+                <div className="pt-3 border-t border-black/[0.08] flex flex-col sm:flex-row justify-between sm:items-center gap-1 sm:gap-2">
+                  <span className="font-bold text-black text-sm sm:text-base">Your Net CPA Commission:</span>
+                  <span className="font-mono text-lg sm:text-xl font-extrabold text-emerald-600 shrink-0">
                     + 1,600 DZD <span className="text-xs font-normal text-[#6b6b6b]">/ order</span>
                   </span>
                 </div>
@@ -1092,8 +993,8 @@ export default function Home() {
                       {pageLang === "ar"
                         ? "سحب فوري مضمون خلال 24 ساعة عبر :"
                         : pageLang === "fr"
-                        ? "Virements garantis sous 24h :"
-                        : "Guaranteed 24h settlement rails:"}
+                          ? "Virements garantis sous 24h :"
+                          : "Guaranteed 24h settlement rails:"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 font-mono text-[10px]">
@@ -1148,34 +1049,32 @@ export default function Home() {
 
         {/* Stepper Buttons with Progress Fill */}
         <div className="relative mb-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 relative z-10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 relative z-10">
             {orderStates.map((state, idx) => (
               <button
                 key={state.title}
                 type="button"
                 onClick={() => setOrderStep(idx)}
-                className={`p-5 rounded-2xl border text-left transition-all relative ${
-                  orderStep === idx
+                className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl border text-left transition-all relative ${orderStep === idx
                     ? "text-white border-black shadow-lg"
                     : "bg-white text-black border-black/[0.08] hover:border-black/30"
-                }`}
+                  }`}
               >
                 {orderStep === idx && (
                   <motion.div
                     layoutId="active-step-highlight"
                     transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                    className="absolute inset-0 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] rounded-2xl shadow-md shadow-sky-500/25"
+                    className="absolute inset-0 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] rounded-xl sm:rounded-2xl shadow-md shadow-sky-500/25"
                     style={{ zIndex: -1 }}
                   />
                 )}
                 <span
-                  className={`text-[11px] font-mono block mb-1 ${
-                    orderStep === idx ? "text-neutral-400" : "text-[#6b6b6b]"
-                  }`}
+                  className={`text-[10px] sm:text-[11px] font-mono block mb-0.5 sm:mb-1 ${orderStep === idx ? "text-sky-100" : "text-[#6b6b6b]"
+                    }`}
                 >
                   {state.badge}
                 </span>
-                <strong className="text-lg font-semibold block">{state.title}</strong>
+                <strong className="text-sm sm:text-lg font-semibold block leading-tight">{state.title}</strong>
               </button>
             ))}
           </div>

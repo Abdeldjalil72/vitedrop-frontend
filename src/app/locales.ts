@@ -1,8 +1,8 @@
 export const pageTranslations = {
   en: {
-    // Menu
+    // Menu & Drawer
     subtitle: "Algerian COD CPA Network",
-    closeLabel: "Close (ESC)",
+    closeLabel: "Close",
     langAria: "Switch language",
     col1Title: "For Media Buyers",
     col1Subtitle: "Affiliates & Advertisers",
@@ -43,22 +43,35 @@ export const pageTranslations = {
     col3Item3Badge: "Instant Labels",
     col3Item3Desc: "Generate official barcode shipping labels instantly from the platform with real-time tracking updates.",
 
-    buyerPortalBtn: "Affiliate Portal (Media Buyers)",
-    supplierPortalBtn: "Supplier Portal (Fournisseurs)",
+    buyerPortalBtn: "Affiliate Portal",
+    supplierPortalBtn: "Supplier Portal",
     whatsappBtn: "VIP Account Manager",
     footerBadge1: "🇩🇿 Official Algerian Cash-on-Delivery CPA Network",
     footerBadge2: "Yalidine & ZR Express Webhook Authority",
     
-    // Navbar
+    // Navbar & Auth
     navCatalog: "Winning Products",
     navAudience: "How It Works",
     navLifecycle: "Order Lifecycle",
     navLogistics: "58 Wilayas",
     navMenu: "Menu",
-    
+    navSignIn: "Sign In",
+    navSignUp: "Register Free",
+    navDashboard: "Dashboard",
+    trackOrderNav: "Track Order",
+
+    // Drawer Enhancements
+    drawerAccountTitle: "Account & Portal Access",
+    drawerRoleBuyer: "Media Buyer (Affiliate)",
+    drawerRoleSupplier: "Warehouse Supplier",
+    drawerQuickTrack: "Track an Order",
+    drawerQuickTrackDesc: "Live courier tracking with Yalidine & ZR Express",
+    drawerFastLinks: "Quick Navigation",
+    drawerLoggedOutSubtitle: "Log in or create your free account to access campaigns and inventory.",
+
     // Hero
-    heroTitle: "Scale COD sales in Algeria on demand.",
-    heroSubtitle: "The premier Cash-on-Delivery CPA network. Pure performance infrastructure for top-tier media buyers and high-volume warehouse suppliers.",
+    heroTitle: "Scale COD E-Commerce in Algeria with Zero Stock Risk.",
+    heroSubtitle: "The premier Cash-on-Delivery CPA network in Algeria. We connect vetted warehouse suppliers with elite media buyers. Instant 24h BaridiMob & CCP payouts, automated Yalidine & ZR Express dispatch across 58 wilayas.",
     
     // Ecosystem Section
     ecoSectionTitle: "Two Sides • One Network",
@@ -96,9 +109,9 @@ export const pageTranslations = {
     logSectionDesc: "One-click bordereaux. Automatic tracking sync. Stop-desk and home delivery covered nationwide via our centralized Yalidine and ZR Express master accounts.",
   },
   fr: {
-    // Menu
+    // Menu & Drawer
     subtitle: "Réseau CPA COD Algérie",
-    closeLabel: "Fermer (Échap)",
+    closeLabel: "Fermer",
     langAria: "Changer la langue",
     col1Title: "Pour Media Buyers",
     col1Subtitle: "Affiliés & Marketeurs",
@@ -139,22 +152,35 @@ export const pageTranslations = {
     col3Item3Badge: "Bordereau Direct",
     col3Item3Desc: "Génération instantanée des bordereaux de livraison avec code-barres officiel et synchronisation en direct.",
 
-    buyerPortalBtn: "Espace Media Buyer (Affiliés)",
-    supplierPortalBtn: "Espace Fournisseur (Stock)",
+    buyerPortalBtn: "Espace Media Buyer",
+    supplierPortalBtn: "Espace Fournisseur",
     whatsappBtn: "Manager VIP Dédié",
     footerBadge1: "🇩🇿 Réseau CPA Cash-on-Delivery Officiel en Algérie",
     footerBadge2: "Autorité Webhooks Yalidine & ZR Express",
     
-    // Navbar
+    // Navbar & Auth
     navCatalog: "Produits Gagnants",
     navAudience: "Comment Ça Marche",
     navLifecycle: "Cycle de Commande",
     navLogistics: "58 Wilayas",
     navMenu: "Menu",
+    navSignIn: "Connexion",
+    navSignUp: "S'inscrire (Gratuit)",
+    navDashboard: "Tableau de Bord",
+    trackOrderNav: "Suivre un Colis",
+
+    // Drawer Enhancements
+    drawerAccountTitle: "Espace & Accès Plateforme",
+    drawerRoleBuyer: "Media Buyer (Affilié)",
+    drawerRoleSupplier: "Fournisseur de Stock",
+    drawerQuickTrack: "Suivi de Commande",
+    drawerQuickTrackDesc: "Mise à jour directe Yalidine & ZR Express",
+    drawerFastLinks: "Navigation Rapide",
+    drawerLoggedOutSubtitle: "Connectez-vous ou créez votre compte gratuit pour accéder aux campagnes.",
 
     // Hero
-    heroTitle: "Évoluez vos ventes COD en Algérie à la demande.",
-    heroSubtitle: "Le premier réseau CPA Cash-on-Delivery. Une infrastructure de performance pure pour les meilleurs media buyers et les fournisseurs à haut volume.",
+    heroTitle: "Multipliez vos ventes COD en Algérie sans risque de stock.",
+    heroSubtitle: "Le 1er réseau CPA Cash-on-Delivery en Algérie. Reliez vos stocks réels aux meilleurs media buyers. Virement BaridiMob & CCP garanti sous 24h, expédition automatisée Yalidine & ZR Express sur 58 wilayas.",
     
     // Ecosystem Section
     ecoSectionTitle: "Deux Faces • Un Réseau",
@@ -192,9 +218,9 @@ export const pageTranslations = {
     logSectionDesc: "Bordereaux en 1 clic. Synchronisation automatique. Livraison à domicile et Stop-Desk couverte à l'échelle nationale via nos comptes maîtres Yalidine et ZR Express.",
   },
   ar: {
-    // Menu
+    // Menu & Drawer
     subtitle: "شبكة الدفع عند الاستلام في الجزائر",
-    closeLabel: "إغلاق (ESC)",
+    closeLabel: "إغلاق",
     langAria: "تغيير اللغة",
     col1Title: "للمسوقين (Media Buyers)",
     col1Subtitle: "محترفو الإعلانات والتسويق بالعمولة",
@@ -235,22 +261,35 @@ export const pageTranslations = {
     col3Item3Badge: "باركود فوري",
     col3Item3Desc: "استخراج بوليصات الشحن (Bordereau) مع الباركود الرسمي مباشرة من المنصة مع مزامنة لحظية للتتبع.",
 
-    buyerPortalBtn: "بوابة المسوقين (Media Buyers)",
-    supplierPortalBtn: "بوابة الموردين (المخازن)",
+    buyerPortalBtn: "بوابة المسوقين",
+    supplierPortalBtn: "بوابة الموردين",
     whatsappBtn: "مدير الحسابات VIP",
     footerBadge1: "🇩🇿 الشبكة الرسمية للدفع عند الاستلام CPA في الجزائر",
     footerBadge2: "توثيق تلقائي عبر ياليدين وZR إكسبريس",
     
-    // Navbar
+    // Navbar & Auth
     navCatalog: "المنتجات الرابحة",
     navAudience: "كيف نعمل",
     navLifecycle: "دورة الطلب",
     navLogistics: "تغطية 58 ولاية",
     navMenu: "القائمة",
+    navSignIn: "تسجيل الدخول",
+    navSignUp: "فتح حساب مجاني",
+    navDashboard: "لوحة التحكم",
+    trackOrderNav: "تتبع طلبك",
+
+    // Drawer Enhancements
+    drawerAccountTitle: "الدخول وحسابك في المنصة",
+    drawerRoleBuyer: "بوابة المسوقين (أرباح بالعمولة)",
+    drawerRoleSupplier: "بوابة الموردين وأصحاب المخازن",
+    drawerQuickTrack: "تتبع شحنة مباشرة",
+    drawerQuickTrackDesc: "تتبع فوري ومباشر مع ياليدين وZR إكسبريس",
+    drawerFastLinks: "أقسام المنصة",
+    drawerLoggedOutSubtitle: "سجل دخولك أو افتح حسابك المجاني للوصول للحملات والمنتجات الرابحة.",
 
     // Hero
-    heroTitle: "ضاعف مبيعاتك في الجزائر الآن.",
-    heroSubtitle: "الشبكة الرائدة في مجال الدفع عند الاستلام. بنية تحتية متطورة مصممة خصيصاً لأفضل مسوقي الإعلانات وأصحاب المخازن الكبرى لضمان أعلى أداء.",
+    heroTitle: "ضاعف مبيعاتك وأرباحك في الجزائر بدون شراء مخزون.",
+    heroSubtitle: "الشبكة الأولى للدفع عند الاستلام (COD CPA) في الجزائر. نربط أصحاب المخازن الحقيقية بأقوى مسوقي الإعلانات. سحب أرباحك خلال 24 ساعة عبر بريدي موب مع شحن آلي لـ 58 ولاية عبر ياليدين وZR إكسبريس.",
     
     // Ecosystem Section
     ecoSectionTitle: "منصة واحدة • طرفان",
