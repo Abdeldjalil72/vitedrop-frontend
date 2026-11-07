@@ -7,7 +7,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tabs";
-import { translations } from "@/lib/locales";
+import { translations, getLocalizedAuthError } from "@/lib/locales";
 import { apiLogin } from "@/lib/api-client";
 import { Mail, Lock, CheckCircle2, AlertCircle, Eye, EyeOff } from "lucide-react";
 
@@ -96,7 +96,7 @@ export default function LoginPage() {
             {error && (
               <div role="alert" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
+                <span>{getLocalizedAuthError(error, lang)}</span>
               </div>
             )}
 

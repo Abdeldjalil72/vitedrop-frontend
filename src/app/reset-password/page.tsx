@@ -7,6 +7,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiResetPassword } from "@/lib/api-client";
+import { getLocalizedAuthError } from "@/lib/locales";
 import { Lock, CheckCircle2, AlertCircle, KeyRound, ArrowRight } from "lucide-react";
 
 function ResetPasswordContent() {
@@ -103,7 +104,7 @@ function ResetPasswordContent() {
                     className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2"
                   >
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{error}</span>
+                    <span>{getLocalizedAuthError(error, lang)}</span>
                   </div>
                 )}
 

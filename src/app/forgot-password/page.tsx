@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { translations } from "@/lib/locales";
+import { translations, getLocalizedAuthError } from "@/lib/locales";
 import { apiForgotPassword } from "@/lib/api-client";
 import { Mail, CheckCircle2, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
                 {error && (
                   <div data-testid="forgot-error-alert" className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{error}</span>
+                    <span>{getLocalizedAuthError(error, lang)}</span>
                   </div>
                 )}
 

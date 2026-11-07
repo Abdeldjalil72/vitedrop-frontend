@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { WilayaSelect } from "@/components/ui/wilaya-select";
 import { ModernSelect, type ModernSelectOption } from "@/components/ui/modern-select";
 import { Tabs } from "@/components/ui/tabs";
-import { translations } from "@/lib/locales";
+import { translations, getLocalizedAuthError } from "@/lib/locales";
 import { validateAlgerianPhone } from "@/lib/formatters";
 import { apiRegisterAffiliate, apiRegisterSupplier } from "@/lib/api-client";
 import {
@@ -355,7 +355,7 @@ function RegisterContent() {
             {error && (
               <div data-testid="register-error-banner" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
+                <span>{getLocalizedAuthError(error, lang)}</span>
               </div>
             )}
 

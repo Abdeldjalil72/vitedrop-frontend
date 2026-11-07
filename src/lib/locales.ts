@@ -1353,3 +1353,153 @@ export const translations = {
     },
   },
 };
+
+export function getLocalizedAuthError(rawError: any, lang: Language): string {
+  const msg = (
+    typeof rawError === "string"
+      ? rawError
+      : rawError?.data?.message || rawError?.message || ""
+  ).toString();
+
+  const status = rawError?.status || rawError?.statusCode;
+
+  // 1. Invalid Credentials / Unauthorized (401)
+  if (
+    status === 401 ||
+    msg.includes("Identifiants invalides") ||
+    msg.toLowerCase().includes("invalid credentials")
+  ) {
+    if (lang === "ar") {
+      return "بيانات الدخول غير صحيحة (يرجى التحقق من البريد الإلكتروني أو كلمة المرور).";
+    }
+    if (lang === "en") {
+      return "Invalid credentials (incorrect email or password).";
+    }
+    return "Identifiants invalides (e-mail ou mot de passe incorrect).";
+  }
+
+  // 2. Email Already Verified
+  if (
+    msg.includes("déjà associée à un compte vérifié") ||
+    msg.toLowerCase().includes("already associated with a verified") ||
+    rawError?.data?.error === "EMAIL_ALREADY_VERIFIED"
+  ) {
+    if (lang === "ar") {
+      return "هذا البريد الإلكتروني مسجل ومفعل بالفعل. يرجى تسجيل الدخول مباشرة.";
+    }
+    if (lang === "en") {
+      return "This email address is already associated with an active account. Please sign in.";
+    }
+    return "Cette adresse e-mail est déjà associée à un compte vérifié. Veuillez vous connecter.";
+  }
+
+  // 3. Email Already in Use
+  if (
+    msg.includes("déjà utilisée") ||
+    msg.toLowerCase().includes("already in use")
+  ) {
+    if (lang === "ar") {
+      return "هذا البريد الإلكتروني مستخدم بالفعل.";
+    }
+    if (lang === "en") {
+      return "This email address is already in use.";
+    }
+    return "Cette adresse e-mail est déjà utilisée.";
+  }
+
+  // 4. Inactive or Disabled Account
+  if (
+    msg.includes("inactif ou désactivé") ||
+    msg.toLowerCase().includes("inactive or disabled")
+  ) {
+    if (lang === "ar") {
+      return "هذا الحساب غير نشط أو تم تعطيله. يرجى التواصل مع الدعم.";
+    }
+    if (lang === "en") {
+      return "This account is inactive or has been disabled. Please contact support.";
+    }
+    return "Ce compte est inactif ou désactivé. Veuillez contacter le support.";
+  }
+
+  // 5. Cooldown / Rate Limiting ("Veuillez patienter X secondes...")
+  if (
+    msg.includes("patienter") ||
+    msg.toLowerCase().includes("wait") ||
+    status === 429
+  ) {
+    const match = msg.match(/\d+/);
+    const sec = match ? match[0] : "15";
+    if (lang === "ar") {
+      return `يرجى الانتظار ${sec} ثانية قبل إعادة المحاولة.`;
+    }
+    if (lang === "en") {
+      return `Please wait ${sec} second(s) before trying again.`;
+    }
+    return `Veuillez patienter ${sec} seconde(s) avant de soumettre à nouveau vos informations.`;
+  }
+
+  // 6. Incorrect OTP Code
+  if (
+    msg.includes("Code de confirmation incorrect") ||
+    msg.toLowerCase().includes("incorrect verification code")
+  ) {
+    if (lang === "ar") {
+      return "رمز التأكيد غير صحيح. يرجى التأكد من الرمز وإعادة المحاولة.";
+    }
+    if (lang === "en") {
+      return "Incorrect verification code. Please check your code and try again.";
+    }
+    return "Code de confirmation incorrect. Veuillez vérifier le code et réessayer.";
+  }
+
+  // 7. Expired OTP Code
+  if (
+    msg.includes("a expiré") ||
+    msg.toLowerCase().includes("expired")
+  ) {
+    if (lang === "ar") {
+      return "انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.";
+    }
+    if (lang === "en") {
+      return "This verification code has expired. Please request a new code.";
+    }
+    return "Ce code de vérification a expiré. Veuillez demander un nouveau code.";
+  }
+
+  // 8. Max attempts exceeded
+  if (
+    msg.includes("Nombre maximal de tentatives dépassé") ||
+    msg.toLowerCase().includes("maximum attempts")
+  ) {
+    if (lang === "ar") {
+      return "تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.";
+    }
+    if (lang === "en") {
+      return "Maximum attempts exceeded. Please request a new code.";
+    }
+    return "Nombre maximal de tentatives dépassé. Veuillez demander un nouveau code.";
+  }
+
+  // 9. No Pending Verification Code
+  if (
+    msg.includes("Aucun code de vérification en attente") ||
+    msg.toLowerCase().includes("no pending verification")
+  ) {
+    if (lang === "ar") {
+      return "لا يوجد رمز تأكيد معلق لهذا البريد الإلكتروني.";
+    }
+    if (lang === "en") {
+      return "No pending verification code found for this email address.";
+    }
+    return "Aucun code de vérification en attente pour cette adresse e-mail.";
+  }
+
+  // Generic fallback if network error
+  if (!msg || msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("fetch failed")) {
+    if (lang === "ar") return "تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مجددًا.";
+    if (lang === "en") return "Unable to connect to the server. Please check your internet connection and try again.";
+    return "Impossible de joindre le serveur. Veuillez vérifier votre connexion Internet et réessayer.";
+  }
+
+  return msg;
+}
