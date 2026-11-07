@@ -78,6 +78,36 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
   const [lang, setLang] = useState<"ar" | "fr">("ar");
   const isAr = lang === "ar";
 
+  useEffect(() => {
+    const syncLang = () => {
+      try {
+        const saved = localStorage.getItem("vitedrop_lang");
+        if (saved === "fr" || saved === "en") {
+          setLang("fr");
+        } else if (saved === "ar") {
+          setLang("ar");
+        }
+      } catch {}
+    };
+
+    syncLang();
+    window.addEventListener("vitedrop_lang_changed", syncLang);
+    window.addEventListener("storage", syncLang);
+    return () => {
+      window.removeEventListener("vitedrop_lang_changed", syncLang);
+      window.removeEventListener("storage", syncLang);
+    };
+  }, []);
+
+  const handleLangToggle = () => {
+    const nextLang = lang === "ar" ? "fr" : "ar";
+    setLang(nextLang);
+    try {
+      localStorage.setItem("vitedrop_lang", nextLang);
+      window.dispatchEvent(new Event("vitedrop_lang_changed"));
+    } catch {}
+  };
+
   // Product state
   const [product, setProduct] = useState<PublicCheckoutProduct | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -436,7 +466,7 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
             <button
               type="button"
               data-testid="landing-lang-toggle"
-              onClick={() => setLang(lang === "ar" ? "fr" : "ar")}
+              onClick={handleLangToggle}
               className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
             >
               {lang === "ar" ? "Français" : "العربية"}

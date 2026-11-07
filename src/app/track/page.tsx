@@ -77,6 +77,36 @@ function TrackOrderContent() {
     }
   }, [initialId]);
 
+  useEffect(() => {
+    const syncLang = () => {
+      try {
+        const saved = localStorage.getItem("vitedrop_lang");
+        if (saved === "fr" || saved === "en") {
+          setLang("fr");
+        } else if (saved === "ar") {
+          setLang("ar");
+        }
+      } catch {}
+    };
+
+    syncLang();
+    window.addEventListener("vitedrop_lang_changed", syncLang);
+    window.addEventListener("storage", syncLang);
+    return () => {
+      window.removeEventListener("vitedrop_lang_changed", syncLang);
+      window.removeEventListener("storage", syncLang);
+    };
+  }, []);
+
+  const handleLangToggle = () => {
+    const nextLang = lang === "ar" ? "fr" : "ar";
+    setLang(nextLang);
+    try {
+      localStorage.setItem("vitedrop_lang", nextLang);
+      window.dispatchEvent(new Event("vitedrop_lang_changed"));
+    } catch {}
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
@@ -240,7 +270,7 @@ function TrackOrderContent() {
           {/* Language Toggle */}
           <button
             type="button"
-            onClick={() => setLang(isAr ? "fr" : "ar")}
+            onClick={handleLangToggle}
             className="px-3 py-1.5 rounded-lg border border-neutral-200 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
           >
             {isAr ? "Français" : "العربية"}

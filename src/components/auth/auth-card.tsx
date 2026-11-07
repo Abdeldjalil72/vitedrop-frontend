@@ -16,21 +16,29 @@ export function AuthCard({ children, initialLang = "fr" }: AuthCardProps) {
   const rtl = isRTL(lang);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
+    const syncLang = () => {
       try {
         const saved = localStorage.getItem("vitedrop_lang") as Language;
         if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
           setLang(saved);
         }
       } catch {}
-    }, 0);
-    return () => window.clearTimeout(timeoutId);
+    };
+
+    syncLang();
+    window.addEventListener("vitedrop_lang_changed", syncLang);
+    window.addEventListener("storage", syncLang);
+    return () => {
+      window.removeEventListener("vitedrop_lang_changed", syncLang);
+      window.removeEventListener("storage", syncLang);
+    };
   }, []);
 
   const handleLangChange = (newLang: Language) => {
     setLang(newLang);
     try {
       localStorage.setItem("vitedrop_lang", newLang);
+      window.dispatchEvent(new Event("vitedrop_lang_changed"));
     } catch {}
   };
 

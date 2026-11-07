@@ -11,13 +11,39 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeAudience, setActiveAudience] = useState<"buyer" | "supplier">("buyer");
   const [orderStep, setOrderStep] = useState(0);
-  const [pageLang, setPageLang] = useState<"en" | "fr" | "ar">("en");
+  const [pageLang, setPageLang] = useState<"en" | "fr" | "ar">("fr");
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<DecodedToken | null>(null);
 
   useEffect(() => {
     setCurrentUser(getCurrentUser());
+
+    const syncLang = () => {
+      try {
+        const saved = localStorage.getItem("vitedrop_lang") as "en" | "fr" | "ar";
+        if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
+          setPageLang(saved);
+        }
+      } catch {}
+    };
+
+    syncLang();
+    window.addEventListener("vitedrop_lang_changed", syncLang);
+    window.addEventListener("storage", syncLang);
+    return () => {
+      window.removeEventListener("vitedrop_lang_changed", syncLang);
+      window.removeEventListener("storage", syncLang);
+    };
   }, []);
+
+  const handlePageLangChange = (newLang: "en" | "fr" | "ar") => {
+    setPageLang(newLang);
+    setIsLangOpen(false);
+    try {
+      localStorage.setItem("vitedrop_lang", newLang);
+      window.dispatchEvent(new Event("vitedrop_lang_changed"));
+    } catch {}
+  };
 
   const t = pageTranslations[pageLang];
 
@@ -103,9 +129,9 @@ export default function Home() {
                 </svg>
               </button>
               <div className={`absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-xl border border-black/[0.06] transition-all duration-200 py-1 z-50 ${isLangOpen ? "opacity-100 visible" : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"}`}>
-                <button data-testid="lang-option-en" onClick={() => { setPageLang("en"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "en" ? "text-sky-600" : "text-black"}`}>English</button>
-                <button data-testid="lang-option-fr" onClick={() => { setPageLang("fr"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "fr" ? "text-sky-600" : "text-black"}`}>Français</button>
-                <button data-testid="lang-option-ar" onClick={() => { setPageLang("ar"); setIsLangOpen(false); }} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "ar" ? "text-sky-600" : "text-black"}`}>العربية</button>
+                <button data-testid="lang-option-en" onClick={() => handlePageLangChange("en")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "en" ? "text-sky-600" : "text-black"}`}>English</button>
+                <button data-testid="lang-option-fr" onClick={() => handlePageLangChange("fr")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "fr" ? "text-sky-600" : "text-black"}`}>Français</button>
+                <button data-testid="lang-option-ar" onClick={() => handlePageLangChange("ar")} className={`w-full text-start px-4 py-2 text-sm font-medium hover:bg-neutral-50 cursor-pointer ${pageLang === "ar" ? "text-sky-600" : "text-black"}`}>العربية</button>
               </div>
             </div>
 
@@ -195,7 +221,7 @@ export default function Home() {
                   >
                     <button
                       type="button"
-                      onClick={() => setPageLang("en")}
+                      onClick={() => handlePageLangChange("en")}
                       className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                         pageLang === "en"
                           ? "bg-white text-black shadow-sm font-bold"
@@ -206,7 +232,7 @@ export default function Home() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPageLang("fr")}
+                      onClick={() => handlePageLangChange("fr")}
                       className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                         pageLang === "fr"
                           ? "bg-white text-black shadow-sm font-bold"
@@ -217,7 +243,7 @@ export default function Home() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPageLang("ar")}
+                      onClick={() => handlePageLangChange("ar")}
                       className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                         pageLang === "ar"
                           ? "bg-white text-black shadow-sm font-bold"

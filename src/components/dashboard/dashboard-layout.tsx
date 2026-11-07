@@ -134,12 +134,22 @@ export function DashboardLayout({
   }, [router]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("vitedrop_lang") as Language;
-      if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
-        setLang(saved);
-      }
-    } catch (e) {}
+    const syncLang = () => {
+      try {
+        const saved = localStorage.getItem("vitedrop_lang") as Language;
+        if (saved && (saved === "fr" || saved === "ar" || saved === "en")) {
+          setLang(saved);
+        }
+      } catch (e) {}
+    };
+
+    syncLang();
+    window.addEventListener("vitedrop_lang_changed", syncLang);
+    window.addEventListener("storage", syncLang);
+    return () => {
+      window.removeEventListener("vitedrop_lang_changed", syncLang);
+      window.removeEventListener("storage", syncLang);
+    };
   }, []);
 
   useEffect(() => {
@@ -207,6 +217,7 @@ export function DashboardLayout({
     setLang(newLang);
     try {
       localStorage.setItem("vitedrop_lang", newLang);
+      window.dispatchEvent(new Event("vitedrop_lang_changed"));
     } catch (e) {}
   };
 
