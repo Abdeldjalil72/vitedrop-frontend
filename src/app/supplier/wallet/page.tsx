@@ -82,8 +82,8 @@ export default function SupplierWalletPage() {
         });
         updateGlobalWalletBalance(bal);
       } else {
-        setWallet({ id: "mock-wallet", balance: 8500, ownerType: "SUPPLIER" });
-        updateGlobalWalletBalance(8500);
+        setWallet({ id: "", balance: 0, ownerType: "SUPPLIER" });
+        updateGlobalWalletBalance(0);
       }
 
       if (txRes.status === "fulfilled" && txRes.value) {

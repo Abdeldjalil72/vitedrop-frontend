@@ -46,21 +46,12 @@ function getProductTelemetry(product: SupplierProductItem): { deliveryRate: numb
   if (product.deliveryRate !== undefined && product.rtoRate !== undefined) {
     return { deliveryRate: product.deliveryRate, rtoRate: product.rtoRate };
   }
-  if (product.id.includes("earbuds") || product.id.includes("01")) {
-    return { deliveryRate: 81.2, rtoRate: 6.4 };
-  }
-  if (product.id.includes("watch") || product.id.includes("02")) {
-    return { deliveryRate: 74.0, rtoRate: 11.2 };
-  }
-  if (product.id.includes("speaker") || product.id.includes("03")) {
-    return { deliveryRate: 86.5, rtoRate: 4.8 };
-  }
-  return { deliveryRate: 78.4, rtoRate: 8.2 };
+  return { deliveryRate: 0, rtoRate: 0 };
 }
 
 export default function SupplierProductsPage() {
   const [products, setProducts] = useState<SupplierProductItem[]>([]);
-  const [walletBalance, setWalletBalance] = useState<number>(8000);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   // Modals

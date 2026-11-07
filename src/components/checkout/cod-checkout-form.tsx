@@ -17,6 +17,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import { WilayaSelect } from "@/components/ui/wilaya-select";
+import { ModernSelect, ModernSelectOption } from "@/components/ui/modern-select";
 import { getWilayaByCode, ALGERIA_WILAYAS } from "@/lib/algeria-locations";
 import { formatDZD, validateAlgerianPhone, formatAlgerianPhoneInput, getAlgerianCarrier } from "@/lib/formatters";
 import { apiCreateCheckoutLead } from "@/lib/api-client";
@@ -65,6 +66,7 @@ export function CodCheckoutForm({
   const [customerPhone, setCustomerPhone] = useState("");
   const [wilayaCode, setWilayaCode] = useState("16"); // Default: Alger
   const [commune, setCommune] = useState("");
+  const [customCommune, setCustomCommune] = useState("");
   const [address, setAddress] = useState("");
   const [deliveryType, setDeliveryType] = useState<"home" | "desk">("home");
   const [quantity, setQuantity] = useState(1);
@@ -78,6 +80,22 @@ export function CodCheckoutForm({
   const currentWilaya = useMemo(() => {
     return getWilayaByCode(wilayaCode) || ALGERIA_WILAYAS[15]; // Default Alger
   }, [wilayaCode]);
+
+  // Communes list for ModernSelect dropdown
+  const communeOptions = useMemo<ModernSelectOption[]>(() => {
+    if (!currentWilaya?.communes?.length) return [];
+    const list: ModernSelectOption[] = currentWilaya.communes.map((c) => ({
+      value: c,
+      label: c,
+    }));
+    list.push({
+      value: "Autre",
+      label: isAr ? "بلدية أخرى (غير مذكورة)" : "Autre commune (non listée)",
+      badge: isAr ? "يدوي" : "Manuel",
+      badgeColor: "bg-amber-100 text-amber-800 border-amber-300",
+    });
+    return list;
+  }, [currentWilaya, isAr]);
 
   // Phone validation status
   const phoneValidation = useMemo(() => {
@@ -103,10 +121,18 @@ export function CodCheckoutForm({
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
     setCommune(""); // Reset commune when wilaya changes
+    setCustomCommune("");
     if (errors.wilaya) {
       setErrors((prev) => {
         const next = { ...prev };
         delete next.wilaya;
+        return next;
+      });
+    }
+    if (errors.commune) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.commune;
         return next;
       });
     }
@@ -136,8 +162,15 @@ export function CodCheckoutForm({
       newErrors.wilaya = isAr ? "يرجى تحديد ولايتك" : "Veuillez sélectionner votre wilaya";
     }
 
-    if (!commune.trim()) {
-      newErrors.commune = isAr ? "يرجى تحديد البلدية" : "Veuillez préciser la commune";
+    const finalCommune = commune === "Autre" ? customCommune.trim() : commune.trim();
+    if (!finalCommune) {
+      newErrors.commune = isAr
+        ? commune === "Autre"
+          ? "يرجى كتابة اسم بلديتك"
+          : "يرجى تحديد البلدية"
+        : commune === "Autre"
+        ? "Veuillez préciser le nom de votre commune"
+        : "Veuillez préciser la commune";
     }
 
     if (!address.trim() || address.trim().length < 4) {
@@ -166,11 +199,13 @@ export function CodCheckoutForm({
       // Backend expects wilaya as a number 1-58
       const wilayaNumber = parseInt(wilayaCode, 10);
 
+      const finalCommune = commune === "Autre" ? customCommune.trim() : commune.trim();
+
       const res = await apiCreateCheckoutLead({
         customerName: customerName.trim(),
         customerPhone: phoneCheck.normalized,
         wilaya: wilayaNumber,
-        commune: commune.trim(),
+        commune: finalCommune,
         address: `${deliveryType === "desk" ? "[STOP-DESK] " : ""}${address.trim()}`,
         productId,
         quantity,
@@ -190,7 +225,7 @@ export function CodCheckoutForm({
           customerName: customerName.trim(),
           customerPhone: phoneCheck.normalized,
           wilayaName: isAr ? currentWilaya.nameAr : currentWilaya.name,
-          commune: commune.trim(),
+          commune: finalCommune,
           deliveryType,
           quantity,
           totalAmount: grandTotal,
@@ -389,46 +424,90 @@ export function CodCheckoutForm({
 
         {/* 3. Wilaya Selection */}
         <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-blue-600" />
+              <span>{isAr ? "الولاية (58 ولاية) *" : "Wilaya de livraison (58 Wilayas) *"}</span>
+            </label>
+            {currentWilaya && (
+              <span className="text-[11px] font-mono font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-lg border border-blue-200/60">
+                #{currentWilaya.code} - {isAr ? currentWilaya.nameAr : currentWilaya.name}
+              </span>
+            )}
+          </div>
           <WilayaSelect
             value={wilayaCode}
             onChange={handleWilayaChange}
             lang={lang}
-            label={isAr ? "الولاية (58 ولاية) *" : "Wilaya de livraison (58 Wilayas) *"}
+            colorScheme="blue"
+            triggerClassName="min-h-[48px] px-4 py-3"
             error={errors.wilaya}
             showDeliveryFees={true}
             data-testid="checkout-wilaya-select"
+            nativeSelectTestId="checkout-wilaya-native-select"
           />
         </div>
 
         {/* 4. Commune Selection */}
         <div className="space-y-1.5">
-          <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-blue-600" />
-            <span>{isAr ? "البلدية *" : "Commune *"}</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs sm:text-sm font-semibold text-neutral-800 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-blue-600" />
+              <span>{isAr ? "البلدية *" : "Commune *"}</span>
+            </label>
+            {commune && commune !== "Autre" && (
+              <span className="text-[11px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-200/60">
+                {commune}
+              </span>
+            )}
+          </div>
+
           {currentWilaya.communes && currentWilaya.communes.length > 0 ? (
-            <div className="relative">
-              <select
-                data-testid="checkout-commune-select"
+            <div className="space-y-2">
+              <ModernSelect
                 value={commune}
-                onChange={(e) => {
-                  setCommune(e.target.value);
+                onChange={(val) => {
+                  setCommune(val);
+                  if (val !== "Autre") setCustomCommune("");
                   if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
                 }}
-                className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-sm bg-white transition-all appearance-none focus:outline-none focus:ring-4 ${
-                  errors.commune
-                    ? "border-rose-400 focus:ring-rose-500/10"
-                    : "border-neutral-200 focus:border-blue-600 focus:ring-blue-600/10"
-                }`}
-              >
-                <option value="">{isAr ? "اختر بلديتك..." : "Sélectionner votre commune..."}</option>
-                {currentWilaya.communes.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-                <option value="Autre">{isAr ? "بلدية أخرى (اكتبها في العنوان)" : "Autre commune (préciser dans l'adresse)"}</option>
-              </select>
+                options={communeOptions}
+                placeholder={isAr ? "اختر بلديتك من القائمة..." : "Sélectionner votre commune..."}
+                icon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+                searchable={true}
+                searchPlaceholder={
+                  isAr ? "ابحث عن اسم البلدية..." : "Rechercher votre commune..."
+                }
+                colorScheme="blue"
+                triggerClassName="min-h-[48px] px-4 py-3 text-sm"
+                nativeSelectTestId="checkout-commune-select"
+                data-testid="checkout-commune-select-trigger"
+                error={errors.commune}
+              />
+
+              {commune === "Autre" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="pt-1"
+                >
+                  <input
+                    type="text"
+                    required
+                    data-testid="checkout-commune-custom-input"
+                    value={customCommune}
+                    onChange={(e) => {
+                      setCustomCommune(e.target.value);
+                      if (errors.commune) setErrors((prev) => ({ ...prev, commune: "" }));
+                    }}
+                    placeholder={
+                      isAr ? "اكتب اسم بلديتك هنا..." : "Précisez le nom de votre commune..."
+                    }
+                    className="w-full min-h-[48px] px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                  />
+                </motion.div>
+              )}
             </div>
           ) : (
             <input
@@ -444,7 +523,11 @@ export function CodCheckoutForm({
               className="w-full min-h-[48px] px-4 py-3 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             />
           )}
-          {errors.commune && <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">{errors.commune}</p>}
+          {errors.commune && (
+            <p data-testid="checkout-error-commune" className="text-xs text-rose-600 font-medium">
+              {errors.commune}
+            </p>
+          )}
         </div>
 
         {/* 5. Delivery Type Selector: Home vs Stop-Desk */}

@@ -381,4 +381,72 @@ test.describe("Public Customer Checkout Funnel (/p/[productId])", () => {
     const submitBtn = page.locator('[data-testid="checkout-submit-btn"]');
     await expect(submitBtn).toBeDisabled();
   });
+
+  test("verifies Wilaya and Commune dropdown menus follow ViteDrop UI/UX rules (accessible, searchable, escape key, min-h-[48px], no raw unstyled OS select)", async ({
+    page,
+  }) => {
+    await setupCustomerCheckoutRoutes(page);
+    await page.goto("/p/prod-smartwatch-01");
+
+    // 1. Wilaya dropdown UI/UX rules verification
+    const wilayaTrigger = page.locator('[data-testid="checkout-wilaya-select"]');
+    await expect(wilayaTrigger).toBeVisible();
+    await expect(wilayaTrigger).toHaveAttribute("role", "combobox");
+    await expect(wilayaTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Click to open Wilaya popover
+    await wilayaTrigger.click();
+    await expect(wilayaTrigger).toHaveAttribute("aria-expanded", "true");
+
+    const wilayaPopover = page.locator("#wilaya-listbox");
+    await expect(wilayaPopover).toBeVisible();
+
+    // Verify keyboard escape closes wilaya dropdown
+    await page.keyboard.press("Escape");
+    await expect(wilayaPopover).toHaveCount(0);
+
+    // Reopen and select Wilaya 31 (Oran)
+    await wilayaTrigger.click();
+    const oranWilaya = page.locator('[data-testid="wilaya-option-31"]');
+    await expect(oranWilaya).toBeVisible();
+    await oranWilaya.click();
+    await expect(wilayaPopover).toHaveCount(0);
+
+    // 2. Commune dropdown UI/UX rules verification
+    // Must be custom ModernSelect trigger (not a raw unstyled select)
+    const communeTrigger = page.locator('[data-testid="checkout-commune-select-trigger"]');
+    await expect(communeTrigger).toBeVisible();
+    await expect(communeTrigger).toHaveAttribute("role", "combobox");
+    await expect(communeTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Open Commune popover
+    await communeTrigger.click();
+    await expect(communeTrigger).toHaveAttribute("aria-expanded", "true");
+
+    const communeListbox = page.locator('[role="listbox"]');
+    await expect(communeListbox).toBeVisible();
+
+    // Verify search filtering works for Oran communes
+    const searchInput = page.locator('input[placeholder*="Rechercher"], input[placeholder*="ابحث"]');
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill("Arzew");
+
+    const arzewOption = page.locator('[data-testid="checkout-commune-select-trigger-option-Arzew"]');
+    await expect(arzewOption).toBeVisible();
+    await arzewOption.click();
+
+    // Verify Commune trigger now displays selected commune
+    await expect(communeTrigger).toContainText("Arzew");
+
+    // Reopen and select "Autre" to test custom manual commune input
+    await communeTrigger.click();
+    const autreOption = page.locator('[data-testid="checkout-commune-select-trigger-option-Autre"]');
+    await expect(autreOption).toBeVisible();
+    await autreOption.click();
+
+    // Custom input should smoothly expand
+    const customCommuneInput = page.locator('[data-testid="checkout-commune-custom-input"]');
+    await expect(customCommuneInput).toBeVisible();
+    await customCommuneInput.fill("Hai Khemisti");
+  });
 });

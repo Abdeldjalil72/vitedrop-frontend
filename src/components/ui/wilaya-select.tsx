@@ -16,7 +16,11 @@ export interface WilayaSelectProps {
   helperText?: string;
   showDeliveryFees?: boolean;
   className?: string;
+  triggerClassName?: string;
+  colorScheme?: "sky" | "blue";
   placeholder?: string;
+  name?: string;
+  nativeSelectTestId?: string;
   "data-testid"?: string;
 }
 
@@ -29,13 +33,18 @@ export function WilayaSelect({
   helperText,
   showDeliveryFees = false,
   className = "",
+  triggerClassName = "",
+  colorScheme = "sky",
   placeholder,
+  name,
+  nativeSelectTestId,
   "data-testid": testId = "wilaya-select-trigger",
 }: WilayaSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const nativeSelectRef = useRef<HTMLSelectElement>(null);
 
   const selectedWilaya = useMemo(
     () => ALGERIA_WILAYAS.find((w) => w.code === value),
@@ -55,6 +64,17 @@ export function WilayaSelect({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   // Focus search input when opened
   useEffect(() => {
@@ -82,39 +102,101 @@ export function WilayaSelect({
   const defaultPlaceholder =
     lang === "ar" ? "اختر الولاية (58 ولاية)..." : "Sélectionner la wilaya...";
 
+  const handleSelect = (code: string) => {
+    onChange(code);
+    setIsOpen(false);
+    if (nativeSelectRef.current) {
+      nativeSelectRef.current.value = code;
+      const event = new Event("change", { bubbles: true });
+      nativeSelectRef.current.dispatchEvent(event);
+    }
+  };
+
   return (
-    <div ref={containerRef} className={`w-full flex flex-col gap-1.5 text-start relative ${className}`}>
+    <div
+      ref={containerRef}
+      className={`w-full flex flex-col gap-1.5 text-start relative ${
+        isOpen ? "z-30" : ""
+      } ${className}`}
+    >
       {label && (
         <label className="text-xs font-semibold text-neutral-800 tracking-tight flex items-center justify-between">
           <span>{label}</span>
           {selectedWilaya && (
-            <span className="text-[11px] font-mono text-sky-600 font-medium">
+            <span
+              className={`text-[11px] font-mono font-medium ${
+                colorScheme === "blue" ? "text-blue-600" : "text-sky-600"
+              }`}
+            >
               #{selectedWilaya.code}
             </span>
           )}
         </label>
       )}
 
-      {/* Trigger Button */}
-      <button
+      {/* Hidden Native Select for Automated Testing & Accessibility */}
+      <select
+        ref={nativeSelectRef}
+        name={name}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        data-testid={nativeSelectTestId}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="sr-only"
+      >
+        {ALGERIA_WILAYAS.map((w) => (
+          <option key={w.code} value={w.code}>
+            {w.code} - {w.name} ({w.nameAr})
+          </option>
+        ))}
+      </select>
+
+      {/* Modern Animated Trigger Button */}
+      <motion.button
         type="button"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls="wilaya-listbox"
         data-testid={testId}
+        whileTap={{ scale: 0.985 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl bg-white border border-black/10 text-sm transition-all text-start cursor-pointer hover:border-black/25 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 ${
-          isOpen ? "border-sky-500 ring-4 ring-sky-500/10 shadow-xs" : ""
-        } ${error ? "border-rose-400 ring-rose-500/10" : ""}`}
+        className={`w-full min-h-[48px] flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl bg-white border text-sm transition-all text-start cursor-pointer select-none hover:border-black/25 focus:outline-none ${
+          colorScheme === "blue"
+            ? `focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 ${
+                isOpen
+                  ? "border-blue-600 ring-4 ring-blue-600/10 shadow-xs"
+                  : "border-neutral-200"
+              }`
+            : `focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 ${
+                isOpen
+                  ? "border-sky-500 ring-4 ring-sky-500/10 shadow-xs"
+                  : "border-black/10"
+              }`
+        } ${error ? "border-rose-400 ring-rose-500/10" : ""} ${triggerClassName}`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-7 h-7 rounded-xl bg-neutral-50 border border-black/[0.04] flex items-center justify-center text-neutral-500 shrink-0">
-            <MapPin className="w-3.5 h-3.5 text-sky-600" />
+            <MapPin
+              className={`w-3.5 h-3.5 ${
+                colorScheme === "blue" ? "text-blue-600" : "text-sky-600"
+              }`}
+            />
           </div>
 
           {selectedWilaya ? (
             <div className="flex items-center gap-2 truncate">
-              <span className="font-mono text-xs font-bold px-1.5 py-0.5 rounded-md bg-neutral-100 text-neutral-800 border border-neutral-200/60">
+              <span
+                className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded-md border ${
+                  colorScheme === "blue"
+                    ? "bg-blue-50 text-blue-800 border-blue-200/60"
+                    : "bg-neutral-100 text-neutral-800 border-neutral-200/60"
+                }`}
+              >
                 {selectedWilaya.code}
               </span>
-              <span className="font-medium text-neutral-900 truncate">
+              <span className="font-semibold text-neutral-900 truncate">
                 {lang === "ar" ? selectedWilaya.nameAr : selectedWilaya.name}
               </span>
               <span className="text-xs text-neutral-400 font-normal hidden sm:inline">
@@ -134,15 +216,25 @@ export function WilayaSelect({
               {formatDZD(selectedWilaya.homeDeliveryFee, lang)}
             </span>
           )}
-          <ChevronDown
-            className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
-              isOpen ? "rotate-180 text-sky-600" : ""
-            }`}
-          />
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+            className="text-neutral-400"
+          >
+            <ChevronDown
+              className={`w-4 h-4 transition-colors ${
+                isOpen
+                  ? colorScheme === "blue"
+                    ? "text-blue-600"
+                    : "text-sky-600"
+                  : ""
+              }`}
+            />
+          </motion.div>
         </div>
-      </button>
+      </motion.button>
 
-      {/* Modern Popover Dropdown */}
+      {/* Modern Popover Dropdown with Apple-style Spring Physics */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -166,7 +258,11 @@ export function WilayaSelect({
                       ? "ابحث بالاسم أو الرقم (مثلاً: 16، وهران)..."
                       : "Rechercher par nom ou code (ex: 16, Oran)..."
                   }
-                  className="w-full bg-white rounded-xl border border-black/10 py-1.5 ps-9 pe-8 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                  className={`w-full bg-white rounded-xl border border-black/10 py-1.5 ps-9 pe-8 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none ${
+                    colorScheme === "blue"
+                      ? "focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
+                      : "focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                  }`}
                 />
                 {search && (
                   <button
@@ -181,7 +277,11 @@ export function WilayaSelect({
             </div>
 
             {/* Wilayas Scrollable List */}
-            <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5 divide-y divide-black/[0.02]">
+            <div
+              id="wilaya-listbox"
+              role="listbox"
+              className="max-h-60 overflow-y-auto p-1.5 space-y-0.5 divide-y divide-black/[0.02]"
+            >
               {filteredWilayas.length > 0 ? (
                 filteredWilayas.map((w) => {
                   const isSelected = w.code === value;
@@ -189,14 +289,15 @@ export function WilayaSelect({
                     <button
                       key={w.code}
                       type="button"
+                      role="option"
+                      aria-selected={isSelected}
                       data-testid={`wilaya-option-${w.code}`}
-                      onClick={() => {
-                        onChange(w.code);
-                        setIsOpen(false);
-                      }}
+                      onClick={() => handleSelect(w.code)}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors text-start cursor-pointer group ${
                         isSelected
-                          ? "bg-sky-50/80 text-sky-900 font-semibold"
+                          ? colorScheme === "blue"
+                            ? "bg-blue-50/90 text-blue-900 font-semibold border border-blue-100"
+                            : "bg-sky-50/80 text-sky-900 font-semibold border border-sky-100"
                           : "text-neutral-700 hover:bg-[#fafafa] hover:text-neutral-950"
                       }`}
                     >
@@ -204,7 +305,9 @@ export function WilayaSelect({
                         <span
                           className={`font-mono text-[11px] px-1.5 py-0.5 rounded-md border ${
                             isSelected
-                              ? "bg-sky-600 text-white border-sky-600 font-bold"
+                              ? colorScheme === "blue"
+                                ? "bg-blue-600 text-white border-blue-600 font-bold"
+                                : "bg-sky-600 text-white border-sky-600 font-bold"
                               : "bg-neutral-100 text-neutral-600 border-neutral-200/60 group-hover:bg-neutral-200/60"
                           }`}
                         >
@@ -228,14 +331,26 @@ export function WilayaSelect({
                               {formatDZD(w.homeDeliveryFee, lang)}
                             </span>
                             <span className="text-neutral-300">|</span>
-                            <span className="text-sky-600">
+                            <span
+                              className={
+                                colorScheme === "blue"
+                                  ? "text-blue-600 font-medium"
+                                  : "text-sky-600"
+                              }
+                            >
                               {formatDZD(w.deskDeliveryFee, lang)}
                             </span>
                           </div>
                         )}
 
                         {isSelected && (
-                          <Check className="w-4 h-4 text-sky-600 shrink-0" />
+                          <Check
+                            className={`w-4 h-4 shrink-0 ${
+                              colorScheme === "blue"
+                                ? "text-blue-600"
+                                : "text-sky-600"
+                            }`}
+                          />
                         )}
                       </div>
                     </button>

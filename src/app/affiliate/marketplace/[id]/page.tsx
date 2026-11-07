@@ -7,7 +7,6 @@ import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrackingLinkModal } from "@/components/affiliate/tracking-link-modal";
-import { MOCK_PRODUCTS } from "@/lib/mock-data";
 import { formatDZD } from "@/lib/formatters";
 import { translations } from "@/lib/locales";
 import { apiGetProductDetails } from "@/lib/api-client";
@@ -21,6 +20,7 @@ import {
   Sparkles,
   Package,
   Layers,
+  RefreshCw,
 } from "lucide-react";
 
 export default function ProductDetailPage({
@@ -29,16 +29,14 @@ export default function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
-  const [product, setProduct] = useState<Product | undefined>(() =>
-    MOCK_PRODUCTS.find((p) => p.id === resolvedParams.id)
-  );
-  const [selectedImage, setSelectedImage] = useState<string>(
-    product?.image || ""
-  );
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchLiveProduct() {
+      setIsLoading(true);
       try {
         const live = await apiGetProductDetails(resolvedParams.id);
         if (live && live.id) {
@@ -49,7 +47,7 @@ export default function ProductDetailPage({
             description:
               live.description ||
               "Produit physique vérifié en entrepôt avec expédition immédiate dans les 58 Wilayas.",
-            supplierId: "supp-verified",
+            supplierId: live.supplierId || "supp-verified",
             supplierName: "Fournisseur Agréé DZ",
             retailPrice: Number(live.retailPrice) || 0,
             totalCpaBudget: 0,
@@ -64,20 +62,40 @@ export default function ProductDetailPage({
                 live.image ||
                 "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
             ],
-            stock: live.stock ?? 100,
-            category: "Électronique & Soins",
-            status: "active",
-            createdAt: new Date().toISOString(),
+            stock: live.stock ?? 0,
+            category: live.category || "Général",
+            status: live.status || "active",
+            createdAt: live.createdAt || new Date().toISOString(),
           };
           setProduct(mapped);
           setSelectedImage(mapped.image);
+        } else {
+          setProduct(undefined);
         }
-      } catch {
-        // Fallback
+      } catch (err) {
+        console.warn("Product details not found:", err);
+        setProduct(undefined);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchLiveProduct();
   }, [resolvedParams.id]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout initialRole="affiliate" initialLang="fr">
+        {({ lang }) => (
+          <div className="py-24 text-center space-y-4">
+            <RefreshCw className="w-8 h-8 text-sky-600 animate-spin mx-auto" />
+            <p className="text-sm font-medium text-neutral-600">
+              {lang === "ar" ? "جاري تحميل تفاصيل المنتج..." : "Chargement des détails du produit..."}
+            </p>
+          </div>
+        )}
+      </DashboardLayout>
+    );
+  }
 
   if (!product) {
     return (

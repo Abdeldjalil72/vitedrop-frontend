@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { getCurrentUser, apiGetMarketplaceProducts } from "@/lib/api-client";
+import { getAppBaseUrl, buildAffiliateProductUrl } from "@/lib/urls";
 import { formatDZD } from "@/lib/formatters";
 import {
   Link2,
@@ -196,15 +197,18 @@ export default function AffiliateLinksPage() {
     loadProducts();
   }, []);
 
-  const affiliateId = currentUser?.sub || "b1e484ee-951a-4386-b016-17217e5ebbf2";
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://vitedrop.dz";
+  const affiliateId = currentUser?.sub || "";
+  const baseUrl = getAppBaseUrl();
 
   const generatedLink = selectedProductId
-    ? `${baseUrl}/p/${selectedProductId}?ref=${affiliateId}&aff=${affiliateId}&utm_source=${encodeURIComponent(
-        utmSource
-      )}&utm_medium=${encodeURIComponent(utmMedium)}&utm_campaign=${encodeURIComponent(
-        utmCampaign
-      )}&sub_id=${encodeURIComponent(subId)}`
+    ? buildAffiliateProductUrl({
+        productId: selectedProductId,
+        affiliateId,
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        subId,
+      })
     : "";
 
   const handleApplyPreset = (preset: TrafficPreset) => {
@@ -527,7 +531,7 @@ export default function AffiliateLinksPage() {
                       </TableRow>
                     ) : (
                       products.map((p) => {
-                        const directLink = `${baseUrl}/p/${p.id}?aff=${affiliateId}`;
+                        const directLink = buildAffiliateProductUrl({ productId: p.id, affiliateId });
                         const isCopied = copiedProductId === p.id;
                         return (
                           <TableRow key={p.id} data-testid="affiliate-link-row">
@@ -586,7 +590,7 @@ export default function AffiliateLinksPage() {
                   </div>
                 ) : (
                   products.map((p) => {
-                    const directLink = `${baseUrl}/p/${p.id}?aff=${affiliateId}`;
+                    const directLink = buildAffiliateProductUrl({ productId: p.id, affiliateId });
                     const isCopied = copiedProductId === p.id;
                     return (
                       <div

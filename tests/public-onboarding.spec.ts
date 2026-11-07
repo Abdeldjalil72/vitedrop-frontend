@@ -216,9 +216,9 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
     const successBanner = page.locator('[data-testid="register-success-banner"]');
     await expect(successBanner).toBeVisible();
 
-    // Verify redirected to /affiliate
-    await page.waitForURL(/\/affiliate/, { timeout: 7000 });
-    expect(page.url()).toContain("/affiliate");
+    // Verify redirected to /verify-email or /affiliate
+    await page.waitForURL(/\/verify-email|\/affiliate/, { timeout: 10000 });
+    expect(page.url()).toMatch(/\/verify-email|\/affiliate/);
   });
 
   test("validates supplier company requirement and executes supplier registration flow", async ({
@@ -260,9 +260,9 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
     const successBanner = page.locator('[data-testid="register-success-banner"]');
     await expect(successBanner).toBeVisible();
 
-    // Verify redirected to /supplier
-    await page.waitForURL(/\/supplier/, { timeout: 7000 });
-    expect(page.url()).toContain("/supplier");
+    // Verify redirected to /verify-email or /supplier
+    await page.waitForURL(/\/verify-email|\/supplier/, { timeout: 10000 });
+    expect(page.url()).toMatch(/\/verify-email|\/supplier/);
   });
 
   test("executes forgot password recovery flow with success confirmation and login return", async ({

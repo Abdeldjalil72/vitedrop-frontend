@@ -26,6 +26,7 @@ import {
 import { CodCheckoutForm } from "@/components/checkout/cod-checkout-form";
 import { formatDZD } from "@/lib/formatters";
 import { apiGetPublicProduct, apiRecordClick, PublicCheckoutProduct } from "@/lib/api-client";
+import { getAppBaseUrl } from "@/lib/urls";
 
 interface PageProps {
   params: Promise<{ productId: string }>;
@@ -382,8 +383,8 @@ export default function CustomerProductLandingPage({ params }: PageProps) {
                 <a
                   href={`sms:?body=${encodeURIComponent(
                     isAr
-                      ? `طلب فيت دروب #${completedOrder.orderId} - الرابط: https://vitedrop.dz/track?id=${completedOrder.orderId}`
-                      : `Commande ViteDrop #${completedOrder.orderId} - Suivi: https://vitedrop.dz/track?id=${completedOrder.orderId}`
+                      ? `طلب فيت دروب #${completedOrder.orderId} - الرابط: ${getAppBaseUrl()}/track?id=${completedOrder.orderId}`
+                      : `Commande ViteDrop #${completedOrder.orderId} - Suivi: ${getAppBaseUrl()}/track?id=${completedOrder.orderId}`
                   )}`}
                   data-testid="sms-reminder-btn"
                   className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"

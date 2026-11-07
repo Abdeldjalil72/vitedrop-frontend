@@ -653,15 +653,24 @@ export default function AdminDepositRequestsPage() {
                     {/* Slip preview & reference */}
                     <td className="py-3.5 px-4 align-middle">
                       <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewSlipRequest(item)}
-                          className="w-9 h-9 rounded-lg border border-purple-200 bg-purple-50/50 hover:bg-purple-100/70 text-purple-700 flex items-center justify-center shrink-0 transition-colors"
-                          data-testid="preview-slip-btn"
-                          title={t.previewSlip}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
+                        {item.receiptUrl === "DIRECT_ADMIN_TOPUP" ? (
+                          <div
+                            className="w-9 h-9 rounded-lg border border-emerald-200 bg-emerald-50/70 text-emerald-700 flex items-center justify-center shrink-0"
+                            title="Rechargement direct de l'administration"
+                          >
+                            <ShieldCheck className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewSlipRequest(item)}
+                            className="w-9 h-9 rounded-lg border border-purple-200 bg-purple-50/50 hover:bg-purple-100/70 text-purple-700 flex items-center justify-center shrink-0 transition-colors"
+                            data-testid="preview-slip-btn"
+                            title={t.previewSlip}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
                         <div className="min-w-0 max-w-[140px]">
                           <span className="text-[11px] font-mono font-bold text-neutral-800 block truncate">
                             {item.referenceNote || t.noNote}
@@ -808,15 +817,22 @@ export default function AdminDepositRequestsPage() {
               {/* Slip preview & Reference */}
               <div className="flex items-center justify-between gap-2 pt-2 border-t border-black/[0.04]">
                 <div className="min-w-0 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPreviewSlipRequest(item)}
-                    className="px-2 py-1 rounded-lg border border-purple-200 bg-purple-50 text-purple-700 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
-                    data-testid="preview-slip-btn"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>{t.viewSlip}</span>
-                  </button>
+                  {item.receiptUrl === "DIRECT_ADMIN_TOPUP" ? (
+                    <div className="px-2 py-1 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-1 shrink-0">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Admin Direct</span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewSlipRequest(item)}
+                      className="px-2 py-1 rounded-lg border border-purple-200 bg-purple-50 text-purple-700 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
+                      data-testid="preview-slip-btn"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{t.viewSlip}</span>
+                    </button>
+                  )}
                   {item.referenceNote && (
                     <span className="text-[10px] font-mono text-neutral-600 truncate">
                       {item.referenceNote}
@@ -1094,7 +1110,26 @@ export default function AdminDepositRequestsPage() {
 
                     {/* Image Viewer Body */}
                     <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center bg-neutral-900/5 min-h-[300px]">
-                      {previewSlipRequest.receiptUrl.startsWith("data:") ||
+                      {previewSlipRequest.receiptUrl === "DIRECT_ADMIN_TOPUP" ? (
+                        <div className="p-8 text-center space-y-3">
+                          <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
+                            <ShieldCheck className="w-8 h-8" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-bold text-neutral-900">
+                              Rechargement Direct Administrateur
+                            </p>
+                            <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                              Cette transaction a été saisie et créditée directement par l'équipe administrative de ViteDrop.
+                            </p>
+                          </div>
+                          {previewSlipRequest.referenceNote && (
+                            <div className="inline-block px-3 py-1.5 rounded-lg bg-neutral-100 font-mono text-xs text-neutral-800 font-semibold border border-neutral-200">
+                              {previewSlipRequest.referenceNote}
+                            </div>
+                          )}
+                        </div>
+                      ) : previewSlipRequest.receiptUrl.startsWith("data:") ||
                       previewSlipRequest.receiptUrl.startsWith("http") ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img

@@ -201,83 +201,8 @@ export default function AffiliateLeadsPage() {
       const data = await apiGetAffiliateOrders();
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.warn("Failed to fetch live affiliate orders, using fallback leads:", err);
-      // Fallback mock leads for demonstration if token missing
-      setOrders([
-        {
-          id: "a9e1040f-fd56-4ac7-b701-57cf528b1e0d",
-          affiliateId: "aff-qa-uuid",
-          cpaCommission: 960,
-          status: "lead_generated",
-          customerName: "Karim Brahimi",
-          customerPhone: "0550123456",
-          address: "12 Rue Didouche Mourad",
-          productId: "prod-earbuds-01",
-          productName: "Écouteurs Sans Fil Pro ANC",
-          quantity: 1,
-          wilaya: 16,
-          commune: "Alger Centre",
-          trackingNumber: null,
-          courier: null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: "0e1a947e-3772-416a-8778-d73554dcf110",
-          affiliateId: "aff-qa-uuid",
-          cpaCommission: 1200,
-          status: "delivered",
-          customerName: "Amine Meziani",
-          customerPhone: "0661987654",
-          address: "Cité 1000 Logements, Bât A4",
-          productId: "prod-watch-02",
-          productName: "Montre Connectée Sport Pulse",
-          quantity: 1,
-          wilaya: 31,
-          commune: "Oran",
-          trackingNumber: "YAL-1791039550527",
-          courier: "YALIDINE",
-          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: "b6f0f645-d4eb-4e4c-bc2d-fd71b6154f2a",
-          affiliateId: "aff-qa-uuid",
-          cpaCommission: 960,
-          status: "in_transit",
-          customerName: "Yassine Mansouri",
-          customerPhone: "0770334455",
-          address: "Rue Colonel Lotfi",
-          productId: "prod-earbuds-01",
-          productName: "Écouteurs Sans Fil Pro ANC",
-          quantity: 1,
-          wilaya: 19,
-          commune: "Sétif",
-          trackingNumber: "ZR-849201948",
-          courier: "ZR_EXPRESS",
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: "0234bd71-5c97-470d-a30f-0c047f0fb523",
-          affiliateId: "aff-qa-uuid",
-          cpaCommission: 720,
-          status: "canceled",
-          customerName: "Samir Kaci",
-          customerPhone: "0559887766",
-          address: "Village Azazga",
-          productId: "prod-cosmetic-03",
-          productName: "Sérum Anti-Âge Bio Élixir",
-          quantity: 1,
-          wilaya: 15,
-          commune: "Tizi Ouzou",
-          trackingNumber: null,
-          courier: null,
-          cancellationReason: "Client injoignable après 3 tentatives d'appel",
-          createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        },
-      ]);
+      console.warn("Failed to fetch live affiliate orders:", err);
+      setOrders([]);
     } finally {
       setIsLoading(false);
     }

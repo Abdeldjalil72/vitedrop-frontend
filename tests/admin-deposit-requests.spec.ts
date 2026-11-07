@@ -224,6 +224,15 @@ async function setupAdminDepositSession(
     });
   });
 
+  // Mock Notifications API to prevent 401 unauthorized redirect
+  await page.route(new RegExp(`^${apiBase}/notifications/`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ count: 0, data: [], unreadCount: 0 }),
+    });
+  });
+
   // Inject Auth Token
   const token = createAdminToken();
   await page.addInitScript(

@@ -8,6 +8,7 @@ import { Product } from "@/types";
 import { Language, translations } from "@/lib/locales";
 import { formatDZD } from "@/lib/formatters";
 import { getCurrentUser } from "@/lib/api-client";
+import { buildAffiliateProductUrl } from "@/lib/urls";
 import { Copy, Check, ExternalLink, Link2, Sparkles } from "lucide-react";
 
 export interface TrackingLinkModalProps {
@@ -27,26 +28,18 @@ export function TrackingLinkModal({
   const [campaign, setCampaign] = useState("tiktok_broad_dz");
   const [subId, setSubId] = useState("hook_v1");
   const [copied, setCopied] = useState(false);
-  const [origin, setOrigin] = useState("https://vitedrop.dz");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setOrigin(window.location.origin);
-    }
-  }, []);
 
   if (!product) return null;
 
   const currentUser = getCurrentUser();
-  const affiliateId = currentUser?.sub || "b1e484ee-951a-4386-b016-17217e5ebbf2";
+  const affiliateId = currentUser?.sub || "";
 
-  const searchParams = new URLSearchParams();
-  searchParams.set("ref", affiliateId);
-  searchParams.set("aff", affiliateId);
-  if (campaign.trim()) searchParams.set("utm_campaign", campaign.trim());
-  if (subId.trim()) searchParams.set("sub_id", subId.trim());
-
-  const trackingUrl = `${origin}/p/${product.id}?${searchParams.toString()}`;
+  const trackingUrl = buildAffiliateProductUrl({
+    productId: product.id,
+    affiliateId,
+    utmCampaign: campaign,
+    subId,
+  });
 
   const handleCopy = async () => {
     try {

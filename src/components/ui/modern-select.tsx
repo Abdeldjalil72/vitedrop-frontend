@@ -29,6 +29,7 @@ export interface ModernSelectProps {
   error?: string;
   helperText?: string;
   align?: "start" | "end";
+  colorScheme?: "sky" | "blue";
   nativeSelectTestId?: string;
   "data-testid"?: string;
   name?: string;
@@ -50,6 +51,7 @@ export function ModernSelect({
   error,
   helperText,
   align = "start",
+  colorScheme = "sky",
   nativeSelectTestId,
   "data-testid": testId,
   name,
@@ -127,7 +129,7 @@ export function ModernSelect({
   return (
     <div
       ref={containerRef}
-      className={`relative flex flex-col gap-1.5 text-start ${className}`}
+      className={`relative flex flex-col gap-1.5 text-start ${isOpen ? "z-30" : ""} ${className}`}
     >
       {label && (
         <label className="text-xs font-semibold text-neutral-800 tracking-tight flex items-center justify-between">
@@ -161,16 +163,21 @@ export function ModernSelect({
       {/* Modern Animated Trigger Button */}
       <motion.button
         type="button"
+        role="combobox"
         data-testid={testId}
         disabled={disabled}
         whileTap={disabled ? undefined : { scale: 0.985 }}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white border text-xs sm:text-sm font-medium transition-all text-start cursor-pointer select-none shadow-2xs hover:border-black/25 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 ${
-          isOpen
-            ? "border-sky-500 ring-4 ring-sky-500/10 shadow-xs"
-            : "border-black/10"
+        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white border text-xs sm:text-sm font-medium transition-all text-start cursor-pointer select-none shadow-2xs hover:border-black/25 focus:outline-none ${
+          colorScheme === "blue"
+            ? `focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 ${
+                isOpen ? "border-blue-600 ring-4 ring-blue-600/10 shadow-xs" : "border-neutral-200"
+              }`
+            : `focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 ${
+                isOpen ? "border-sky-500 ring-4 ring-sky-500/10 shadow-xs" : "border-black/10"
+              }`
         } ${error ? "border-rose-400 ring-rose-500/10" : ""} ${
           disabled ? "opacity-50 cursor-not-allowed bg-neutral-50" : ""
         } ${triggerClassName}`}
@@ -217,7 +224,11 @@ export function ModernSelect({
         >
           <ChevronDown
             className={`w-4 h-4 transition-colors ${
-              isOpen ? "text-sky-600" : ""
+              isOpen
+                ? colorScheme === "blue"
+                  ? "text-blue-600"
+                  : "text-sky-600"
+                : ""
             }`}
           />
         </motion.div>
@@ -246,7 +257,11 @@ export function ModernSelect({
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={searchPlaceholder}
-                    className="w-full bg-white rounded-xl border border-black/10 py-1.5 ps-9 pe-8 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                    className={`w-full bg-white rounded-xl border border-black/10 py-1.5 ps-9 pe-8 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none ${
+                      colorScheme === "blue"
+                        ? "focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
+                        : "focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                    }`}
                   />
                   {search && (
                     <button
@@ -262,7 +277,7 @@ export function ModernSelect({
             )}
 
             {/* Scrollable Options List */}
-            <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5">
+            <div role="listbox" className="max-h-60 overflow-y-auto p-1.5 space-y-0.5">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((opt) => {
                   const isSelected = opt.value === value;
@@ -270,11 +285,15 @@ export function ModernSelect({
                     <button
                       key={opt.value}
                       type="button"
+                      role="option"
+                      aria-selected={isSelected}
                       data-testid={testId ? `${testId}-option-${opt.value}` : undefined}
                       onClick={() => handleSelect(opt.value)}
                       className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors text-start cursor-pointer group ${
                         isSelected
-                          ? "bg-sky-50/90 text-sky-950 font-semibold border border-sky-100"
+                          ? colorScheme === "blue"
+                            ? "bg-blue-50/90 text-blue-950 font-semibold border border-blue-100"
+                            : "bg-sky-50/90 text-sky-950 font-semibold border border-sky-100"
                           : "text-neutral-700 hover:bg-[#fafafa] hover:text-neutral-950"
                       }`}
                     >
@@ -289,7 +308,9 @@ export function ModernSelect({
                           <span
                             className={`font-mono text-[10px] px-1.5 py-0.5 rounded-md border shrink-0 ${
                               isSelected
-                                ? "bg-sky-600 text-white border-sky-600 font-bold"
+                                ? colorScheme === "blue"
+                                  ? "bg-blue-600 text-white border-blue-600 font-bold"
+                                  : "bg-sky-600 text-white border-sky-600 font-bold"
                                 : opt.badgeColor ||
                                   "bg-neutral-100 text-neutral-600 border-neutral-200/60 group-hover:bg-neutral-200/60"
                             }`}
@@ -309,7 +330,11 @@ export function ModernSelect({
                       </div>
 
                       {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-sky-600 shrink-0 ms-1" />
+                        <Check
+                          className={`w-3.5 h-3.5 shrink-0 ms-1 ${
+                            colorScheme === "blue" ? "text-blue-600" : "text-sky-600"
+                          }`}
+                        />
                       )}
                     </button>
                   );

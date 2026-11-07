@@ -424,3 +424,4 @@ export function NotificationPopover({ lang = "fr" }: NotificationPopoverProps) {
     </div>
   );
 }
+

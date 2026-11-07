@@ -100,39 +100,14 @@ export default function AffiliateWalletPage() {
         });
         updateGlobalWalletBalance(bal);
       } else {
-        const savedBal = (() => {
-          if (typeof window !== "undefined") {
-            try {
-              const saved = localStorage.getItem("vitedrop_wallet_balance");
-              if (saved !== null && !isNaN(Number(saved))) {
-                const s = Number(saved);
-                if (s !== 14500) return s;
-              }
-            } catch {}
-          }
-          return 1200;
-        })();
-        setWallet({ id: "mock-wallet", balance: savedBal, ownerType: "AFFILIATE" });
-        updateGlobalWalletBalance(savedBal);
+        setWallet({ id: "", balance: 0, ownerType: "AFFILIATE" });
+        updateGlobalWalletBalance(0);
       }
 
       if (txRes.status === "fulfilled" && txRes.value?.data) {
         setTransactions(txRes.value.data);
       } else {
-        setTransactions([
-          {
-            id: "tx-aff-01",
-            walletId: "wal-aff-qa",
-            userId: "aff-qa-uuid",
-            userRole: "affiliate",
-            type: "CPA_PAYOUT",
-            amount: 1200,
-            balanceAfter: 1200,
-            referenceId: "VD-89410",
-            description: "Commission CPA commande livrée (Oran)",
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-          },
-        ]);
+        setTransactions([]);
       }
 
       if (ordersRes.status === "fulfilled" && Array.isArray(ordersRes.value)) {
@@ -218,7 +193,7 @@ export default function AffiliateWalletPage() {
       setWallet((prev) =>
         prev
           ? { ...prev, balance: newBal }
-          : { id: "mock-wallet", balance: newBal, ownerType: "AFFILIATE" }
+          : { id: "", balance: newBal, ownerType: "AFFILIATE" }
       );
       updateGlobalWalletBalance(newBal);
 

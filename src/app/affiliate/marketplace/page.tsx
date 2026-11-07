@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tabs";
 import { ModernSelect } from "@/components/ui/modern-select";
 import { TrackingLinkModal } from "@/components/affiliate/tracking-link-modal";
-import { MOCK_PRODUCTS } from "@/lib/mock-data";
 import { apiGetMarketplaceProducts } from "@/lib/api-client";
 import { Product } from "@/types";
 import { formatDZD } from "@/lib/formatters";
@@ -24,54 +23,63 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Check,
+  RefreshCw,
 } from "lucide-react";
 
 export default function AffiliateMarketplacePage() {
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState<"cpa" | "price-asc" | "price-desc" | "newest">("cpa");
   const [activeModalProduct, setActiveModalProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
-    async function loadBackendProducts() {
-      try {
-        const liveProducts = await apiGetMarketplaceProducts();
-        if (Array.isArray(liveProducts) && liveProducts.length > 0) {
-          const mapped: Product[] = liveProducts.map((p) => ({
-            id: p.id,
-            title: p.name,
-            titleAr: p.name,
-            description:
-              p.description ||
-              "Produit physique vérifié en entrepôt avec expédition immédiate dans les 58 Wilayas.",
-            supplierId: "supp-verified",
-            supplierName: "Fournisseur Agréé DZ",
-            retailPrice: Number(p.retailPrice) || 0,
-            totalCpaBudget: 0,
-            affiliateNetPayout: Number(p.affiliateNetPayout) || 0,
-            platformFee: 0,
-            image:
-              p.imageUrl ||
+  const loadBackendProducts = async () => {
+    setIsLoading(true);
+    try {
+      const liveProducts = await apiGetMarketplaceProducts();
+      if (Array.isArray(liveProducts)) {
+        const mapped: Product[] = liveProducts.map((p) => ({
+          id: p.id,
+          title: p.name,
+          titleAr: p.name,
+          description:
+            p.description ||
+            "Produit physique vérifié en entrepôt avec expédition immédiate dans les 58 Wilayas.",
+          supplierId: p.supplierId || "supp-verified",
+          supplierName: "Fournisseur Agréé DZ",
+          retailPrice: Number(p.retailPrice) || 0,
+          totalCpaBudget: 0,
+          affiliateNetPayout: Number(p.affiliateNetPayout) || 0,
+          platformFee: 0,
+          image:
+            p.imageUrl ||
+            p.image ||
+            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
+          gallery: [
+            p.imageUrl ||
               p.image ||
               "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
-            gallery: [
-              p.imageUrl ||
-                p.image ||
-                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
-            ],
-            stock: p.stock ?? 100,
-            category: p.category || "Électronique & Soins",
-            status: "active",
-            createdAt: p.createdAt || new Date().toISOString(),
-          }));
+          ],
+          stock: p.stock ?? 0,
+          category: p.category || "Général",
+          status: p.status || "active",
+          createdAt: p.createdAt || new Date().toISOString(),
+        }));
 
-          setProducts(mapped);
-        }
-      } catch {
-        // Fallback to MOCK_PRODUCTS
+        setProducts(mapped);
+      } else {
+        setProducts([]);
       }
+    } catch (err) {
+      console.warn("Failed to load live marketplace products from backend:", err);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadBackendProducts();
   }, []);
 
@@ -213,112 +221,124 @@ export default function AffiliateMarketplacePage() {
               </div>
             </div>
 
+            {/* Loading Indicator */}
+            {isLoading && (
+              <div className="py-20 flex flex-col items-center justify-center gap-3">
+                <RefreshCw className="w-8 h-8 text-sky-600 animate-spin" />
+                <p className="text-xs font-medium text-neutral-500">
+                  {lang === "ar" ? "جاري تحميل المنتجات من قاعدة البيانات..." : "Chargement du catalogue en direct..."}
+                </p>
+              </div>
+            )}
+
             {/* Product Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((p) => (
-                <Card
-                  key={p.id}
-                  enableHover
-                  data-testid="marketplace-product-card"
-                  className="overflow-hidden flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Image Area */}
-                    <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 rounded-2xl">
-                      <img
-                        src={p.image}
-                        alt={p.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 start-3">
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-neutral-800 shadow-xs border border-black/[0.04]">
-                          {p.category}
-                        </span>
-                      </div>
-                      <div className="absolute top-3 end-3">
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                            p.stock > 50
-                              ? "bg-emerald-500/90 text-white"
-                              : "bg-amber-500/90 text-white"
-                          }`}
-                        >
-                          {p.stock} {t.marketplace.inStock}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Product Meta */}
-                    <div className="p-6 pb-2 space-y-2">
-                      <h3 className="font-bold text-base text-neutral-900 tracking-tight leading-snug line-clamp-2">
-                        {lang === "ar" && p.titleAr ? p.titleAr : p.title}
-                      </h3>
-                      <p className="text-xs text-[#6b6b6b] line-clamp-2 leading-relaxed">
-                        {p.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Financial Metrics & Actions Footer */}
-                  <div className="p-6 pt-4 border-t border-black/[0.06] space-y-4">
-                    <div className="flex items-center justify-between">
-                      {/* Retail Price */}
-                      <div>
-                        <span className="text-[11px] text-[#6b6b6b] block">
-                          {t.marketplace.retailPrice}
-                        </span>
-                        <span className="text-sm font-mono font-semibold text-neutral-800">
-                          {formatDZD(p.retailPrice, lang)}
-                        </span>
+            {!isLoading && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((p) => (
+                  <Card
+                    key={p.id}
+                    enableHover
+                    data-testid="marketplace-product-card"
+                    className="overflow-hidden flex flex-col justify-between group"
+                  >
+                    <div>
+                      {/* Image Area */}
+                      <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 rounded-2xl">
+                        <img
+                          src={p.image}
+                          alt={p.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 start-3">
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-neutral-800 shadow-xs border border-black/[0.04]">
+                            {p.category}
+                          </span>
+                        </div>
+                        <div className="absolute top-3 end-3">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                              p.stock > 50
+                                ? "bg-emerald-500/90 text-white"
+                                : "bg-amber-500/90 text-white"
+                            }`}
+                          >
+                            {p.stock} {t.marketplace.inStock}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Affiliate Net CPA */}
-                      <div className="text-end">
-                        <span className="text-lg font-mono font-bold text-emerald-600 tracking-tight block">
-                          +{formatDZD(p.affiliateNetPayout, lang)}
-                        </span>
+                      {/* Product Meta */}
+                      <div className="p-6 pb-2 space-y-2">
+                        <h3 className="font-bold text-base text-neutral-900 tracking-tight leading-snug line-clamp-2">
+                          {lang === "ar" && p.titleAr ? p.titleAr : p.title}
+                        </h3>
+                        <p className="text-xs text-[#6b6b6b] line-clamp-2 leading-relaxed">
+                          {p.description}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <Link href={`/affiliate/marketplace/${p.id}`} className="w-full">
+                    {/* Financial Metrics & Actions Footer */}
+                    <div className="p-6 pt-4 border-t border-black/[0.06] space-y-4">
+                      <div className="flex items-center justify-between">
+                        {/* Retail Price */}
+                        <div>
+                          <span className="text-[11px] text-[#6b6b6b] block">
+                            {t.marketplace.retailPrice}
+                          </span>
+                          <span className="text-sm font-mono font-semibold text-neutral-800">
+                            {formatDZD(p.retailPrice, lang)}
+                          </span>
+                        </div>
+
+                        {/* Affiliate Net CPA */}
+                        <div className="text-end">
+                          <span className="text-lg font-mono font-bold text-emerald-600 tracking-tight block">
+                            +{formatDZD(p.affiliateNetPayout, lang)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <Link href={`/affiliate/marketplace/${p.id}`} className="w-full">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full text-xs"
+                            data-testid="view-product-details-btn"
+                          >
+                            {t.marketplace.viewDetails}
+                          </Button>
+                        </Link>
+
                         <Button
-                          variant="secondary"
                           size="sm"
                           className="w-full text-xs"
-                          data-testid="view-product-details-btn"
+                          onClick={() => setActiveModalProduct(p)}
+                          data-testid="generate-link-btn"
                         >
-                          {t.marketplace.viewDetails}
+                          <Link2 className="w-3.5 h-3.5" />
+                          <span>{t.marketplace.generateLink}</span>
                         </Button>
-                      </Link>
-
-                      <Button
-                        size="sm"
-                        className="w-full text-xs"
-                        onClick={() => setActiveModalProduct(p)}
-                        data-testid="generate-link-btn"
-                      >
-                        <Link2 className="w-3.5 h-3.5" />
-                        <span>{t.marketplace.generateLink}</span>
-                      </Button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             {/* Empty State */}
-            {filteredProducts.length === 0 && (
+            {!isLoading && filteredProducts.length === 0 && (
               <div className="p-16 text-center bg-white rounded-3xl border border-dashed border-black/10">
                 <Package className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
                 <h4 className="text-base font-semibold text-neutral-800">
-                  {lang === "ar" ? "لا توجد منتجات مطابقة" : "Aucun produit trouvé"}
+                  {lang === "ar" ? "لا توجد منتجات متاحة حالياً" : "Aucun produit disponible"}
                 </h4>
                 <p className="text-xs text-[#6b6b6b] mt-1 max-w-sm mx-auto">
                   {lang === "ar"
-                    ? "جرب استخدام كلمات بحث أخرى أو اختر صنفاً مختلفاً."
-                    : "Essayez de modifier vos filtres de recherche ou sélectionnez une autre catégorie."}
+                    ? "لم يتم العثور على منتجات في قاعدة البيانات."
+                    : "Aucun produit actif n'a été trouvé dans la base de données pour le moment."}
                 </p>
               </div>
             )}

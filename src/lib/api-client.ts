@@ -90,7 +90,10 @@ export async function apiRequest<T = any>(
       data?.message ||
       (Array.isArray(data?.message) ? data.message.join(", ") : null) ||
       `Erreur serveur (${response.status})`;
-    throw new Error(Array.isArray(message) ? message.join(", ") : message);
+    const err: any = new Error(Array.isArray(message) ? message.join(", ") : message);
+    err.status = response.status;
+    err.data = data;
+    throw err;
   }
 
   return data as T;
@@ -115,13 +118,40 @@ export async function apiLogin(credentials: {
   throw new Error("Jeton d'authentification invalide.");
 }
 
-export async function apiRegisterAffiliate(data: {
+export interface RegisterAffiliateInput {
   email: string;
   password: string;
   fullName: string;
   phone?: string;
-}): Promise<{ access_token: string; user: DecodedToken | null }> {
-  const res = await apiRequest<{ access_token: string }>(
+  trafficSource?: string;
+  experienceLevel?: string;
+  wilaya?: number;
+  telegramHandle?: string;
+}
+
+export interface RegisterSupplierInput {
+  email: string;
+  password: string;
+  fullName: string;
+  phone?: string;
+  company?: string;
+  warehouseWilaya?: number;
+  warehouseCommune?: string;
+  businessType?: string;
+  callCenterPreference?: string;
+  monthlyVolume?: string;
+}
+
+export interface RegisterResult {
+  requiresVerification: boolean;
+  email: string;
+  message: string;
+  access_token?: string;
+  user?: DecodedToken | null;
+}
+
+export async function apiRegisterAffiliate(data: RegisterAffiliateInput): Promise<RegisterResult> {
+  const res = await apiRequest<RegisterResult>(
     "/auth/register/affiliate",
     {
       method: "POST",
@@ -132,19 +162,14 @@ export async function apiRegisterAffiliate(data: {
   if (res?.access_token) {
     setAuthToken(res.access_token);
     const user = parseJwt(res.access_token);
-    return { access_token: res.access_token, user };
+    return { ...res, user };
   }
 
-  throw new Error("Échec de la création de compte affilié.");
+  return res;
 }
 
-export async function apiRegisterSupplier(data: {
-  email: string;
-  password: string;
-  fullName: string;
-  phone?: string;
-}): Promise<{ access_token: string; user: DecodedToken | null }> {
-  const res = await apiRequest<{ access_token: string }>(
+export async function apiRegisterSupplier(data: RegisterSupplierInput): Promise<RegisterResult> {
+  const res = await apiRequest<RegisterResult>(
     "/auth/register/supplier",
     {
       method: "POST",
@@ -155,10 +180,40 @@ export async function apiRegisterSupplier(data: {
   if (res?.access_token) {
     setAuthToken(res.access_token);
     const user = parseJwt(res.access_token);
-    return { access_token: res.access_token, user };
+    return { ...res, user };
   }
 
-  throw new Error("Échec de la création de compte fournisseur.");
+  return res;
+}
+
+export async function apiVerifyEmail(data: {
+  email: string;
+  code: string;
+}): Promise<{ success: boolean; access_token: string; user: DecodedToken | null; message: string }> {
+  const res = await apiRequest<{ success: boolean; access_token: string; user?: any; message: string }>(
+    "/auth/verify-email",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (res?.access_token) {
+    setAuthToken(res.access_token);
+    const user = parseJwt(res.access_token);
+    return { success: true, access_token: res.access_token, user, message: res.message };
+  }
+
+  throw new Error("Échec de la validation du code.");
+}
+
+export async function apiResendVerification(
+  email: string
+): Promise<{ success: boolean; message: string; isAlreadyVerified?: boolean }> {
+  return await apiRequest("/auth/resend-verification", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
 }
 
 export async function apiForgotPassword(

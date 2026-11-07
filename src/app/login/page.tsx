@@ -46,8 +46,13 @@ export default function LoginPage() {
           router.push("/affiliate");
         }
       }, 700);
-    } catch (err) {
+    } catch (err: any) {
       setIsLoading(false);
+      if (err?.data?.error === "EMAIL_NOT_VERIFIED" || err?.status === 403) {
+        // Redirect to email verification page with pre-filled email
+        router.push(`/verify-email?email=${encodeURIComponent(email)}&unverified=true`);
+        return;
+      }
       setError(
         err instanceof Error
           ? err.message
