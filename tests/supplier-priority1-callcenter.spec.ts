@@ -111,6 +111,15 @@ async function setupSupplierSession(page: Page, lang: "fr" | "en" | "ar" = "fr",
       return;
     }
 
+    if (url.includes("/call-attempt") && method === "POST") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, attempt: 1, reason: "Injoignable" }),
+      });
+      return;
+    }
+
     await route.continue();
   });
 
@@ -149,6 +158,23 @@ async function setupSupplierSession(page: Page, lang: "fr" | "en" | "ar" = "fr",
         limit: 100,
         offset: 0,
       }),
+    });
+  });
+
+  // Intercept deposit requests and notifications
+  await page.route(new RegExp(`^${apiBase}/wallets?/deposit-requests/me`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.route(new RegExp(`^${apiBase}/notifications`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
     });
   });
 

@@ -246,6 +246,7 @@ export default function SupplierWalletPage() {
       {({ lang }) => {
         const t = translations[lang];
         const isAr = lang === "ar";
+        const isEn = lang === "en";
         const wLoc = t.supplier.wallet;
 
         return (
@@ -571,15 +572,15 @@ export default function SupplierWalletPage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-neutral-900">
-                        {isAr ? "وصولات وطلبات الشحن الأخيرة" : "Bordereaux de Versement Récent"}
+                        {isAr ? "وصولات وطلبات الشحن الأخيرة" : isEn ? "Recent Deposit Slips" : "Bordereaux de Versement Récent"}
                       </h3>
                       <p className="text-[11px] text-neutral-500">
-                        {isAr ? "متابعة حالة مراجعة الإيداعات البنكية والبريدية" : "Suivi de validation des dépôts BaridiMob / CCP"}
+                        {isAr ? "متابعة حالة مراجعة الإيداعات البنكية والبريدية" : isEn ? "BaridiMob & CCP deposit review tracking" : "Suivi de validation des dépôts BaridiMob / CCP"}
                       </p>
                     </div>
                   </div>
                   <span className="text-xs font-mono font-bold text-neutral-500">
-                    {depositRequests.length} {isAr ? "طلبات" : "dépôt(s)"}
+                    {depositRequests.length} {isAr ? "طلبات" : isEn ? "slip(s)" : "dépôt(s)"}
                   </span>
                 </div>
 
@@ -605,10 +606,10 @@ export default function SupplierWalletPage() {
                           }`}
                         >
                           {req.status === "APPROVED"
-                            ? isAr ? "تم التأكيد والإيداع" : "Validé & Crédité"
+                            ? isAr ? "تم التأكيد والإيداع" : isEn ? "Approved & Credited" : "Validé & Crédité"
                             : req.status === "REJECTED"
-                            ? isAr ? "مرفوض" : "Rejeté"
-                            : isAr ? "قيد المراجعة" : "En cours de validation"}
+                            ? isAr ? "مرفوض" : isEn ? "Rejected" : "Rejeté"
+                            : isAr ? "قيد المراجعة" : isEn ? "Under Review" : "En cours de validation"}
                         </span>
                       </div>
 
@@ -772,7 +773,7 @@ export default function SupplierWalletPage() {
                   <div className="p-8 text-center text-neutral-500 space-y-2">
                     <Wallet className="w-8 h-8 text-neutral-400 mx-auto" />
                     <p className="text-xs font-semibold text-neutral-800">
-                      {isAr ? "لا توجد معاملات مطابقة" : "Aucun mouvement financier correspondant"}
+                      {isAr ? "لا توجد معاملات مطابقة" : isEn ? "No matching financial transactions" : "Aucun mouvement financier correspondant"}
                     </p>
                   </div>
                 ) : (

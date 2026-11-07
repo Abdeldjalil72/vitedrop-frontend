@@ -304,8 +304,8 @@ export default function AffiliateSettingsPage() {
                       {method === "BARIDIMOB"
                         ? dict.ripBaridimob
                         : method === "CCP"
-                        ? dict.ccpNumKey
-                        : dict.bankRib}
+                          ? dict.ccpNumKey
+                          : dict.bankRib}
                     </label>
                     <input
                       type="text"

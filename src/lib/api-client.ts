@@ -342,7 +342,7 @@ export function updateGlobalWalletBalance(balance: number): void {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem("vitedrop_wallet_balance", String(balance));
-    } catch {}
+    } catch { }
     window.dispatchEvent(new CustomEvent("vitedrop_balance_updated", { detail: balance }));
   }
 }
@@ -576,6 +576,7 @@ export async function apiRecordCallAttempt(
     {
       method: "POST",
       body: JSON.stringify({ attempt, reason: reason || "Injoignable / Pas de réponse" }),
+      silentAuthFail: true,
     }
   );
 }
@@ -1336,7 +1337,7 @@ export async function apiSubmitDepositRequest(data: {
 }
 
 export async function apiGetMyDepositRequests(): Promise<DepositRequest[]> {
-  return apiRequest("/wallets/deposit-requests/me");
+  return apiRequest("/wallets/deposit-requests/me", { silentAuthFail: true });
 }
 
 export async function apiGetAdminDepositRequests(query: {
@@ -1402,7 +1403,7 @@ const DEFAULT_SUPPLIER_SETTINGS: SupplierSettings = {
 
 export async function apiGetSupplierSettings(): Promise<SupplierSettings> {
   try {
-    return await apiRequest<SupplierSettings>("/supplier/settings");
+    return await apiRequest<SupplierSettings>("/supplier/settings", { silentAuthFail: true });
   } catch {
     if (typeof window !== "undefined") {
       const cached = localStorage.getItem("vitedrop_supplier_settings");

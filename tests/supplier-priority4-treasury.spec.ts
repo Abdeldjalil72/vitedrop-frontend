@@ -188,6 +188,23 @@ async function setupPriority4Session(
     });
   });
 
+  // Intercept deposit requests and notifications
+  await page.route(new RegExp(`^${apiBase}/wallets?/deposit-requests/me`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.route(new RegExp(`^${apiBase}/notifications`), async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
   await page.addInitScript(
     ({ token, selectedLang }) => {
       localStorage.setItem("vitedrop_token", token);

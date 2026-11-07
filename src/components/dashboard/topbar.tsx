@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, Wallet as WalletIcon, LogOut, Shield } from "lucide-react";
 import { UserRole } from "@/types";
@@ -30,6 +30,28 @@ export function Topbar({
 }: TopbarProps) {
   const router = useRouter();
   const t = translations[lang];
+
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handleLogout = () => {
     removeAuthToken();
@@ -97,24 +119,61 @@ export function Topbar({
         </div>
 
         {/* Language Switcher */}
-        <div className="relative group">
+        <div ref={langRef} className="relative">
           <button
             type="button"
-            className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl hover:bg-[#f4f4f4] transition-colors text-[11px] sm:text-xs font-semibold text-black"
+            onClick={() => setIsLangOpen((prev) => !prev)}
+            aria-expanded={isLangOpen}
+            aria-haspopup="listbox"
+            data-testid="language-switcher-btn"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl hover:bg-[#f4f4f4] transition-colors text-[11px] sm:text-xs font-semibold text-black cursor-pointer"
           >
             <svg className="w-3.5 h-3.5 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
             </svg>
             <span>{lang.toUpperCase()}</span>
-            <svg className="w-3 h-3 text-neutral-400 group-hover:text-black transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className={`w-3 h-3 text-neutral-400 transition-transform shrink-0 ${isLangOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div className="absolute end-0 top-full mt-1 w-28 bg-white rounded-xl shadow-xl border border-black/[0.06] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
-            <button onClick={() => onLangChange("en")} className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 ${lang === "en" ? "text-sky-600" : "text-black"}`}>English</button>
-            <button onClick={() => onLangChange("fr")} className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 ${lang === "fr" ? "text-sky-600" : "text-black"}`}>Français</button>
-            <button onClick={() => onLangChange("ar")} className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 ${lang === "ar" ? "text-sky-600" : "text-black"}`}>العربية</button>
-          </div>
+          {isLangOpen && (
+            <div
+              role="listbox"
+              data-testid="language-dropdown-menu"
+              className="absolute end-0 top-full mt-1 w-28 bg-white rounded-xl shadow-xl border border-black/[0.06] py-1 z-50 animate-in fade-in zoom-in-95 duration-150"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  onLangChange("en");
+                  setIsLangOpen(false);
+                }}
+                className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 cursor-pointer ${lang === "en" ? "text-sky-600 font-bold" : "text-black"}`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onLangChange("fr");
+                  setIsLangOpen(false);
+                }}
+                className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 cursor-pointer ${lang === "fr" ? "text-sky-600 font-bold" : "text-black"}`}
+              >
+                Français
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onLangChange("ar");
+                  setIsLangOpen(false);
+                }}
+                className={`w-full text-start px-3.5 py-1.5 text-xs font-medium hover:bg-neutral-50 cursor-pointer ${lang === "ar" ? "text-sky-600 font-bold" : "text-black"}`}
+              >
+                العربية
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Notifications Popover */}

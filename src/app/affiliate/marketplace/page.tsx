@@ -58,8 +58,8 @@ export default function AffiliateMarketplacePage() {
             "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
           gallery: [
             p.imageUrl ||
-              p.image ||
-              "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
+            p.image ||
+            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
           ],
           stock: p.stock ?? 0,
           category: p.category || "Général",
@@ -256,11 +256,10 @@ export default function AffiliateMarketplacePage() {
                         </div>
                         <div className="absolute top-3 end-3">
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                              p.stock > 50
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${p.stock > 50
                                 ? "bg-emerald-500/90 text-white"
                                 : "bg-amber-500/90 text-white"
-                            }`}
+                              }`}
                           >
                             {p.stock} {t.marketplace.inStock}
                           </span>

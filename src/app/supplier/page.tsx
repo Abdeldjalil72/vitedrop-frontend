@@ -396,6 +396,7 @@ function SupplierDashboardView({
       {({ lang }) => {
         const t = translations[lang];
         const isAr = lang === "ar";
+        const isEn = lang === "en";
         const s = t.supplier.dashboard;
 
         const currentBalance = walletBalance !== null ? walletBalance : 8000;
@@ -487,7 +488,7 @@ function SupplierDashboardView({
                       data-testid="insufficient-escrow-topup-btn"
                     >
                       <Wallet className="w-3 h-3" />
-                      <span>{isAr ? "شحن الرصيد الآن" : "Recharger mon Solde"}</span>
+                      <span>{isAr ? "شحن الرصيد الآن" : isEn ? "Top Up Escrow Now" : "Recharger mon Solde"}</span>
                     </Button>
                   )}
                   <button
@@ -502,143 +503,147 @@ function SupplierDashboardView({
             )}
 
             {/* Prepaid Escrow & Ledger Health Banner */}
-            <div
-              className={`p-4 sm:p-5 rounded-2xl border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 transition-colors min-w-0 w-full ${
-                isLowBalance
-                  ? "bg-amber-50/80 border-amber-200 text-amber-950"
-                  : "bg-purple-50/70 border-purple-200/80 text-purple-950"
-              }`}
-            >
-              <div className="flex items-start gap-3.5 min-w-0">
-                <div
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
-                    isLowBalance ? "bg-amber-100 text-amber-700" : "bg-purple-100 text-purple-700"
-                  }`}
-                >
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm sm:text-base">
-                      {s.escrowBannerTitle}
-                    </h3>
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                        isLowBalance
-                          ? "bg-amber-200/80 text-amber-900"
-                          : "bg-emerald-100 text-emerald-800"
-                      }`}
-                    >
-                      {isLowBalance
-                        ? s.statusLowBalance
-                        : s.statusOperational}
-                    </span>
+            {!isCallCenterOnly && (
+              <div
+                className={`p-4 sm:p-5 rounded-2xl border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 transition-colors min-w-0 w-full ${
+                  isLowBalance
+                    ? "bg-amber-50/80 border-amber-200 text-amber-950"
+                    : "bg-purple-50/70 border-purple-200/80 text-purple-950"
+                }`}
+              >
+                <div className="flex items-start gap-3.5 min-w-0">
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                      isLowBalance ? "bg-amber-100 text-amber-700" : "bg-purple-100 text-purple-700"
+                    }`}
+                  >
+                    <ShieldCheck className="w-5 h-5" />
                   </div>
-                  <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
-                    {s.escrowBannerDesc}
-                  </p>
-                  {/* Dynamic Solvency Runway Telemetry */}
-                  <div className="pt-1.5 flex items-center gap-2 text-xs">
-                    <span className="inline-flex items-center gap-1.5 font-semibold text-neutral-800 bg-white/70 px-2.5 py-0.5 rounded-lg border border-neutral-200/60 shadow-2xs">
-                      <span className={`w-2 h-2 rounded-full ${isLowBalance ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
-                      <span>{s.solvencyRunwayText.replace("{count}", String(runwayDeliveries))}</span>
-                    </span>
-                    <span className="text-[11px] font-mono text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-md font-semibold">
-                      ~{avgCpa} DZD / CPA
-                    </span>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-sm sm:text-base">
+                        {s.escrowBannerTitle}
+                      </h3>
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          isLowBalance
+                            ? "bg-amber-200/80 text-amber-900"
+                            : "bg-emerald-100 text-emerald-800"
+                        }`}
+                      >
+                        {isLowBalance
+                          ? s.statusLowBalance
+                          : s.statusOperational}
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-600 max-w-2xl leading-relaxed">
+                      {s.escrowBannerDesc}
+                    </p>
+                    {/* Dynamic Solvency Runway Telemetry */}
+                    <div className="pt-1.5 flex items-center gap-2 text-xs">
+                      <span className="inline-flex items-center gap-1.5 font-semibold text-neutral-800 bg-white/70 px-2.5 py-0.5 rounded-lg border border-neutral-200/60 shadow-2xs">
+                        <span className={`w-2 h-2 rounded-full ${isLowBalance ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
+                        <span>{s.solvencyRunwayText.replace("{count}", String(runwayDeliveries))}</span>
+                      </span>
+                      <span className="text-[11px] font-mono text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-md font-semibold">
+                        ~{avgCpa} DZD / CPA
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4 bg-white/80 backdrop-blur-xs p-3 px-4 rounded-xl border border-black/5 shrink-0 self-stretch md:self-auto justify-between md:justify-start">
-                <div>
-                  <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wide block">
-                    {s.availableBalance}
-                  </span>
-                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
-                    {formatDZD(currentBalance, lang)}
-                  </span>
+                <div className="flex items-center gap-4 bg-white/80 backdrop-blur-xs p-3 px-4 rounded-xl border border-black/5 shrink-0 self-stretch md:self-auto justify-between md:justify-start">
+                  <div>
+                    <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wide block">
+                      {s.availableBalance}
+                    </span>
+                    <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
+                      {formatDZD(currentBalance, lang)}
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setIsTopUpModalOpen(true)}
+                    className="text-xs"
+                  >
+                    {s.details}
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setIsTopUpModalOpen(true)}
-                  className="text-xs"
-                >
-                  {s.details}
-                </Button>
               </div>
-            </div>
+            )}
 
             {/* Workflow Navigation Tabs */}
-            <div className="flex items-center gap-2 border-b border-neutral-200/80 pb-2 overflow-x-auto no-scrollbar w-full max-w-full min-w-0">
-              <button
-                type="button"
-                onClick={() => setActiveTab("queue")}
-                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
-                  activeTab === "queue"
-                    ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
-                    : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
-                }`}
-                data-testid="tab-queue"
-              >
-                <Headphones className="w-4 h-4 text-sky-400" />
-                <span>{s.tabQueue}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
-                    activeTab === "queue" ? "bg-white/20 text-white" : "bg-sky-100 text-sky-800"
+            {!isCallCenterOnly && (
+              <div className="flex items-center gap-2 border-b border-neutral-200/80 pb-2 overflow-x-auto no-scrollbar w-full max-w-full min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("queue")}
+                  className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
+                    activeTab === "queue"
+                      ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
+                      : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
                   }`}
+                  data-testid="tab-queue"
                 >
-                  {leads.length}
-                </span>
-              </button>
+                  <Headphones className="w-4 h-4 text-sky-400" />
+                  <span>{s.tabQueue}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                      activeTab === "queue" ? "bg-white/20 text-white" : "bg-sky-100 text-sky-800"
+                    }`}
+                  >
+                    {leads.length}
+                  </span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("confirmed")}
-                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
-                  activeTab === "confirmed"
-                    ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
-                    : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
-                }`}
-                data-testid="tab-confirmed"
-              >
-                <Truck className="w-4 h-4 text-purple-400" />
-                <span>{s.tabConfirmed}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("confirmed")}
+                  className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
                     activeTab === "confirmed"
-                      ? "bg-white/20 text-white"
-                      : "bg-purple-100 text-purple-800"
+                      ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
+                      : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
                   }`}
+                  data-testid="tab-confirmed"
                 >
-                  {confirmedOrders.length}
-                </span>
-              </button>
+                  <Truck className="w-4 h-4 text-purple-400" />
+                  <span>{s.tabConfirmed}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                      activeTab === "confirmed"
+                        ? "bg-white/20 text-white"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
+                    {confirmedOrders.length}
+                  </span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("all")}
-                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
-                  activeTab === "all"
-                    ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
-                    : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
-                }`}
-                data-testid="tab-all"
-              >
-                <Package className="w-4 h-4 text-emerald-400" />
-                <span>{s.tabAll}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("all")}
+                  className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
                     activeTab === "all"
-                      ? "bg-white/20 text-white"
-                      : "bg-neutral-100 text-neutral-700"
+                      ? "bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white shadow-md shadow-sky-500/20"
+                      : "bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/60"
                   }`}
+                  data-testid="tab-all"
                 >
-                  {allOrders.length}
-                </span>
-              </button>
-            </div>
+                  <Package className="w-4 h-4 text-emerald-400" />
+                  <span>{s.tabAll}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                      activeTab === "all"
+                        ? "bg-white/20 text-white"
+                        : "bg-neutral-100 text-neutral-700"
+                    }`}
+                  >
+                    {allOrders.length}
+                  </span>
+                </button>
+              </div>
+            )}
 
             {/* TAB 1: CALL CENTER QUEUE */}
             {activeTab === "queue" && (
@@ -1301,7 +1306,7 @@ function SupplierDashboardView({
                 {/* Priority 2: Floating Sticky Batch Drawer */}
                 {selectedLeadIds.length > 0 && (
                   <div
-                    className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 max-w-2xl w-[94vw] animate-in slide-in-from-bottom-5 duration-200"
+                    className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 max-w-2xl w-[94vw] animate-in slide-in-from-bottom-5 duration-200"
                     data-testid="supplier-batch-drawer"
                   >
                     <div className="flex items-center gap-3">

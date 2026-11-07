@@ -423,14 +423,14 @@ export function SupplierProductModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 [overscroll-behavior:contain]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="supplier-product-modal-title"
       data-testid="supplier-product-modal"
     >
       <div
-        className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[92vh] text-start animate-in zoom-in-95 duration-200"
+        className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[92vh] [overscroll-behavior:contain] text-start animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -908,23 +908,23 @@ export function SupplierProductModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-neutral-50/70 border-t border-neutral-100 flex items-center justify-between gap-2.5 shrink-0">
+        <div className="p-4 bg-neutral-50/70 border-t border-neutral-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
           <Link
             href="/supplier/products/new"
             onClick={onClose}
-            className="text-xs text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1 cursor-pointer"
+            className="text-xs text-sky-600 hover:text-sky-700 font-semibold flex items-center justify-center sm:justify-start gap-1 cursor-pointer"
             data-testid="modal-to-full-studio-link"
           >
             <span>{isAr ? "فتح الاستوديو الكامل" : lang === "en" ? "Open Full Studio" : "Ouvrir l'éditeur complet"} &rarr;</span>
           </Link>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-end gap-2.5">
             <Button
               type="button"
               variant="secondary"
               size="sm"
               onClick={onClose}
               disabled={isSubmitting}
-              className="text-xs"
+              className="text-xs flex-1 sm:flex-none justify-center"
             >
               {t.cancel}
             </Button>
@@ -933,7 +933,7 @@ export function SupplierProductModal({
               form="supplier-product-form"
               size="sm"
               disabled={isSubmitting || !isFormComplete}
-              className="gap-1.5 rounded-full bg-[#064e3b] text-amber-200 text-xs font-semibold hover:bg-[#085a44] transition-all shadow-xs active:scale-95 border border-[#0a5e47] focus-visible:ring-2 focus-visible:ring-amber-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#064e3b]"
+              className="gap-1.5 rounded-full bg-[#064e3b] text-amber-200 text-xs font-semibold hover:bg-[#085a44] transition-all shadow-xs active:scale-95 border border-[#0a5e47] focus-visible:ring-2 focus-visible:ring-amber-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#064e3b] flex-1 sm:flex-none justify-center"
               data-testid="product-submit-btn"
             >
               <PackagePlus className="w-3.5 h-3.5 text-amber-300" />

@@ -326,7 +326,7 @@ export function SupplierTopUpModal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs [overscroll-behavior:contain]"
             aria-hidden="true"
           />
 
@@ -337,7 +337,7 @@ export function SupplierTopUpModal({
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ type: "spring", stiffness: 420, damping: 32 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-neutral-200/90 overflow-hidden text-start flex flex-col max-h-[90vh] my-auto"
+            className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-neutral-200/90 overflow-hidden text-start flex flex-col max-h-[90vh] [overscroll-behavior:contain] my-auto"
           >
             {/* Pinned Header */}
             <div className="shrink-0 p-4 sm:p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/70">

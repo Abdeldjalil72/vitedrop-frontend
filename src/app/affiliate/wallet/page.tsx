@@ -269,8 +269,8 @@ export default function AffiliateWalletPage() {
                   {isAr
                     ? "سحب فوري لأرباحك عبر BaridiMob أو CCP أو الحساب البنكي بدون عمولات إضافية"
                     : isEn
-                    ? "Instantly withdraw your delivered CPA commissions via BaridiMob, CCP, or bank transfer"
-                    : "Encaissez vos gains CPA livrés via BaridiMob, CCP ou virement bancaire sans frais cachés"}
+                      ? "Instantly withdraw your delivered CPA commissions via BaridiMob, CCP, or bank transfer"
+                      : "Encaissez vos gains CPA livrés via BaridiMob, CCP ou virement bancaire sans frais cachés"}
                 </p>
               </div>
 
@@ -386,8 +386,8 @@ export default function AffiliateWalletPage() {
                     {isAr
                       ? "دفع فوري عبر BaridiMob خلال ساعتين • CCP خلال 24 ساعة • تحويل بنكي"
                       : isEn
-                      ? "Fast payouts within 2h via BaridiMob, 24h via CCP or bank transfer"
-                      : "Paiements rapides sous 2h par BaridiMob, sous 24h par CCP ou virement bancaire"}
+                        ? "Fast payouts within 2h via BaridiMob, 24h via CCP or bank transfer"
+                        : "Paiements rapides sous 2h par BaridiMob, sous 24h par CCP ou virement bancaire"}
                   </p>
                 </div>
               </div>
@@ -476,13 +476,12 @@ export default function AffiliateWalletPage() {
 
                             <TableCell>
                               <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                  isRefund
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${isRefund
                                     ? "bg-amber-50 text-amber-800 border border-amber-200"
                                     : isPayout
-                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                    : "bg-purple-50 text-purple-700 border border-purple-200"
-                                }`}
+                                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                      : "bg-purple-50 text-purple-700 border border-purple-200"
+                                  }`}
                               >
                                 {isRefund ? (
                                   <>
@@ -516,9 +515,8 @@ export default function AffiliateWalletPage() {
 
                             <TableCell className="text-end">
                               <span
-                                className={`font-mono text-xs font-bold tracking-tight ${
-                                  isCredit ? "text-emerald-600" : "text-rose-600"
-                                }`}
+                                className={`font-mono text-xs font-bold tracking-tight ${isCredit ? "text-emerald-600" : "text-rose-600"
+                                  }`}
                               >
                                 {isCredit ? "+" : ""}
                                 {formatDZD(Number(tx.amount), lang)}
@@ -581,19 +579,18 @@ export default function AffiliateWalletPage() {
                           </div>
 
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                              isRefund
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${isRefund
                                 ? "bg-amber-50 text-amber-800 border border-amber-200"
                                 : isPayout
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                : "bg-purple-50 text-purple-700 border border-purple-200"
-                            }`}
+                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  : "bg-purple-50 text-purple-700 border border-purple-200"
+                              }`}
                           >
                             {isRefund
                               ? (isAr ? "استرجاع" : isEn ? "Refund" : "Remboursement")
                               : isPayout
-                              ? (isAr ? "عمولة CPA" : isEn ? "CPA Payout" : "Gain CPA")
-                              : (isAr ? "سحب" : isEn ? "Withdrawal" : "Retrait")}
+                                ? (isAr ? "عمولة CPA" : isEn ? "CPA Payout" : "Gain CPA")
+                                : (isAr ? "سحب" : isEn ? "Withdrawal" : "Retrait")}
                           </span>
                         </div>
 
@@ -602,9 +599,8 @@ export default function AffiliateWalletPage() {
                             {isAr ? "المبلغ:" : isEn ? "Amount:" : "Montant:"}
                           </span>
                           <span
-                            className={`font-mono font-bold text-xs tracking-tight ${
-                              isCredit ? "text-emerald-600" : "text-rose-600"
-                            }`}
+                            className={`font-mono font-bold text-xs tracking-tight ${isCredit ? "text-emerald-600" : "text-rose-600"
+                              }`}
                           >
                             {isCredit ? "+" : ""}
                             {formatDZD(Number(tx.amount), lang)}
@@ -672,8 +668,8 @@ export default function AffiliateWalletPage() {
                         {isAr
                           ? "سيتم خصم المبلغ من رصيدك وتحويله فور تأكيد وإرسال الدفعة من طرف الإدارة."
                           : isEn
-                          ? "The amount will be deducted from your balance once confirmed and paid by admin."
-                          : "Le montant sera déduit de votre solde dès confirmation et paiement par l'administration."}
+                            ? "The amount will be deducted from your balance once confirmed and paid by admin."
+                            : "Le montant sera déduit de votre solde dès confirmation et paiement par l'administration."}
                       </p>
                     </div>
                   ) : (
@@ -712,11 +708,10 @@ export default function AffiliateWalletPage() {
                               type="button"
                               onClick={() => setWithdrawMethod(m.id as "BARIDIMOB" | "CCP" | "BANK" | "USDT")}
                               data-testid={`withdraw-method-${m.id.toLowerCase()}`}
-                              className={`p-2.5 rounded-xl border text-center font-medium transition-all cursor-pointer ${
-                                withdrawMethod === m.id
+                              className={`p-2.5 rounded-xl border text-center font-medium transition-all cursor-pointer ${withdrawMethod === m.id
                                   ? "border-emerald-600 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-600/20"
                                   : "border-neutral-200 hover:bg-neutral-50 text-neutral-700"
-                              }`}
+                                }`}
                             >
                               {m.label}
                             </button>
@@ -754,8 +749,8 @@ export default function AffiliateWalletPage() {
                           {isAr
                             ? "الحد الأدنى: 2 000 د.ج"
                             : isEn
-                            ? "Minimum: 2 000 DZD (Priority from 20 000 DZD)"
-                            : "Minimum: 2 000 DZD (Priorité dès 20 000 DZD)"}
+                              ? "Minimum: 2 000 DZD (Priority from 20 000 DZD)"
+                              : "Minimum: 2 000 DZD (Priorité dès 20 000 DZD)"}
                         </span>
                       </div>
 
@@ -765,10 +760,10 @@ export default function AffiliateWalletPage() {
                           {withdrawMethod === "BARIDIMOB"
                             ? (isAr ? "رقم RIP الخاص بـ BaridiMob (20 رقم) *" : isEn ? "BaridiMob RIP Number (20 digits) *" : "Numéro RIP BaridiMob (20 chiffres) *")
                             : withdrawMethod === "CCP"
-                            ? (isAr ? "رقم حساب CCP مع المفتاح *" : isEn ? "CCP Account Number + Key *" : "Numéro de Compte CCP + Clé *")
-                            : withdrawMethod === "BANK"
-                            ? (isAr ? "رقم الحساب البنكي RIB (20 رقم) *" : isEn ? "Bank RIB (20 digits) *" : "RIB Bancaire (20 chiffres) *")
-                            : (isAr ? "عنوان محفظة USDT (TRC-20) *" : isEn ? "USDT Wallet Address (TRC-20) *" : "Adresse Wallet USDT (TRC-20) *")}
+                              ? (isAr ? "رقم حساب CCP مع المفتاح *" : isEn ? "CCP Account Number + Key *" : "Numéro de Compte CCP + Clé *")
+                              : withdrawMethod === "BANK"
+                                ? (isAr ? "رقم الحساب البنكي RIB (20 رقم) *" : isEn ? "Bank RIB (20 digits) *" : "RIB Bancaire (20 chiffres) *")
+                                : (isAr ? "عنوان محفظة USDT (TRC-20) *" : isEn ? "USDT Wallet Address (TRC-20) *" : "Adresse Wallet USDT (TRC-20) *")}
                         </label>
                         <input
                           type="text"
@@ -781,10 +776,10 @@ export default function AffiliateWalletPage() {
                             withdrawMethod === "BARIDIMOB"
                               ? "0079999900XXXXXXXXXX"
                               : withdrawMethod === "CCP"
-                              ? "12345678 Clé 90"
-                              : withdrawMethod === "BANK"
-                              ? "RIB 20 chiffres"
-                              : "T..."
+                                ? "12345678 Clé 90"
+                                : withdrawMethod === "BANK"
+                                  ? "RIB 20 chiffres"
+                                  : "T..."
                           }
                           className="w-full p-2.5 rounded-xl border border-neutral-200 font-mono text-xs focus:outline-hidden focus:border-emerald-600"
                         />

@@ -26,6 +26,7 @@ import {
   RefreshCw,
   Layers,
   Filter,
+  Edit3,
 } from "lucide-react";
 
 export interface SupplierProductItem {
@@ -394,7 +395,7 @@ export default function SupplierProductsPage() {
                           </span>
                           <div className="flex items-center gap-1.5 font-mono text-[11px]">
                             <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/50" data-testid="mobile-product-delivery-rate">
-                              {telemetry.deliveryRate}% {isAr ? "تسليم" : "Livré"}
+                              {telemetry.deliveryRate}% {isAr ? "تسليم" : lang === "en" ? "Delivered" : "Livré"}
                             </span>
                             <span className="font-semibold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/50" data-testid="mobile-product-rto-rate">
                               {telemetry.rtoRate}% RTO
@@ -408,6 +409,23 @@ export default function SupplierProductsPage() {
                           <span className="font-bold text-emerald-700">
                             {formatDZD(affiliatePayout, lang)}
                           </span>
+                        </div>
+
+                        {/* Mobile Actions: Edit Product */}
+                        <div className="pt-2 border-t border-neutral-100 flex items-center justify-end">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                              setEditingProduct(p);
+                              setIsProductModalOpen(true);
+                            }}
+                            className="w-full text-xs font-semibold py-1.5 gap-1.5 justify-center border-neutral-200 hover:bg-neutral-50 text-neutral-800"
+                            data-testid={`mobile-edit-product-${p.id}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-neutral-500" />
+                            <span>{isAr ? "تعديل المنتج" : lang === "en" ? "Edit Product" : "Modifier le Produit"}</span>
+                          </Button>
                         </div>
                       </div>
                     );
@@ -522,7 +540,7 @@ export default function SupplierProductsPage() {
                                   className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60 shrink-0"
                                   data-testid="product-delivery-rate"
                                 >
-                                  {telemetry.deliveryRate}% {isAr ? "تسليم" : "Livré"}
+                                  {telemetry.deliveryRate}% {isAr ? "تسليم" : lang === "en" ? "Delivered" : "Livré"}
                                 </span>
                                 <span
                                   className="font-semibold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded-lg border border-rose-200/60 shrink-0"
@@ -550,18 +568,18 @@ export default function SupplierProductsPage() {
                                 >
                                   {isOutOfStock ? pLoc.stockLow : pLoc.statusActive}
                                 </span>
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() => {
-                                    setEditingProduct(p);
-                                    setIsProductModalOpen(true);
-                                  }}
-                                  className="h-7 px-2 text-xs font-medium text-neutral-600 hover:text-neutral-900 border-neutral-200 hover:bg-neutral-50"
-                                  data-testid={`edit-product-${p.id}`}
-                                >
-                                  {isAr ? "تعديل" : "Modifier"}
-                                </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() => {
+                                      setEditingProduct(p);
+                                      setIsProductModalOpen(true);
+                                    }}
+                                    className="h-7 px-2 text-xs font-medium text-neutral-600 hover:text-neutral-900 border-neutral-200 hover:bg-neutral-50"
+                                    data-testid={`edit-product-${p.id}`}
+                                  >
+                                    {isAr ? "تعديل" : lang === "en" ? "Edit" : "Modifier"}
+                                  </Button>
                               </div>
                             </TableCell>
                           </TableRow>

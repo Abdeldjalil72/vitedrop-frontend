@@ -256,6 +256,7 @@ export default function SupplierOrdersPage() {
       {({ lang }) => {
         const t = translations[lang];
         const isAr = lang === "ar";
+        const isEn = lang === "en";
         const o = t.supplier.orders;
 
         return (
@@ -631,7 +632,7 @@ export default function SupplierOrdersPage() {
                                   className="text-[11px] px-2 py-1 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300"
                                 >
                                   <Printer className="w-3 h-3" />
-                                  <span>{isAr ? "البوليصة" : "Bordereau"}</span>
+                                  <span>{isAr ? "البوليصة" : isEn ? "Waybill" : "Bordereau"}</span>
                                 </Button>
                                 <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                                   {o.deliveredSettled}
@@ -645,7 +646,7 @@ export default function SupplierOrdersPage() {
                                     className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1"
                                   >
                                     <CheckCircle2 className="w-3 h-3" />
-                                    <span>{isAr ? "تمت إعادة للمخزون" : "Stock Réintégré"}</span>
+                                    <span>{isAr ? "تمت إعادة للمخزون" : isEn ? "Stock Restocked" : "Stock Réintégré"}</span>
                                   </span>
                                 ) : order.restockStatus === "DAMAGED" ? (
                                   <span
@@ -653,7 +654,7 @@ export default function SupplierOrdersPage() {
                                     className="text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1"
                                   >
                                     <AlertCircle className="w-3 h-3" />
-                                    <span>{isAr ? "منتج تالف (خسارة)" : "Défectueux / Perte"}</span>
+                                    <span>{isAr ? "منتج تالف (خسارة)" : isEn ? "Damaged / Loss" : "Défectueux / Perte"}</span>
                                   </span>
                                 ) : (
                                   <>
@@ -663,14 +664,14 @@ export default function SupplierOrdersPage() {
                                       disabled={actionLoadingId === order.id}
                                       onClick={() => handleRestockRto(order.id, "INTACT")}
                                       className="text-[11px] px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 shadow-xs cursor-pointer"
-                                      title={isAr ? "إعادة المنتج الصالح إلى المخزون (+1)" : "Réintégrer au stock disponible (+1)"}
+                                      title={isAr ? "إعادة المنتج الصالح إلى المخزون (+1)" : isEn ? "Restock item to available inventory (+1)" : "Réintégrer au stock disponible (+1)"}
                                     >
                                       {actionLoadingId === order.id ? (
                                         <RefreshCw className="w-3 h-3 animate-spin" />
                                       ) : (
                                         <Package className="w-3 h-3" />
                                       )}
-                                      <span>{isAr ? "إعادة للمخزون" : "Réintégrer Stock"}</span>
+                                      <span>{isAr ? "إعادة للمخزون" : isEn ? "Restock" : "Réintégrer Stock"}</span>
                                     </Button>
                                     <Button
                                       size="sm"
@@ -679,10 +680,10 @@ export default function SupplierOrdersPage() {
                                       disabled={actionLoadingId === order.id}
                                       onClick={() => handleRestockRto(order.id, "DAMAGED")}
                                       className="text-[11px] px-2 py-1 text-rose-700 hover:bg-rose-50 border-rose-200 gap-1 cursor-pointer"
-                                      title={isAr ? "شطب المنتج كقطعة تالفة" : "Classer comme produit défectueux"}
+                                      title={isAr ? "شطب المنتج كقطعة تالفة" : isEn ? "Mark item as damaged" : "Classer comme produit défectueux"}
                                     >
                                       <AlertCircle className="w-3 h-3 text-rose-600" />
-                                      <span>{isAr ? "تالف" : "Défectueux"}</span>
+                                      <span>{isAr ? "تالف" : isEn ? "Damaged" : "Défectueux"}</span>
                                     </Button>
                                   </>
                                 )}
@@ -857,7 +858,7 @@ export default function SupplierOrdersPage() {
                                 className="flex-1 text-xs py-1.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300 justify-center"
                               >
                                 <Printer className="w-3.5 h-3.5" />
-                                <span>{isAr ? "البوليصة" : "Bordereau"}</span>
+                                <span>{isAr ? "البوليصة" : isEn ? "Waybill" : "Bordereau"}</span>
                               </Button>
                             </div>
                             <div className="flex items-center gap-1.5 w-full">
@@ -887,13 +888,15 @@ export default function SupplierOrdersPage() {
                                     "Retour",
                                     isAr
                                       ? "تمت محاكاة إرجاع الطرد (Retour RTO) بنجاح."
+                                      : isEn
+                                      ? "RTO return simulated successfully."
                                       : "Simulation de retour (RTO) enregistrée avec succès."
                                   )
                                 }
                                 className="flex-1 text-xs py-1.5 bg-rose-600 hover:bg-rose-700 text-white gap-1 justify-center"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" />
-                                <span>{isAr ? "إرجاع" : "Retour"}</span>
+                                <span>{isAr ? "إرجاع" : isEn ? "Return" : "Retour"}</span>
                               </Button>
                             </div>
                           </div>
@@ -907,7 +910,7 @@ export default function SupplierOrdersPage() {
                               className="text-xs py-1 px-2.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300"
                             >
                               <Printer className="w-3.5 h-3.5" />
-                              <span>{isAr ? "البوليصة" : "Bordereau"}</span>
+                              <span>{isAr ? "البوليصة" : isEn ? "Waybill" : "Bordereau"}</span>
                             </Button>
                             <span className="flex-1 text-center text-[11px] font-semibold text-emerald-600 bg-emerald-50 py-1 rounded-xl border border-emerald-200">
                               {o.deliveredSettled}
@@ -918,12 +921,12 @@ export default function SupplierOrdersPage() {
                             {order.restockStatus === "RESTOCKED" ? (
                               <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl text-center flex items-center justify-center gap-1">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                <span>{isAr ? "تمت إعادة للمخزون" : "Stock Réintégré"}</span>
+                                <span>{isAr ? "تمت إعادة للمخزون" : isEn ? "Stock Restocked" : "Stock Réintégré"}</span>
                               </span>
                             ) : order.restockStatus === "DAMAGED" ? (
                               <span className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-xl text-center flex items-center justify-center gap-1">
                                 <AlertCircle className="w-3.5 h-3.5" />
-                                <span>{isAr ? "منتج تالف (خسارة)" : "Défectueux / Perte"}</span>
+                                <span>{isAr ? "منتج تالف (خسارة)" : isEn ? "Damaged / Loss" : "Défectueux / Perte"}</span>
                               </span>
                             ) : (
                               <div className="flex items-center gap-1.5 w-full">
@@ -939,7 +942,7 @@ export default function SupplierOrdersPage() {
                                   ) : (
                                     <Package className="w-3 h-3" />
                                   )}
-                                  <span>{isAr ? "إعادة للمخزون" : "Réintégrer Stock"}</span>
+                                  <span>{isAr ? "إعادة للمخزون" : isEn ? "Restock" : "Réintégrer Stock"}</span>
                                 </Button>
                                 <Button
                                   size="sm"
@@ -950,7 +953,7 @@ export default function SupplierOrdersPage() {
                                   className="text-xs py-1.5 text-rose-700 border-rose-200 hover:bg-rose-50 gap-1 px-3 cursor-pointer"
                                 >
                                   <AlertCircle className="w-3 h-3 text-rose-600" />
-                                  <span>{isAr ? "تالف" : "Défectueux"}</span>
+                                  <span>{isAr ? "تالف" : isEn ? "Damaged" : "Défectueux"}</span>
                                 </Button>
                               </div>
                             )}
@@ -972,11 +975,11 @@ export default function SupplierOrdersPage() {
               <Modal
                 isOpen={!!customDispatchOrder}
                 onClose={() => setCustomDispatchOrder(null)}
-                title={isAr ? "شحن الطرد مع رقم تتبع مخصص" : "Expédier avec numéro de suivi"}
+                title={isAr ? "شحن الطرد مع رقم تتبع مخصص" : isEn ? "Dispatch with Tracking Number" : "Expédier avec numéro de suivi"}
                 description={
                   isAr
                     ? `الطلب #${customDispatchOrder.id.slice(0, 8)} - ${customDispatchOrder.customerName}`
-                    : `Commande #${customDispatchOrder.id.slice(0, 8)} - ${customDispatchOrder.customerName}`
+                    : `Order #${customDispatchOrder.id.slice(0, 8)} - ${customDispatchOrder.customerName}`
                 }
               >
                 <form
@@ -992,7 +995,7 @@ export default function SupplierOrdersPage() {
                 >
                   <div className="space-y-1.5 text-start">
                     <label className="text-xs font-semibold text-neutral-700 block">
-                      {isAr ? "شركة التوصيل" : "Transporteur"}
+                      {isAr ? "شركة التوصيل" : isEn ? "Carrier / Courier" : "Transporteur"}
                     </label>
                     <select
                       value={customCourierInput}
@@ -1006,13 +1009,15 @@ export default function SupplierOrdersPage() {
 
                   <div className="space-y-1.5 text-start">
                     <label className="text-xs font-semibold text-neutral-700 block">
-                      {isAr ? "رقم التتبع (Tracking Number)" : "Numéro de suivi (Tracking Number)"}
+                      {isAr ? "رقم التتبع (Tracking Number)" : isEn ? "Tracking Number" : "Numéro de suivi (Tracking Number)"}
                     </label>
                     <input
                       type="text"
                       placeholder={
                         isAr
                           ? "مثال: yal-12345678 (فارغ للتوليد التلقائي)"
+                          : isEn
+                          ? "E.g. yal-12345678 (leave empty for auto)"
                           : "Ex: yal-12345678 (laisser vide pour auto)"
                       }
                       value={customTrackingInput}
@@ -1023,6 +1028,8 @@ export default function SupplierOrdersPage() {
                     <p className="text-[11px] text-neutral-500">
                       {isAr
                         ? "إذا تركته فارغاً، سيتم توليد رقم تتبع تلقائي تجريبي من قبل النظام."
+                        : isEn
+                        ? "If left blank, an official tracking number will be generated automatically."
                         : "Si laissé vide, un numéro de suivi officiel sera généré automatiquement."}
                     </p>
                   </div>
@@ -1047,7 +1054,7 @@ export default function SupplierOrdersPage() {
                       ) : (
                         <Send className="w-3.5 h-3.5" />
                       )}
-                      <span>{isAr ? "تأكيد الشحن وتوليد البوليصة" : "Confirmer et expédier"}</span>
+                      <span>{isAr ? "تأكيد الشحن وتوليد البوليصة" : isEn ? "Confirm & Dispatch" : "Confirmer et expédier"}</span>
                     </Button>
                   </div>
                 </form>

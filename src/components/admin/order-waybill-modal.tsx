@@ -106,18 +106,18 @@ export function OrderWaybillModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-xs overflow-y-auto [overscroll-behavior:contain]">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="waybill-modal-title"
         data-testid="order-waybill-modal"
-        className="bg-white rounded-3xl border border-black/10 shadow-2xl max-w-2xl w-full max-h-[min(94vh,calc(100dvh-2rem))] overflow-y-auto p-5 sm:p-7 text-start relative animate-in fade-in zoom-in-95 duration-150"
+        className="bg-white rounded-3xl border border-black/10 shadow-2xl max-w-2xl w-full max-h-[min(94vh,calc(100dvh-2rem))] overflow-y-auto p-5 sm:p-7 text-start relative animate-in fade-in zoom-in-95 duration-150 [overscroll-behavior:contain]"
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between gap-3 pb-4 border-b border-neutral-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-neutral-100">
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
+            <span className="p-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 shrink-0">
               <Truck className="w-5 h-5" />
             </span>
             <div>
@@ -135,7 +135,7 @@ export function OrderWaybillModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 self-end sm:self-auto">
             {order.courierLabelUrl && (
               <a
                 href={order.courierLabelUrl}
