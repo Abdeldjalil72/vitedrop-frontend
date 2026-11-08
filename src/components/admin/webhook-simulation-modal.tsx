@@ -111,7 +111,7 @@ export function WebhookSimulationModal({
     setError(null);
 
     try {
-      await apiSimulateCourierWebhook(trackingNumber.trim(), status);
+      await apiSimulateCourierWebhook(trackingNumber.trim(), status, provider);
       onSuccess(trackingNumber.trim(), status);
       onClose();
     } catch (err: any) {

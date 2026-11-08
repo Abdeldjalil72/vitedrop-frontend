@@ -182,15 +182,15 @@ function VerifyEmailContent() {
                 {isAr
                   ? "تأكيد البريد الإلكتروني"
                   : isEn
-                  ? "Verify your email"
-                  : "Vérifiez votre e-mail"}
+                    ? "Verify your email"
+                    : "Vérifiez votre e-mail"}
               </h2>
               <p className="text-xs text-[#6b6b6b] mt-1.5 max-w-sm mx-auto">
                 {isAr
                   ? `أدخل رمز التحقق المكون من 6 أرقام المرسل إلى`
                   : isEn
-                  ? `Enter the 6-digit verification code sent to`
-                  : `Saisissez le code de confirmation à 6 chiffres envoyé à`}
+                    ? `Enter the 6-digit verification code sent to`
+                    : `Saisissez le code de confirmation à 6 chiffres envoyé à`}
                 <br />
                 <span dir="ltr" className="font-semibold text-neutral-800 break-all">
                   {email || (isAr ? "بريدك الإلكتروني" : isEn ? "your email address" : "votre adresse email")}
@@ -205,8 +205,8 @@ function VerifyEmailContent() {
                   {isAr
                     ? "يرجى تأكيد بريدك الإلكتروني أولاً لتفعيل حسابك ومتابعة الدخول."
                     : isEn
-                    ? "Please confirm your email address first to activate your account."
-                    : "Votre compte n'est pas encore activé. Veuillez saisir le code reçu par e-mail."}
+                      ? "Please confirm your email address first to activate your account."
+                      : "Votre compte n'est pas encore activé. Veuillez saisir le code reçu par e-mail."}
                 </span>
               </div>
             )}
@@ -226,15 +226,15 @@ function VerifyEmailContent() {
                     ? isAr
                       ? "تم تأكيد البريد الإلكتروني بنجاح! جارٍ التوجيه..."
                       : isEn
-                      ? "Email address verified! Redirecting..."
-                      : success
+                        ? "Email address verified! Redirecting..."
+                        : success
                     : success.includes("nouveau code")
-                    ? isAr
-                      ? "تم إرسال رمز تحقق جديد مكون من 6 أرقام إلى بريدك الإلكتروني."
-                      : isEn
-                      ? "A new 6-digit verification code has been sent to your email."
-                      : success
-                    : success}
+                      ? isAr
+                        ? "تم إرسال رمز تحقق جديد مكون من 6 أرقام إلى بريدك الإلكتروني."
+                        : isEn
+                          ? "A new 6-digit verification code has been sent to your email."
+                          : success
+                      : success}
                 </span>
               </div>
             )}
@@ -260,8 +260,8 @@ function VerifyEmailContent() {
                       isAr
                         ? `الرقم ${idx + 1} من 6`
                         : isEn
-                        ? `Digit ${idx + 1} of 6`
-                        : `Chiffre ${idx + 1} sur 6`
+                          ? `Digit ${idx + 1} of 6`
+                          : `Chiffre ${idx + 1} sur 6`
                     }
                     type="text"
                     inputMode="numeric"
@@ -310,8 +310,8 @@ function VerifyEmailContent() {
                     {isAr
                       ? `يمكنك طلب رمز جديد بعد (${cooldown} ثانية)`
                       : isEn
-                      ? `Resend available in (${cooldown}s)`
-                      : `Renvoyer un code disponible dans (${cooldown}s)`}
+                        ? `Resend available in (${cooldown}s)`
+                        : `Renvoyer un code disponible dans (${cooldown}s)`}
                   </span>
                 )}
               </div>
@@ -327,8 +327,8 @@ function VerifyEmailContent() {
                   {isAr
                     ? "هل أخطأت في البريد أو تريد تعديل بياناتك؟ اضغط هنا"
                     : isEn
-                    ? "Wrong email or need to modify details? Click here"
-                    : "Mauvaise adresse ou informations à modifier ? Cliquez ici"}
+                      ? "Wrong email or need to modify details? Click here"
+                      : "Mauvaise adresse ou informations à modifier ? Cliquez ici"}
                 </Link>
               </div>
 

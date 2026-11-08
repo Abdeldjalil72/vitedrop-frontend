@@ -603,9 +603,16 @@ export async function apiRestockRtoOrder(
 
 export async function apiSimulateCourierWebhook(
   trackingNumber: string,
-  status: "Livre" | "Retour"
+  status: "Livre" | "Retour",
+  provider?: "yalidine" | "zr_express" | string
 ): Promise<any> {
-  return apiRequest("/webhooks/courier/yalidine", {
+  const isZr =
+    provider?.toLowerCase().includes("zr") ||
+    trackingNumber.trim().toUpperCase().startsWith("ZR");
+  const endpoint = isZr
+    ? "/webhooks/courier/zr-express"
+    : "/webhooks/courier/yalidine";
+  return apiRequest(endpoint, {
     method: "POST",
     body: JSON.stringify({
       trackingNumber,

@@ -362,8 +362,8 @@ function RegisterContent() {
                 {isAr
                   ? "انضم إلى شبكة الأفلييت والتجارة الإلكترونية الأولى في الجزائر"
                   : isEn
-                  ? "Join Algeria's #1 COD CPA Affiliate & Dropshipping Network"
-                  : "Rejoignez le réseau d'affiliation CPA & Dropshipping COD n°1 en Algérie"}
+                    ? "Join Algeria's #1 COD CPA Affiliate & Dropshipping Network"
+                    : "Rejoignez le réseau d'affiliation CPA & Dropshipping COD n°1 en Algérie"}
               </p>
             </div>
 
@@ -395,8 +395,8 @@ function RegisterContent() {
                   {isAr
                     ? "تم إنشاء الحساب! جارٍ التوجيه إلى صفحة تأكيد البريد الإلكتروني..."
                     : isEn
-                    ? "Account created! Redirecting to email verification..."
-                    : "Compte créé ! Redirection vers la vérification par e-mail..."}
+                      ? "Account created! Redirecting to email verification..."
+                      : "Compte créé ! Redirection vers la vérification par e-mail..."}
                 </span>
               </div>
             )}
@@ -466,13 +466,13 @@ function RegisterContent() {
                           ? isAr
                             ? "إخفاء كلمة المرور"
                             : isEn
-                            ? "Hide password"
-                            : "Masquer le mot de passe"
+                              ? "Hide password"
+                              : "Masquer le mot de passe"
                           : isAr
-                          ? "إظهار كلمة المرور"
-                          : isEn
-                          ? "Show password"
-                          : "Afficher le mot de passe"
+                            ? "إظهار كلمة المرور"
+                            : isEn
+                              ? "Show password"
+                              : "Afficher le mot de passe"
                       }
                       className="p-1 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 transition-colors"
                     >
@@ -492,8 +492,8 @@ function RegisterContent() {
                       {isAr
                         ? "معلومات المسوق (Affilié)"
                         : isEn
-                        ? "Affiliate Profile & Channels"
-                        : "Profil Affilié & Canaux"}
+                          ? "Affiliate Profile & Channels"
+                          : "Profil Affilié & Canaux"}
                     </span>
                   </div>
 
@@ -502,8 +502,8 @@ function RegisterContent() {
                       isAr
                         ? "مصدر الزيارات الرئيسي (Traffic Source)"
                         : isEn
-                        ? "Primary Traffic Source"
-                        : "Source de trafic principale"
+                          ? "Primary Traffic Source"
+                          : "Source de trafic principale"
                     }
                     value={trafficSource}
                     onChange={(val) => setTrafficSource(val)}
@@ -518,8 +518,8 @@ function RegisterContent() {
                       isAr
                         ? "الخبرة في التجارة الإلكترونية والدفع عند الاستلام"
                         : isEn
-                        ? "E-commerce / COD Experience"
-                        : "Expérience en E-commerce / COD"
+                          ? "E-commerce / COD Experience"
+                          : "Expérience en E-commerce / COD"
                     }
                     value={experienceLevel}
                     onChange={(val) => setExperienceLevel(val)}
@@ -534,8 +534,8 @@ function RegisterContent() {
                       isAr
                         ? "ولاية الإقامة"
                         : isEn
-                        ? "Wilaya of Residence"
-                        : "Wilaya de résidence"
+                          ? "Wilaya of Residence"
+                          : "Wilaya de résidence"
                     }
                     value={affiliateWilaya}
                     onChange={(code) => setAffiliateWilaya(code)}
@@ -547,8 +547,8 @@ function RegisterContent() {
                       isAr
                         ? "حساب تيليغرام أو واتساب (اختياري)"
                         : isEn
-                        ? "Telegram or WhatsApp Handle (optional)"
-                        : "Pseudo Telegram ou WhatsApp (optionnel)"
+                          ? "Telegram or WhatsApp Handle (optional)"
+                          : "Pseudo Telegram ou WhatsApp (optionnel)"
                     }
                     type="text"
                     dir="ltr"
@@ -559,8 +559,8 @@ function RegisterContent() {
                       isAr
                         ? "للتواصل المباشر مع مدير حسابك"
                         : isEn
-                        ? "Allows your dedicated Account Manager to reach you quickly"
-                        : "Permet à votre Account Manager de vous contacter rapidement"
+                          ? "Allows your dedicated Account Manager to reach you quickly"
+                          : "Permet à votre Account Manager de vous contacter rapidement"
                     }
                     startIcon={<Send className="w-4 h-4 text-neutral-400" />}
                   />
@@ -576,8 +576,8 @@ function RegisterContent() {
                       {isAr
                         ? "معلومات المورد والمستودع"
                         : isEn
-                        ? "Supplier & Warehouse Profile"
-                        : "Profil Fournisseur & Entrepôt"}
+                          ? "Supplier & Warehouse Profile"
+                          : "Profil Fournisseur & Entrepôt"}
                     </span>
                   </div>
 
@@ -600,8 +600,8 @@ function RegisterContent() {
                         isAr
                           ? "ولاية المستودع الرئيسي"
                           : isEn
-                          ? "Primary Warehouse Wilaya"
-                          : "Wilaya de l'entrepôt"
+                            ? "Primary Warehouse Wilaya"
+                            : "Wilaya de l'entrepôt"
                       }
                       value={warehouseWilaya}
                       onChange={(code) => setWarehouseWilaya(code)}
@@ -614,8 +614,8 @@ function RegisterContent() {
                         isAr
                           ? "بلدية المستودع (اختياري)"
                           : isEn
-                          ? "Warehouse Commune (optional)"
-                          : "Commune de l'entrepôt (optionnel)"
+                            ? "Warehouse Commune (optional)"
+                            : "Commune de l'entrepôt (optionnel)"
                       }
                       type="text"
                       placeholder="Ex: Boufarik, Oued Smar..."
@@ -630,8 +630,8 @@ function RegisterContent() {
                       isAr
                         ? "نوع النشاط التجاري"
                         : isEn
-                        ? "Business Activity Type"
-                        : "Type d'activité commerciale"
+                          ? "Business Activity Type"
+                          : "Type d'activité commerciale"
                     }
                     value={businessType}
                     onChange={(val) => setBusinessType(val)}
@@ -646,8 +646,8 @@ function RegisterContent() {
                       isAr
                         ? "تأكيد الطلبيات (Call Center)"
                         : isEn
-                        ? "Order Confirmation Management (Call Center)"
-                        : "Gestion de la confirmation des commandes"
+                          ? "Order Confirmation Management (Call Center)"
+                          : "Gestion de la confirmation des commandes"
                     }
                     value={callCenterPreference}
                     onChange={(val) => setCallCenterPreference(val)}
@@ -662,8 +662,8 @@ function RegisterContent() {
                       isAr
                         ? "الحجم الشهري المتوقع للطلبات"
                         : isEn
-                        ? "Estimated Monthly Order Volume"
-                        : "Volume de commandes estimé / mois"
+                          ? "Estimated Monthly Order Volume"
+                          : "Volume de commandes estimé / mois"
                     }
                     value={monthlyVolume}
                     onChange={(val) => setMonthlyVolume(val)}
@@ -686,8 +686,8 @@ function RegisterContent() {
                   {isAr
                     ? "إنشاء حساب ومتابعة التأكيد"
                     : isEn
-                    ? "Create my account & receive code"
-                    : "Créer mon compte et recevoir le code"}
+                      ? "Create my account & receive code"
+                      : "Créer mon compte et recevoir le code"}
                 </Button>
               </div>
             </form>

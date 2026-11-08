@@ -193,12 +193,13 @@ export default function SupplierOrdersPage() {
   const handleSimulateWebhook = async (
     trackingNumber: string,
     status: "Livre" | "Retour",
-    customMsg?: string
+    customMsg?: string,
+    courier?: string
   ) => {
     setActionLoadingId(trackingNumber);
     setErrorMessage(null);
     try {
-      await apiSimulateCourierWebhook(trackingNumber, status);
+      await apiSimulateCourierWebhook(trackingNumber, status, courier);
       setActionMessage(customMsg || `Webhook de livraison simulé avec succès (${status}).`);
       setTimeout(() => setActionMessage(null), 3500);
       await fetchOrders();
@@ -582,7 +583,8 @@ export default function SupplierOrdersPage() {
                                     handleSimulateWebhook(
                                       order.trackingNumber!,
                                       "Livre",
-                                      o.msgWebhookDelivered.replace("{status}", "Livre")
+                                      o.msgWebhookDelivered.replace("{status}", "Livre"),
+                                      order.courier || undefined
                                     )
                                   }
                                   className="text-[11px] px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
@@ -600,7 +602,8 @@ export default function SupplierOrdersPage() {
                                       "Retour",
                                       isAr
                                         ? "تمت محاكاة إرجاع الطرد (Retour RTO) بنجاح."
-                                        : "Simulation de retour (RTO) enregistrée avec succès."
+                                        : "Simulation de retour (RTO) enregistrée avec succès.",
+                                      order.courier || undefined
                                     )
                                   }
                                   className="text-[11px] px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white gap-1"
@@ -870,7 +873,8 @@ export default function SupplierOrdersPage() {
                                   handleSimulateWebhook(
                                     order.trackingNumber!,
                                     "Livre",
-                                    o.msgWebhookDelivered.replace("{status}", "Livre")
+                                    o.msgWebhookDelivered.replace("{status}", "Livre"),
+                                    order.courier || undefined
                                   )
                                 }
                                 className="flex-1 text-xs py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 justify-center"
@@ -890,7 +894,8 @@ export default function SupplierOrdersPage() {
                                       ? "تمت محاكاة إرجاع الطرد (Retour RTO) بنجاح."
                                       : isEn
                                       ? "RTO return simulated successfully."
-                                      : "Simulation de retour (RTO) enregistrée avec succès."
+                                      : "Simulation de retour (RTO) enregistrée avec succès.",
+                                    order.courier || undefined
                                   )
                                 }
                                 className="flex-1 text-xs py-1.5 bg-rose-600 hover:bg-rose-700 text-white gap-1 justify-center"
