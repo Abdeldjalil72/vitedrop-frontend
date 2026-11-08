@@ -204,7 +204,7 @@ export default function AdminAuditLogPage() {
                             <span className="text-neutral-500 text-[11px]">
                               {isArabic ? "المسؤول:" : isEnglish ? "Operator:" : "Opérateur:"}
                             </span>
-                            <span className="font-medium text-neutral-900 font-sans truncate max-w-[180px]">
+                            <span className="font-medium text-neutral-900 font-sans truncate max-w-[180px]" dir="ltr">
                               {log.adminEmail || log.adminId.slice(0, 8)}
                             </span>
                           </div>
@@ -213,7 +213,7 @@ export default function AdminAuditLogPage() {
                             <span className="text-neutral-500 text-[11px]">
                               {isArabic ? "الكيان:" : isEnglish ? "Target:" : "Cible:"}
                             </span>
-                            <span className="font-mono text-neutral-700 text-[11px] truncate max-w-[180px]">
+                            <span className="font-mono text-neutral-700 text-[11px] truncate max-w-[180px]" dir="ltr">
                               {log.entityType} ({log.entityId.slice(0, 8)}...)
                             </span>
                           </div>

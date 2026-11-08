@@ -223,6 +223,7 @@ export default function AdminSettingsPage() {
                           max={50}
                           required
                           value={settings.platformFeePercent}
+                          onWheel={(e) => (e.target as HTMLElement).blur()}
                           onChange={(e) =>
                             setSettings({
                               ...settings,
@@ -231,7 +232,7 @@ export default function AdminSettingsPage() {
                           }
                           className="w-full font-mono text-left"
                         />
-                        <Percent className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
+                        <Percent className="w-4 h-4 text-neutral-400 absolute end-3 top-3 pointer-events-none" />
                       </div>
                       <p className="text-xs text-neutral-500 mt-1">{t.feeSubtext}</p>
                     </div>
@@ -248,6 +249,7 @@ export default function AdminSettingsPage() {
                             step={1000}
                             required
                             value={settings.highPriorityWithdrawalThreshold}
+                            onWheel={(e) => (e.target as HTMLElement).blur()}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
@@ -258,7 +260,7 @@ export default function AdminSettingsPage() {
                             }
                             className="w-full font-mono text-left"
                           />
-                          <Coins className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
+                          <Coins className="w-4 h-4 text-neutral-400 absolute end-3 top-3 pointer-events-none" />
                         </div>
                         <p className="text-xs text-neutral-500 mt-1">
                           {t.thresholdSubtext}
@@ -276,6 +278,7 @@ export default function AdminSettingsPage() {
                             step={1000}
                             required
                             value={settings.minimumTopUpAmount}
+                            onWheel={(e) => (e.target as HTMLElement).blur()}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
@@ -284,7 +287,7 @@ export default function AdminSettingsPage() {
                             }
                             className="w-full font-mono text-left"
                           />
-                          <Receipt className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
+                          <Receipt className="w-4 h-4 text-neutral-400 absolute end-3 top-3 pointer-events-none" />
                         </div>
                       </div>
                     </div>
@@ -315,6 +318,7 @@ export default function AdminSettingsPage() {
                         step={50}
                         required
                         value={settings.defaultShippingFee}
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         onChange={(e) =>
                           setSettings({
                             ...settings,
@@ -367,6 +371,7 @@ export default function AdminSettingsPage() {
                         step={30}
                         required
                         value={settings.webhookReplayWindowSeconds}
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         onChange={(e) =>
                           setSettings({
                             ...settings,

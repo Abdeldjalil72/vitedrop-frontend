@@ -736,9 +736,139 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              {/* Table Container with Explicit Horizontal Scroll (No Document Overflow) */}
-              <div className="w-full overflow-x-auto rounded-2xl border border-[#e7e5df] bg-white shadow-xs">
-                <Table className="min-w-[760px]">
+              {/* Clearinghouse Container: Mobile Cards (sm:hidden) + Desktop Table (hidden sm:block) */}
+              <div className="w-full rounded-2xl border border-[#e7e5df] bg-white shadow-xs overflow-hidden">
+                {/* Mobile Cards (Phones < 640px) */}
+                <div className="block sm:hidden divide-y divide-[#e7e5df]">
+                  {isLoading ? (
+                    <div className="p-6 text-center text-neutral-500">
+                      <span className="inline-flex items-center gap-2 text-xs" aria-live="polite">
+                        <RefreshCw className="h-4 w-4 animate-spin text-[#064e3b]" aria-hidden="true" />
+                        {tr.table.loading}
+                      </span>
+                    </div>
+                  ) : filteredWithdrawals.length === 0 ? (
+                    <div className="p-8 text-center text-neutral-500">
+                      <div className="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
+                        <div className="w-9 h-9 rounded-full bg-emerald-50 text-[#064e3b] flex items-center justify-center border border-emerald-200/80">
+                          <CheckCircle2 className="w-4 h-4" />
+                        </div>
+                        <span className="font-semibold text-xs text-neutral-900">
+                          {tr.table.emptyTitle}
+                        </span>
+                        <span className="text-[11px] text-[#6b6b6b]">
+                          {searchQuery || methodFilter !== "ALL"
+                            ? tr.table.emptyFilter
+                            : tr.table.emptyClear}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    filteredWithdrawals.map((w) => {
+                      const isBaridimob = w.method === "BARIDIMOB";
+                      const isHighAmount = w.amount >= 20000;
+
+                      return (
+                        <div
+                          key={w.id}
+                          className="p-4 space-y-3 hover:bg-stone-50/70 transition-colors"
+                          data-testid="admin-clearinghouse-card"
+                        >
+                          {/* Top Row: Beneficiary & Amount */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-50 to-stone-100 border border-[#e7e5df] flex items-center justify-center font-bold text-xs text-[#064e3b] shrink-0 select-none shadow-2xs">
+                                {(w.fullName || w.userEmail || "AF").slice(0, 2).toUpperCase()}
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-semibold text-xs text-neutral-950 tracking-tight leading-snug truncate">
+                                  {w.fullName || "Media Buyer"}
+                                </span>
+                                <span className="text-[10px] text-[#6b6b6b] truncate" dir="ltr">
+                                  {w.userEmail || "—"}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col items-end shrink-0">
+                              <span className="font-mono text-sm font-bold text-neutral-950">
+                                {formatDZD(w.amount, lang)}
+                              </span>
+                              {isHighAmount && (
+                                <span className="mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                                  {tr.table.tagPriority}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Middle Row: Rail, Coordinates & Date */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-stone-50 border border-[#e7e5df]/80 text-xs">
+                            <div className="flex items-center gap-2 min-w-0">
+                              {isBaridimob ? (
+                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-semibold shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" aria-hidden="true" />
+                                  <span>BaridiMob</span>
+                                </div>
+                              ) : (
+                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-900 text-[10px] font-semibold shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+                                  <span>CCP Algérie Poste</span>
+                                </div>
+                              )}
+                              <span className="font-mono text-[11px] text-neutral-700 truncate" dir="ltr">
+                                {w.recipientDetailsMasked || w.paymentReference || "—"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-500">
+                              <span dir="ltr">#{w.id.slice(0, 8)}</span>
+                              <span>•</span>
+                              <span>
+                                {new Date(w.createdAt).toLocaleDateString(
+                                  currentLang === "ar" ? "ar-DZ" : currentLang === "en" ? "en-DZ" : "fr-DZ",
+                                  { day: "2-digit", month: "short", year: "numeric" }
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Bottom Row: Action Buttons */}
+                          <div className="grid grid-cols-2 gap-2 pt-0.5">
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedWithdrawal(w);
+                                setModalAction("REJECT");
+                              }}
+                              className="min-h-[40px] text-xs font-semibold rounded-xl shadow-2xs hover:bg-rose-100 active:scale-95 transition-all flex items-center justify-center gap-1.5 w-full"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>{tr.table.btnReject}</span>
+                            </Button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedWithdrawal(w);
+                                setModalAction("APPROVE");
+                              }}
+                              className="min-h-[40px] inline-flex items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-xl font-semibold bg-[#064e3b] hover:bg-[#085a44] text-white shadow-2xs active:scale-95 transition-all cursor-pointer w-full"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 text-amber-200" />
+                              <span>{tr.table.btnApprove}</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Desktop Table (Tablet & Desktop >= 640px) */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <Table className="min-w-[760px]">
                   <TableHeader>
                     <TableRow className="bg-stone-50/80 text-neutral-500 font-medium text-[11px] uppercase tracking-wider border-b border-[#e7e5df]">
                       <TableHead>{tr.table.thRef}</TableHead>
@@ -884,7 +1014,8 @@ export default function AdminDashboardPage() {
                       })
                     )}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               </div>
 
               {/* Footer Link */}

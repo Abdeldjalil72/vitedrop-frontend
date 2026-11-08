@@ -234,7 +234,7 @@ export default function AdminAgentsPage() {
                           {agent.phone && (
                             <div className="flex items-center gap-1.5 text-neutral-700 font-mono text-[11px]">
                               <Phone className="w-3 h-3 text-neutral-400 shrink-0" />
-                              <span>{agent.phone}</span>
+                              <span dir="ltr">{agent.phone}</span>
                             </div>
                           )}
                           <div className="flex items-center gap-1.5 text-xs">
@@ -324,7 +324,7 @@ export default function AdminAgentsPage() {
                               </div>
                             </td>
                             <td className="px-4 py-3 text-neutral-700">
-                              {agent.phone || "—"}
+                              <span dir="ltr">{agent.phone || "—"}</span>
                             </td>
                             <td className="px-4 py-3 font-sans">
                               {agent.tenantId ? (

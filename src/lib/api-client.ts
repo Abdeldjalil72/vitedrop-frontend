@@ -625,7 +625,7 @@ export async function apiGetAdminStats(): Promise<{
   pendingWithdrawalsAmount: number;
   platformRevenue: number;
 }> {
-  return apiRequest("/admin/stats");
+  return apiRequest("/admin/stats", { silentAuthFail: true });
 }
 
 export type WithdrawalStatus = "PENDING" | "APPROVED" | "PAID" | "REJECTED" | "FAILED";
@@ -724,7 +724,7 @@ export interface AdminUser {
 }
 
 export async function apiGetAdminUsers(): Promise<AdminUser[]> {
-  return apiRequest<AdminUser[]>("/admin/users");
+  return apiRequest<AdminUser[]>("/admin/users", { silentAuthFail: true });
 }
 
 export async function apiUpdateUserStatus(
@@ -1195,7 +1195,7 @@ export interface WebhookEventItem {
 }
 
 export async function apiGetWebhookEvents(limit = 50): Promise<WebhookEventItem[]> {
-  return apiRequest(`/admin/webhooks?limit=${limit}`);
+  return apiRequest(`/admin/webhooks?limit=${limit}`, { silentAuthFail: true });
 }
 
 // ----------------------------------------------------
@@ -1288,7 +1288,7 @@ export async function apiGetAuditLogs(
   if (query.offset !== undefined) params.set("offset", String(query.offset));
 
   const qs = params.toString();
-  return apiRequest(`/admin/audit-logs${qs ? `?${qs}` : ""}`);
+  return apiRequest(`/admin/audit-logs${qs ? `?${qs}` : ""}`, { silentAuthFail: true });
 }
 
 // ----------------------------------------------------
@@ -1460,7 +1460,7 @@ const DEFAULT_ADMIN_SETTINGS: AdminPlatformSettings = {
 
 export async function apiGetAdminPlatformSettings(): Promise<AdminPlatformSettings> {
   try {
-    return await apiRequest<AdminPlatformSettings>("/admin/settings");
+    return await apiRequest<AdminPlatformSettings>("/admin/settings", { silentAuthFail: true });
   } catch {
     if (typeof window !== "undefined") {
       const cached = localStorage.getItem("vitedrop_admin_platform_settings");

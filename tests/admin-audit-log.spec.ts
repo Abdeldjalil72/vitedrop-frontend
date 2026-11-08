@@ -72,6 +72,30 @@ async function setupAdminAuditLogSession(
     });
   });
 
+  await page.route(`${apiBase}/notifications*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.route(`${apiBase}/wallets/me*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ balance: 0, pendingBalance: 0, paidOutTotal: 0 }),
+    });
+  });
+
+  await page.route(`${apiBase}/admin/stats*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ platformRevenue: 1280000, pendingDisbursements: 45000 }),
+    });
+  });
+
   await page.addInitScript(
     ({ token, langKey }) => {
       window.localStorage.setItem("vitedrop_token", token);
@@ -81,7 +105,7 @@ async function setupAdminAuditLogSession(
   );
 
   await page.goto("/admin/audit-log", { waitUntil: "domcontentloaded" });
-  await page.waitForLoadState("networkidle");
+  await page.waitForSelector('[data-dashboard-role="admin"]', { timeout: 30000 });
 }
 
 test.describe("Admin Immutable Audit Trail Suite", () => {

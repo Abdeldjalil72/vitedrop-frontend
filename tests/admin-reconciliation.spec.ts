@@ -121,6 +121,30 @@ async function setupReconciliationSession(
     });
   });
 
+  await page.route(`${apiBase}/admin/users*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.route(`${apiBase}/notifications*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.route(`${apiBase}/wallets/me*`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ balance: 0, pendingBalance: 0, paidOutTotal: 0 }),
+    });
+  });
+
   // Inject token and language into localStorage before page scripts execute
   await page.addInitScript(
     ({ token, selectedLang }) => {

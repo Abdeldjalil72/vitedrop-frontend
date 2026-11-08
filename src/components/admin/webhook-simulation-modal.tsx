@@ -123,18 +123,19 @@ export function WebhookSimulationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 [overscroll-behavior:contain]"
+      onClick={() => !isSubmitting && onClose()}
       role="dialog"
       aria-modal="true"
       aria-labelledby="webhook-simulation-modal-title"
       data-testid="simulate-webhook-modal"
     >
       <div
-        className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200"
+        className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200 flex flex-col max-h-[min(90vh,calc(100dvh-2rem))] [overscroll-behavior:contain]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
+        <div className="p-4 sm:p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-200/80 flex items-center justify-center text-purple-600 shrink-0">
               <Radio className="w-5 h-5" />
@@ -163,7 +164,7 @@ export function WebhookSimulationModal({
         </div>
 
         {/* Form Body */}
-        <form noValidate onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto min-h-0">
           <p className="text-xs text-neutral-600 leading-relaxed">{t.desc}</p>
 
           {/* Provider Selection */}

@@ -178,18 +178,19 @@ export function UserRoleModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 [overscroll-behavior:contain]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="user-role-modal-title"
       data-testid="user-role-modal"
+      onClick={() => !isSubmitting && onClose()}
     >
       <div
-        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200"
+        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200 flex flex-col max-h-[min(90vh,calc(100dvh-2rem))] [overscroll-behavior:contain]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
+        <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-neutral-100 border border-neutral-200/80 flex items-center justify-center text-neutral-800">
               <Shield className="w-5 h-5 text-neutral-700" />
@@ -202,7 +203,7 @@ export function UserRoleModal({
                 {t.title}
               </h2>
               <p className="text-xs text-neutral-500 font-mono mt-0.5">
-                {user.email} &bull; <span dir="ltr">{user.id.slice(0, 8)}</span>
+                <span dir="ltr">{user.email}</span> &bull; <span dir="ltr">{user.id.slice(0, 8)}</span>
               </p>
             </div>
           </div>
@@ -211,22 +212,22 @@ export function UserRoleModal({
             onClick={onClose}
             disabled={isSubmitting}
             className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
-            aria-label="Fermer"
+            aria-label={t.cancel}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form noValidate onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-5 space-y-4 flex-1 overflow-y-auto min-h-0">
           {/* Target Identity info */}
           <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs space-y-1">
             <div className="font-semibold text-neutral-900">
-              {user.fullName || (lang === "ar" ? "بدون اسم" : "Non spécifié")}
+              {user.fullName || (lang === "ar" ? "بدون اسم" : lang === "en" ? "Not specified" : "Non spécifié")}
             </div>
             <div className="flex items-center justify-between text-neutral-500 font-mono text-[11px]">
-              <span>Rôle actuel : <strong>{user.role}</strong></span>
-              <span>Solde : {user.balance.toLocaleString()} DZD</span>
+              <span>{lang === "ar" ? "الدور الحالي :" : lang === "en" ? "Current role:" : "Rôle actuel :"} <strong>{user.role}</strong></span>
+              <span>{lang === "ar" ? "الرصيد :" : lang === "en" ? "Balance:" : "Solde :"} <span dir="ltr">{user.balance.toLocaleString()} DZD</span></span>
             </div>
           </div>
 

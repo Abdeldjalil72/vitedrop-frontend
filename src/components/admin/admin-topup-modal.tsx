@@ -272,7 +272,7 @@ export function AdminTopUpModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 [overscroll-behavior:contain]">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -280,7 +280,7 @@ export function AdminTopUpModal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={() => !isSubmitting && onClose()}
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs [overscroll-behavior:contain]"
             aria-hidden="true"
           />
 
@@ -293,7 +293,7 @@ export function AdminTopUpModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ type: "spring", stiffness: 450, damping: 35 }}
-            className="relative z-10 w-full max-w-lg bg-[#f8f7f4] border border-[#e7e5df] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+            className="relative z-10 w-full max-w-lg bg-[#f8f7f4] border border-[#e7e5df] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[min(92vh,calc(100dvh-2rem))] [overscroll-behavior:contain]"
             data-testid="admin-topup-modal"
           >
             {/* Header */}
@@ -351,7 +351,7 @@ export function AdminTopUpModal({
                   <div className="flex items-center justify-between text-xs text-neutral-500">
                     <span className="font-medium flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-purple-600" />
-                      <span>{isAr ? "المورد المحدد" : "Fournisseur sélectionné"}</span>
+                      <span>{isAr ? "المورد المحدد" : lang === "en" ? "Selected Supplier" : "Fournisseur sélectionné"}</span>
                     </span>
                     <span className="font-mono text-[10px] text-neutral-400">
                       ID: <span dir="ltr">{supplier.id.slice(0, 8)}...</span>

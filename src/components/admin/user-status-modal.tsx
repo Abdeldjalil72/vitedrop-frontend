@@ -151,18 +151,19 @@ export function UserStatusModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 [overscroll-behavior:contain]"
+      onClick={() => !isSubmitting && onClose()}
       role="dialog"
       aria-modal="true"
       aria-labelledby="user-status-modal-title"
       data-testid="user-status-modal"
     >
       <div
-        className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200"
+        className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-black/[0.08] overflow-hidden text-start animate-in zoom-in-95 duration-200 flex flex-col max-h-[min(90vh,calc(100dvh-2rem))] [overscroll-behavior:contain]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
+        <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50 shrink-0">
           <div className="flex items-center gap-3">
             <div
               className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
@@ -201,11 +202,11 @@ export function UserStatusModal({
         </div>
 
         {/* Form Body */}
-        <form noValidate onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="p-5 space-y-4 flex-1 overflow-y-auto min-h-0">
           {/* User Target Card */}
           <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs space-y-1">
             <div className="font-semibold text-neutral-900">
-              {user.fullName || (lang === "ar" ? "بدون اسم" : "Non spécifié")}
+              {user.fullName || (lang === "ar" ? "بدون اسم" : lang === "en" ? "Not specified" : "Non spécifié")}
             </div>
             <div className="flex items-center justify-between text-neutral-500 font-mono text-[11px]">
               <span>{user.role}</span>
@@ -259,7 +260,7 @@ export function UserStatusModal({
           {isSuspending && (
             <div className="space-y-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 block">
-                {lang === "ar" ? "أسباب سريعة" : "Motifs rapides"}
+                {lang === "ar" ? "أسباب سريعة" : lang === "en" ? "Quick reasons" : "Motifs rapides"}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {t.quickReasons.map((qr) => (

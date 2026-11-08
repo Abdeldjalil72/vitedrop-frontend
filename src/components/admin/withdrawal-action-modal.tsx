@@ -185,12 +185,16 @@ export function WithdrawalActionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-xs">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-xs [overscroll-behavior:contain]"
+      onClick={() => !isSubmitting && onClose()}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="withdrawal-modal-title"
-        className="bg-white rounded-3xl border border-black/[0.08] shadow-2xl max-w-lg w-full max-h-[min(92vh,calc(100dvh-2rem))] overflow-y-auto p-5 sm:p-6 text-start relative animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl border border-black/[0.08] shadow-2xl max-w-lg w-full max-h-[min(92vh,calc(100dvh-2rem))] overflow-y-auto p-5 sm:p-6 text-start relative animate-in fade-in zoom-in-95 duration-150 [overscroll-behavior:contain]"
       >
         <button
           type="button"
@@ -306,7 +310,7 @@ export function WithdrawalActionModal({
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/[0.06]">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-black/[0.06]">
             <Button
               type="button"
               variant="secondary"
