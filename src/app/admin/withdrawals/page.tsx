@@ -307,64 +307,61 @@ export default function AdminWithdrawalsPage() {
               )}
             </div>
 
-            {/* Actions on phone */}
-            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-neutral-100">
+            {/* Actions on phone & tablet */}
+            <div className="space-y-2 pt-2 border-t border-neutral-100">
+              {w.status === "PENDING" && (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => openModal(w, "APPROVE")}
+                    className="min-h-[40px] text-xs font-semibold text-emerald-700 bg-emerald-50/70 border border-emerald-200 hover:bg-emerald-100 w-full flex items-center justify-center gap-1.5"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{t.actions.approve}</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => openModal(w, "REJECT")}
+                    className="min-h-[40px] text-xs font-semibold w-full flex items-center justify-center gap-1.5"
+                  >
+                    <XCircle className="w-3.5 h-3.5" />
+                    <span>{t.actions.reject}</span>
+                  </Button>
+                </div>
+              )}
+              {w.status === "APPROVED" && (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() => openModal(w, "PAID")}
+                    className="min-h-[40px] text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white w-full flex items-center justify-center gap-1.5"
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>{t.actions.markPaid}</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => openModal(w, "FAILED")}
+                    className="min-h-[40px] text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 w-full flex items-center justify-center gap-1.5"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>{t.actions.markFailed}</span>
+                  </Button>
+                </div>
+              )}
               <Button
                 size="sm"
-                variant="ghost"
+                variant="secondary"
                 onClick={() => setDetailWithdrawal(w)}
-                className="h-7 text-xs text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 px-2"
+                className="min-h-[38px] text-xs text-neutral-700 hover:text-neutral-900 w-full flex items-center justify-center gap-1.5"
               >
-                <Eye className="w-3.5 h-3.5 me-1" />
+                <Eye className="w-3.5 h-3.5" />
                 <span>{t.actions.details}</span>
               </Button>
-
-              <div className="flex items-center gap-1.5">
-                {w.status === "PENDING" && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => openModal(w, "APPROVE")}
-                      className="h-7 text-xs text-emerald-700 hover:bg-emerald-50 px-2"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 me-1" />
-                      <span>{t.actions.approve}</span>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => openModal(w, "REJECT")}
-                      className="h-7 text-xs text-rose-700 hover:bg-rose-50 px-2"
-                    >
-                      <XCircle className="w-3.5 h-3.5 me-1" />
-                      <span>{t.actions.reject}</span>
-                    </Button>
-                  </>
-                )}
-                {w.status === "APPROVED" && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() => openModal(w, "PAID")}
-                      className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2.5"
-                    >
-                      <CreditCard className="w-3.5 h-3.5 me-1" />
-                      <span>{t.actions.markPaid}</span>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => openModal(w, "FAILED")}
-                      className="h-7 text-xs text-amber-700 hover:bg-amber-50 px-2"
-                    >
-                      <AlertTriangle className="w-3.5 h-3.5 me-1" />
-                      <span>{t.actions.markFailed}</span>
-                    </Button>
-                  </>
-                )}
-              </div>
             </div>
           </div>
         );

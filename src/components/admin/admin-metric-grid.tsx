@@ -67,9 +67,9 @@ export function AdminMetricCard({
 
   return (
     <div
-      className={`bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs text-start flex flex-col justify-between ${className}`}
+      className={`bg-white p-3.5 sm:p-5 lg:p-6 rounded-2xl border border-[#e7e5df] shadow-xs text-start flex flex-col justify-between min-w-0 ${className}`}
     >
-      <div>
+      <div className="min-w-0">
         <div className="flex items-center justify-between gap-1.5 mb-2">
           <span className="text-[11px] sm:text-xs font-semibold text-[#6b6b6b] line-clamp-1">
             {label}
@@ -82,7 +82,7 @@ export function AdminMetricCard({
             </div>
           )}
         </div>
-        <div className={`text-xl sm:text-2xl lg:text-3xl font-bold font-mono leading-none ${valueStyles}`}>
+        <div className={`text-base sm:text-2xl lg:text-3xl font-bold font-mono leading-tight truncate ${valueStyles}`}>
           {value}
         </div>
       </div>

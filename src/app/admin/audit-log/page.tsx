@@ -93,7 +93,7 @@ export default function AdminAuditLogPage() {
             />
 
             {/* Filter Bar */}
-            <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-neutral-200/80 shadow-xs flex flex-col sm:flex-row gap-3">
+            <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-[#e7e5df] shadow-xs grid grid-cols-2 sm:flex sm:flex-row gap-2.5 sm:gap-3">
               <div className="w-full sm:w-56">
                 <select
                   value={filters.action || ""}
@@ -154,7 +154,7 @@ export default function AdminAuditLogPage() {
             )}
 
             {/* Table / Cards Card */}
-            <div className="bg-white rounded-xl border border-neutral-200/80 shadow-xs overflow-hidden">
+            <div className="bg-white rounded-2xl border border-[#e7e5df] shadow-xs overflow-hidden">
               <div className="p-3.5 sm:p-4 border-b border-neutral-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-neutral-500" />
@@ -182,12 +182,12 @@ export default function AdminAuditLogPage() {
                 </div>
               ) : (
                 <>
-                  {/* Mobile Cards (Phone / Small Screens) */}
-                  <div className="block sm:hidden divide-y divide-neutral-100">
+                  {/* Mobile & Tablet Cards (< 1024px) */}
+                  <div className="block lg:hidden divide-y divide-neutral-100 md:divide-y-0 md:grid md:grid-cols-2 md:gap-3 md:p-3.5">
                     {logs.map((log) => (
                       <div
                         key={log.id}
-                        className="p-3.5 space-y-2.5"
+                        className="p-3.5 space-y-2.5 md:rounded-xl md:border md:border-[#e7e5df]"
                         data-testid="admin-audit-card"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -244,8 +244,8 @@ export default function AdminAuditLogPage() {
                     ))}
                   </div>
 
-                  {/* Desktop Table View */}
-                  <div className="hidden sm:block overflow-x-auto">
+                  {/* Desktop Table View (>= 1024px) */}
+                  <div className="hidden lg:block overflow-x-auto custom-scrollbar">
                     <table className="w-full text-xs text-start">
                       <thead className="bg-neutral-50 text-neutral-500 font-medium border-b border-neutral-200">
                         <tr>

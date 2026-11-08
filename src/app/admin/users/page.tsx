@@ -221,10 +221,10 @@ export default function AdminUsersPage() {
             </AdminMetricGrid>
 
             {/* Filter and Search Bar */}
-            <div className="p-3.5 sm:p-4 bg-white rounded-xl sm:rounded-2xl border border-black/[0.08] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
+            <div className="p-3.5 sm:p-4 bg-white rounded-xl sm:rounded-2xl border border-[#e7e5df] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
               {/* Search input */}
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                 <Input
                   type="text"
                   placeholder={
@@ -236,7 +236,7 @@ export default function AdminUsersPage() {
                   }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="min-h-[40px] pl-9 text-xs"
+                  className="min-h-[40px] ps-9 pe-3 text-xs"
                 />
               </div>
 
@@ -288,17 +288,17 @@ export default function AdminUsersPage() {
             </div>
 
             {/* List / Table Container */}
-            <Card className="p-0 overflow-hidden border border-black/[0.08] shadow-xs">
-              {/* Mobile View: Cards */}
-              <div className="block sm:hidden divide-y divide-neutral-100">
+            <Card className="p-0 overflow-hidden border border-[#e7e5df] shadow-xs">
+              {/* Mobile & Tablet View: Cards (< 1024px) */}
+              <div className="block lg:hidden divide-y divide-neutral-100 md:divide-y-0 md:grid md:grid-cols-2 md:gap-3 md:p-3.5">
                 {isLoading ? (
-                  <div className="p-6 space-y-3">
+                  <div className="p-6 space-y-3 md:col-span-2">
                     {Array.from({ length: 4 }).map((_, i) => (
                       <div key={i} className="h-24 bg-neutral-100 rounded-xl animate-pulse" />
                     ))}
                   </div>
                 ) : filteredUsers.length === 0 ? (
-                  <div className="p-12 text-center text-neutral-500">
+                  <div className="p-12 text-center text-neutral-500 md:col-span-2">
                     <span className="text-sm font-medium">
                       {isAr
                         ? "لا توجد نتائج مطابقة لبحثك"
@@ -311,7 +311,7 @@ export default function AdminUsersPage() {
                   filteredUsers.map((user) => (
                     <div
                       key={user.id}
-                      className="p-3.5 space-y-3"
+                      className="p-3.5 space-y-3 md:rounded-xl md:border md:border-[#e7e5df]"
                       data-testid="admin-user-card"
                     >
                       {/* Identity & Role */}
@@ -487,8 +487,8 @@ export default function AdminUsersPage() {
                 )}
               </div>
 
-              {/* Desktop View: Table */}
-              <div className="hidden sm:block overflow-x-auto">
+              {/* Desktop View: Table (>= 1024px) */}
+              <div className="hidden lg:block overflow-x-auto custom-scrollbar">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-[#fbfbfb]">

@@ -736,10 +736,10 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              {/* Clearinghouse Container: Mobile Cards (sm:hidden) + Desktop Table (hidden sm:block) */}
+              {/* Clearinghouse Container: Mobile & Tablet Cards (lg:hidden) + Desktop Table (hidden lg:block) */}
               <div className="w-full rounded-2xl border border-[#e7e5df] bg-white shadow-xs overflow-hidden">
-                {/* Mobile Cards (Phones < 640px) */}
-                <div className="block sm:hidden divide-y divide-[#e7e5df]">
+                {/* Mobile & Tablet Cards (< 1024px) */}
+                <div className="block lg:hidden divide-y divide-[#e7e5df] md:divide-y-0 md:grid md:grid-cols-2 md:gap-3 md:p-3.5">
                   {isLoading ? (
                     <div className="p-6 text-center text-neutral-500">
                       <span className="inline-flex items-center gap-2 text-xs" aria-live="polite">
@@ -771,7 +771,7 @@ export default function AdminDashboardPage() {
                       return (
                         <div
                           key={w.id}
-                          className="p-4 space-y-3 hover:bg-stone-50/70 transition-colors"
+                          className="p-4 space-y-3 md:rounded-xl md:border md:border-[#e7e5df] hover:bg-stone-50/70 transition-colors"
                           data-testid="admin-clearinghouse-card"
                         >
                           {/* Top Row: Beneficiary & Amount */}
@@ -866,8 +866,8 @@ export default function AdminDashboardPage() {
                   )}
                 </div>
 
-                {/* Desktop Table (Tablet & Desktop >= 640px) */}
-                <div className="hidden sm:block overflow-x-auto">
+                {/* Desktop Table (>= 1024px) */}
+                <div className="hidden lg:block overflow-x-auto custom-scrollbar">
                   <Table className="min-w-[760px]">
                   <TableHeader>
                     <TableRow className="bg-stone-50/80 text-neutral-500 font-medium text-[11px] uppercase tracking-wider border-b border-[#e7e5df]">

@@ -72,11 +72,11 @@ export function Topbar({
       role === "admin" ? "bg-[#fdfdfc] border-b border-[#e7e5df]" : "bg-white border-b border-black/[0.08]"
     } px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30`}>
       {/* Start side: Hamburger + Role Badge */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
         <button
           type="button"
           onClick={onOpenMobileMenu}
-          className="p-1.5 sm:p-2 rounded-xl text-neutral-600 hover:text-black hover:bg-neutral-100 cursor-pointer shrink-0"
+          className="p-2 rounded-xl text-neutral-600 hover:text-black hover:bg-neutral-100 cursor-pointer shrink-0 md:hidden"
           aria-label="Open sidebar"
         >
           <Menu className="w-5 h-5" />
@@ -84,10 +84,10 @@ export function Topbar({
 
         {/* Role Identity Badge */}
         <div
-          className={`inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold border shrink-0 ${badgeClass}`}
+          className={`inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold border max-w-[105px] sm:max-w-none truncate ${badgeClass}`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          <span>{roleLabel}</span>
+          <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+          <span className="truncate">{roleLabel}</span>
         </div>
 
         {/* Optional dev/admin role switcher if explicitly enabled */}

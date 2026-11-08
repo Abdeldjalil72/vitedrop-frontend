@@ -184,21 +184,22 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Tracking & Actions */}
-              <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-neutral-100 text-[11px]">
-                <div className="min-w-0">
+              <div className="space-y-2 pt-2 border-t border-neutral-100 text-[11px]">
+                <div className="flex items-center justify-between gap-2 min-w-0">
                   {order.trackingNumber ? (
-                    <div className="flex items-center gap-1 font-mono text-neutral-700">
+                    <div className="flex items-center gap-1.5 font-mono text-neutral-700 min-w-0">
                       <Truck className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                       <span className="truncate">{order.trackingNumber}</span>
                       <button
                         type="button"
                         onClick={() => handleCopy(`mob-track-${order.id}`, order.trackingNumber!)}
-                        className="p-1 text-neutral-400 hover:text-neutral-700"
+                        className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                        aria-label={isArabic ? "نسخ رقم التتبع" : isEnglish ? "Copy Tracking #" : "Copier le numéro de suivi"}
                       >
                         {copiedId === `mob-track-${order.id}` ? (
-                          <Check className="w-3 h-3 text-emerald-600" />
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
-                          <Copy className="w-3 h-3" />
+                          <Copy className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
@@ -209,21 +210,25 @@ export default function AdminOrdersPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className={`grid ${isDispatchedOrBeyond ? "grid-cols-2" : "grid-cols-1"} gap-2 pt-0.5`}>
                   {isDispatchedOrBeyond && (
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => setWaybillOrder(order)}
-                      className="h-7 px-2 text-xs flex items-center gap-1 text-purple-700 hover:bg-purple-50"
+                      className="min-h-[40px] px-3 text-xs flex items-center justify-center gap-1.5 text-purple-700 hover:bg-purple-50 w-full"
                     >
-                      <FileText className="w-3 h-3" />
+                      <FileText className="w-3.5 h-3.5" />
                       <span>{isArabic ? "بوليصة" : isEnglish ? "Waybill" : "Bordereau"}</span>
                     </Button>
                   )}
-                  <Link href={`/admin/orders/${order.id}`}>
-                    <Button variant="secondary" size="sm" className="h-7 px-2 text-xs flex items-center gap-1">
-                      <Eye className="w-3 h-3" />
+                  <Link href={`/admin/orders/${order.id}`} className="w-full">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="min-h-[40px] px-3 text-xs flex items-center justify-center gap-1.5 w-full"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
                       <span>{isArabic ? "تفاصيل" : isEnglish ? "Details" : "Détails"}</span>
                     </Button>
                   </Link>

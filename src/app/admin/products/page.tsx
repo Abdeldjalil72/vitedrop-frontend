@@ -185,49 +185,54 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-neutral-100">
+            <div className="space-y-2 pt-2 border-t border-neutral-100">
               <div className="text-[11px] font-mono">
                 Stock: <span className="font-bold text-neutral-900">{product.stock}</span>{" "}
                 <span className="text-neutral-400">({product.reservedStock || 0} res.)</span>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <Link href={`/admin/products/${product.id}`}>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                    <Eye className="w-3.5 h-3.5 text-neutral-500" />
+              <div className="flex flex-wrap items-center gap-2">
+                <Link href={`/admin/products/${product.id}`} className="flex-1 min-w-[90px]">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="min-h-[40px] px-3 text-xs w-full flex items-center justify-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-neutral-600" />
+                    <span>{isArabic ? "تفاصيل" : isEnglish ? "Details" : "Détails"}</span>
                   </Button>
                 </Link>
 
                 {product.status === "active" ? (
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                     onClick={() => openStatusModal(product, "suspended")}
-                    className="h-7 px-2 text-xs text-amber-700 hover:bg-amber-50"
+                    className="min-h-[40px] px-3 text-xs text-amber-700 bg-amber-50/70 border border-amber-200 hover:bg-amber-100 flex-1 min-w-[100px] flex items-center justify-center gap-1.5"
                   >
-                    <PauseCircle className="w-3.5 h-3.5 me-1" />
+                    <PauseCircle className="w-3.5 h-3.5" />
                     <span>{isArabic ? "تعليق" : isEnglish ? "Suspend" : "Suspendre"}</span>
                   </Button>
                 ) : product.status === "suspended" ? (
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                     onClick={() => openStatusModal(product, "active")}
-                    className="h-7 px-2 text-xs text-emerald-700 hover:bg-emerald-50"
+                    className="min-h-[40px] px-3 text-xs text-emerald-700 bg-emerald-50/70 border border-emerald-200 hover:bg-emerald-100 flex-1 min-w-[100px] flex items-center justify-center gap-1.5"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 me-1" />
+                    <ShieldCheck className="w-3.5 h-3.5" />
                     <span>{isArabic ? "تفعيل" : isEnglish ? "Reactivate" : "Réactiver"}</span>
                   </Button>
                 ) : null}
 
                 {product.status !== "archived" && (
                   <Button
-                    variant="ghost"
+                    variant="danger"
                     size="sm"
                     onClick={() => openStatusModal(product, "archived")}
-                    className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                    className="min-h-[40px] px-3 text-xs flex-1 min-w-[95px] flex items-center justify-center gap-1.5"
                   >
-                    <Archive className="w-3.5 h-3.5 me-1" />
+                    <Archive className="w-3.5 h-3.5" />
                     <span>{isArabic ? "أرشفة" : isEnglish ? "Archive" : "Archiver"}</span>
                   </Button>
                 )}

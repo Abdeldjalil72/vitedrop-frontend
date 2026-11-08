@@ -165,10 +165,10 @@ export default function AdminWebhooksPage() {
             </AdminMetricGrid>
 
             {/* Filter and Search Bar */}
-            <div className="p-3.5 sm:p-4 bg-white rounded-xl sm:rounded-2xl border border-black/[0.08] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
+            <div className="p-3.5 sm:p-4 bg-white rounded-xl sm:rounded-2xl border border-[#e7e5df] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
               {/* Search input */}
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                 <Input
                   type="text"
                   placeholder={
@@ -180,7 +180,7 @@ export default function AdminWebhooksPage() {
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="min-h-[40px] pl-9 text-xs"
+                  className="min-h-[40px] ps-9 pe-3 text-xs"
                   data-testid="search-webhooks-input"
                 />
               </div>
@@ -246,7 +246,7 @@ export default function AdminWebhooksPage() {
             )}
 
             {/* Webhooks Table Card */}
-            <div className="bg-white rounded-xl border border-neutral-200/80 shadow-xs overflow-hidden">
+            <div className="bg-white rounded-2xl border border-[#e7e5df] shadow-xs overflow-hidden">
               <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-neutral-500" />

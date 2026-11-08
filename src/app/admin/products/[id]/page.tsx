@@ -81,6 +81,7 @@ export default function AdminProductDetailPage({
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isArabic = lang === "ar";
+        const isEnglish = lang === "en";
 
         if (isLoading) {
           return (
@@ -93,15 +94,23 @@ export default function AdminProductDetailPage({
 
         if (error || !product) {
           return (
-            <div className="p-8 text-center bg-white rounded-xl border border-neutral-200 space-y-4">
+            <div className="p-8 text-center bg-white rounded-2xl border border-[#e7e5df] space-y-4">
               <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
               <h2 className="text-lg font-bold text-neutral-900">
-                {isArabic ? "المنتج غير موجود" : "Produit introuvable"}
+                {isArabic
+                  ? "المنتج غير موجود"
+                  : isEnglish
+                  ? "Product not found"
+                  : "Produit introuvable"}
               </h2>
               <p className="text-xs text-neutral-500">{error}</p>
               <Link href="/admin/products">
                 <Button variant="secondary" size="sm">
-                  {isArabic ? "العودة لقائمة المنتجات" : "Retour aux produits"}
+                  {isArabic
+                    ? "العودة لقائمة المنتجات"
+                    : isEnglish
+                    ? "Back to products"
+                    : "Retour aux produits"}
                 </Button>
               </Link>
             </div>
@@ -140,8 +149,14 @@ export default function AdminProductDetailPage({
                     <button
                       type="button"
                       onClick={() => handleCopy("prod-id", product.id)}
-                      className="p-1 rounded-md text-neutral-400 hover:text-neutral-700"
-                      title={isArabic ? "نسخ معرف المنتج" : "Copier ID"}
+                      className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-700"
+                      title={
+                        isArabic
+                          ? "نسخ معرف المنتج"
+                          : isEnglish
+                          ? "Copy Product ID"
+                          : "Copier ID"
+                      }
                     >
                       {copiedId === "prod-id" ? (
                         <Check className="w-3 h-3 text-emerald-600" />
@@ -163,7 +178,11 @@ export default function AdminProductDetailPage({
                     className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto"
                   >
                     <PauseCircle className="w-3.5 h-3.5" />
-                    {isArabic ? "تعليق تشغيلي" : "Suspendre Produit"}
+                    {isArabic
+                      ? "تعليق تشغيلي"
+                      : isEnglish
+                      ? "Suspend Product"
+                      : "Suspendre Produit"}
                   </Button>
                 ) : product.status === "suspended" ? (
                   <Button
@@ -173,7 +192,11 @@ export default function AdminProductDetailPage({
                     className="min-h-[40px] sm:min-h-0 text-xs bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 w-full sm:w-auto"
                   >
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    {isArabic ? "إعادة تفعيل" : "Réactiver Produit"}
+                    {isArabic
+                      ? "إعادة تفعيل"
+                      : isEnglish
+                      ? "Reactivate Product"
+                      : "Réactiver Produit"}
                   </Button>
                 ) : null}
 
@@ -185,7 +208,7 @@ export default function AdminProductDetailPage({
                     className="min-h-[40px] sm:min-h-0 text-xs text-rose-700 hover:bg-rose-50 flex items-center justify-center gap-1.5 w-full sm:w-auto"
                   >
                     <Archive className="w-3.5 h-3.5" />
-                    {isArabic ? "أرشفة" : "Archiver"}
+                    {isArabic ? "أرشفة" : isEnglish ? "Archive" : "Archiver"}
                   </Button>
                 )}
               </div>
@@ -193,72 +216,105 @@ export default function AdminProductDetailPage({
 
             {/* Performance KPIs */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs">
-                <span className="text-xs font-semibold text-neutral-500 block mb-1">
-                  {isArabic ? "سعر التجزئة للجمهور" : "Prix Public"}
+              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-2xl border border-[#e7e5df] shadow-xs min-w-0">
+                <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 block mb-1 truncate">
+                  {isArabic
+                    ? "سعر التجزئة للجمهور"
+                    : isEnglish
+                    ? "Public Retail Price"
+                    : "Prix Public"}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold font-mono text-neutral-900">
+                <span className="text-base sm:text-2xl font-bold font-mono text-neutral-900 block truncate">
                   {formatDZD(product.retailPrice, lang)}
                 </span>
               </div>
 
-              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs">
-                <span className="text-xs font-semibold text-neutral-500 block mb-1">
-                  {isArabic ? "العمولة الإجمالية (CPA)" : "CPA Brut Fournisseur"}
+              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-2xl border border-[#e7e5df] shadow-xs min-w-0">
+                <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 block mb-1 truncate">
+                  {isArabic
+                    ? "العمولة الإجمالية (CPA)"
+                    : isEnglish
+                    ? "Supplier Gross CPA"
+                    : "CPA Brut Fournisseur"}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-700">
+                <span className="text-base sm:text-2xl font-bold font-mono text-emerald-700 block truncate">
                   {formatDZD(product.supplierTotalCpa, lang)}
                 </span>
               </div>
 
-              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs">
-                <span className="text-xs font-semibold text-neutral-500 block mb-1">
-                  {isArabic ? "المخزون المتوفر" : "Stock Disponible"}
+              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-2xl border border-[#e7e5df] shadow-xs min-w-0">
+                <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 block mb-1 truncate">
+                  {isArabic
+                    ? "المخزون المتوفر"
+                    : isEnglish
+                    ? "Available Stock"
+                    : "Stock Disponible"}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold font-mono text-neutral-900">
+                <span className="text-base sm:text-2xl font-bold font-mono text-neutral-900 block truncate">
                   {product.stock}
                 </span>
-                <div className="text-[10px] sm:text-[11px] text-neutral-500 font-mono mt-1">
-                  {product.reservedStock || 0} {isArabic ? "محجوز للطلبيات" : "unités réservées"}
+                <div className="text-[10px] sm:text-[11px] text-neutral-500 font-mono mt-1 truncate">
+                  {product.reservedStock || 0}{" "}
+                  {isArabic
+                    ? "محجوز للطلبيات"
+                    : isEnglish
+                    ? "reserved units"
+                    : "unités réservées"}
                 </div>
               </div>
 
-              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-xl border border-neutral-200/80 shadow-xs">
-                <span className="text-xs font-semibold text-neutral-500 block mb-1">
-                  {isArabic ? "معدل التسليم" : "Taux de Livraison"}
+              <div className="bg-white p-3.5 sm:p-5 lg:p-6 rounded-2xl border border-[#e7e5df] shadow-xs min-w-0">
+                <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 block mb-1 truncate">
+                  {isArabic
+                    ? "معدل التسليم"
+                    : isEnglish
+                    ? "Delivery Rate"
+                    : "Taux de Livraison"}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold font-mono text-sky-700">
+                <span className="text-base sm:text-2xl font-bold font-mono text-sky-700 block truncate">
                   {performance?.deliveryRate !== undefined
                     ? `${performance.deliveryRate.toFixed(1)}%`
                     : "—"}
                 </span>
-                <div className="text-[10px] sm:text-[11px] text-neutral-400 mt-1">
+                <div className="text-[10px] sm:text-[11px] text-neutral-400 mt-1 truncate">
                   {performance?.deliveredOrders || 0} / {performance?.totalOrders || 0}{" "}
-                  {isArabic ? "تم تسليمها" : "livrées"}
+                  {isArabic ? "تم تسليمها" : isEnglish ? "delivered" : "livrées"}
                 </div>
               </div>
             </div>
 
-
             {/* Product Details Section */}
-            <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-4">
+            <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-4 shadow-xs">
               <h3 className="text-sm font-semibold text-neutral-900 border-b border-neutral-100 pb-2">
-                {isArabic ? "معلومات المنتج والمورد" : "Détails du Produit & Fournisseur"}
+                {isArabic
+                  ? "معلومات المنتج والمورد"
+                  : isEnglish
+                  ? "Product & Supplier Details"
+                  : "Détails du Produit & Fournisseur"}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div className="space-y-2">
                   <div>
                     <span className="text-neutral-500 font-medium">
-                      {isArabic ? "الوصف:" : "Description:"}
+                      {isArabic ? "الوصف:" : isEnglish ? "Description:" : "Description:"}
                     </span>
                     <p className="text-neutral-800 mt-1">
-                      {product.description || (isArabic ? "لا يوجد وصف" : "Aucune description")}
+                      {product.description ||
+                        (isArabic
+                          ? "لا يوجد وصف"
+                          : isEnglish
+                          ? "No description provided"
+                          : "Aucune description")}
                     </p>
                   </div>
                   <div>
                     <span className="text-neutral-500 font-medium">
-                      {isArabic ? "تاريخ الإضافة:" : "Date de création:"}
+                      {isArabic
+                        ? "تاريخ الإضافة:"
+                        : isEnglish
+                        ? "Created at:"
+                        : "Date de création:"}
                     </span>
                     <p className="font-mono text-neutral-800 mt-1">
                       {formatDateTime(product.createdAt, lang)}
@@ -269,15 +325,27 @@ export default function AdminProductDetailPage({
                 <div className="p-3.5 sm:p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2">
                   <div className="flex items-center gap-2 font-semibold text-purple-800">
                     <Store className="w-4 h-4" />
-                    <span>{isArabic ? "المورد المسؤول" : "Fournisseur Titulaire"}</span>
+                    <span>
+                      {isArabic
+                        ? "المورد المسؤول"
+                        : isEnglish
+                        ? "Assigned Supplier"
+                        : "Fournisseur Titulaire"}
+                    </span>
                   </div>
                   <div className="font-mono text-neutral-600 flex items-center gap-1.5">
                     <span>ID: {product.supplierId}</span>
                     <button
                       type="button"
                       onClick={() => handleCopy("sup-id", product.supplierId)}
-                      className="p-1 rounded-md text-neutral-400 hover:text-neutral-700"
-                      title={isArabic ? "نسخ معرف المورد" : "Copier ID"}
+                      className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-700"
+                      title={
+                        isArabic
+                          ? "نسخ معرف المورد"
+                          : isEnglish
+                          ? "Copy Supplier ID"
+                          : "Copier ID"
+                      }
                     >
                       {copiedId === "sup-id" ? (
                         <Check className="w-3 h-3 text-emerald-600" />
@@ -289,6 +357,8 @@ export default function AdminProductDetailPage({
                   <p className="text-[11px] text-neutral-500">
                     {isArabic
                       ? "رصيد الضمان يغطي الالتزامات المالية للطلبيات الصادرة لهذا المنتج."
+                      : isEnglish
+                      ? "Supplier escrow balance guarantees CPA commission settlement for this product."
                       : "Le solde escrow du fournisseur garantit le règlement des commissions CPA."}
                   </p>
                 </div>

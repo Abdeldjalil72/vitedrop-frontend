@@ -71,12 +71,12 @@ export function WebhookEventTable({
 
   return (
     <>
-      {/* Mobile Card View (Phone / Small Screens) */}
-      <div className="block sm:hidden divide-y divide-neutral-100">
+      {/* Mobile & Tablet Card View (< 1024px) */}
+      <div className="block lg:hidden divide-y divide-neutral-100 md:divide-y-0 md:grid md:grid-cols-2 md:gap-3 md:p-3.5">
         {events.map((evt) => (
           <div
             key={evt.id}
-            className="p-3.5 space-y-2.5"
+            className="p-3.5 space-y-2.5 md:rounded-xl md:border md:border-[#e7e5df]"
             data-testid="admin-webhook-card"
           >
             <div className="flex items-center justify-between gap-2">
@@ -161,8 +161,8 @@ export function WebhookEventTable({
         ))}
       </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden sm:block overflow-x-auto">
+      {/* Desktop Table View (>= 1024px) */}
+      <div className="hidden lg:block overflow-x-auto custom-scrollbar">
         <table className="w-full text-xs text-start">
           <thead className="bg-neutral-50 text-neutral-500 font-medium border-b border-neutral-200">
             <tr>

@@ -209,7 +209,7 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
   }, [filters.wilaya]);
 
   return (
-    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-black/[0.08] shadow-xs space-y-4 text-start">
+    <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#e7e5df] shadow-xs space-y-3.5 sm:space-y-4 text-start">
       {/* Header bar: title, active count pill, reset button */}
       <div className="flex items-center justify-between gap-3 pb-3 border-b border-black/[0.04]">
         <div className="flex items-center gap-2.5">
@@ -243,10 +243,10 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
         )}
       </div>
 
-      {/* Grid of 4 Filter Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Grid of 4 Filter Controls (2-col on mobile for dropdowns, 4-col on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* 1. Search */}
-        <div className="space-y-1.5">
+        <div className="col-span-2 sm:col-span-1 space-y-1.5">
           <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5">
             <Search className="w-3.5 h-3.5 text-neutral-400" />
             <span>{t.searchLabel}</span>
@@ -276,10 +276,10 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
         </div>
 
         {/* 2. Modern Status Dropdown */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-neutral-400" />
-            <span>{t.statusLabel}</span>
+        <div className="col-span-1 space-y-1.5 min-w-0">
+          <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5 truncate">
+            <Layers className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+            <span className="truncate">{t.statusLabel}</span>
           </label>
           <ModernSelect
             value={filters.status || "ALL"}
@@ -287,7 +287,7 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
             options={statusOptions}
             placeholder={t.statusPlaceholder}
             icon={<Filter className="w-3.5 h-3.5 text-neutral-500" />}
-            triggerClassName="h-10 px-3.5 rounded-xl bg-white hover:bg-neutral-50/50 border-black/10 text-xs sm:text-sm font-medium shadow-2xs"
+            triggerClassName="h-10 px-3 rounded-xl bg-white hover:bg-neutral-50/50 border-black/10 text-xs sm:text-sm font-medium shadow-2xs"
             menuClassName="min-w-[260px]"
             align="start"
             data-testid="admin-orders-status-select"
@@ -296,10 +296,10 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
         </div>
 
         {/* 3. Tracking Number */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5">
-            <Truck className="w-3.5 h-3.5 text-neutral-400" />
-            <span>{t.trackingLabel}</span>
+        <div className="col-span-1 space-y-1.5 min-w-0">
+          <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5 truncate">
+            <Truck className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+            <span className="truncate">{t.trackingLabel}</span>
           </label>
           <div className="relative flex items-center">
             <Truck className="w-4 h-4 text-neutral-400 absolute start-3 pointer-events-none" />
@@ -326,7 +326,7 @@ export function OrderFilters({ filters, onChange, onReset, lang }: OrderFiltersP
         </div>
 
         {/* 4. Modern Searchable Wilaya Dropdown */}
-        <div className="space-y-1.5">
+        <div className="col-span-2 sm:col-span-1 space-y-1.5 min-w-0">
           <label className="block text-xs font-semibold text-neutral-800 tracking-tight flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-sky-600" />
             <span>{t.wilayaLabel}</span>

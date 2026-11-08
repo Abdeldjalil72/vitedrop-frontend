@@ -159,6 +159,7 @@ export default function AdminOrderDetailPage({
     <DashboardLayout initialRole="admin" initialLang="fr">
       {({ lang }) => {
         const isArabic = lang === "ar";
+        const isEnglish = lang === "en";
 
         if (isLoading) {
           return (
@@ -174,15 +175,23 @@ export default function AdminOrderDetailPage({
 
         if (error || !order) {
           return (
-            <div className="p-8 text-center bg-white rounded-xl border border-neutral-200 space-y-4">
+            <div className="p-8 text-center bg-white rounded-2xl border border-[#e7e5df] space-y-4">
               <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
               <h2 className="text-lg font-bold text-neutral-900">
-                {isArabic ? "تعذر تحميل الطلبية" : "Commande introuvable"}
+                {isArabic
+                  ? "تعذر تحميل الطلبية"
+                  : isEnglish
+                  ? "Order not found"
+                  : "Commande introuvable"}
               </h2>
               <p className="text-xs text-neutral-500">{error}</p>
               <Link href="/admin/orders">
                 <Button variant="secondary" size="sm">
-                  {isArabic ? "العودة لقائمة الطلبيات" : "Retour aux commandes"}
+                  {isArabic
+                    ? "العودة لقائمة الطلبيات"
+                    : isEnglish
+                    ? "Back to orders"
+                    : "Retour aux commandes"}
                 </Button>
               </Link>
             </div>
@@ -215,8 +224,14 @@ export default function AdminOrderDetailPage({
                     <button
                       type="button"
                       onClick={() => handleCopy("order-id", order.id)}
-                      className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
-                      title={isArabic ? "نسخ معرف الطلبية" : "Copier ID"}
+                      className="p-1.5 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+                      title={
+                        isArabic
+                          ? "نسخ معرف الطلبية"
+                          : isEnglish
+                          ? "Copy Order ID"
+                          : "Copier ID"
+                      }
                     >
                       {copiedId === "order-id" ? (
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -227,7 +242,11 @@ export default function AdminOrderDetailPage({
                     <StatusBadge status={order.status as OrderStatus} lang={lang} />
                   </div>
                   <p className="text-xs text-neutral-500 font-mono mt-0.5">
-                    {isArabic ? "تاريخ الإنشاء:" : "Créée le:"}{" "}
+                    {isArabic
+                      ? "تاريخ الإنشاء:"
+                      : isEnglish
+                      ? "Created at:"
+                      : "Créée le:"}{" "}
                     {formatDateTime(order.createdAt, lang)}
                   </p>
                 </div>
@@ -242,7 +261,13 @@ export default function AdminOrderDetailPage({
                   className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto text-purple-700 hover:bg-purple-50"
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>{isArabic ? "بوليصة الشحن (Bordereau)" : "Bordereau Yalidine"}</span>
+                  <span>
+                    {isArabic
+                      ? "بوليصة الشحن (Bordereau)"
+                      : isEnglish
+                      ? "Courier Waybill"
+                      : "Bordereau Yalidine"}
+                  </span>
                 </Button>
 
                 <Button
@@ -253,7 +278,11 @@ export default function AdminOrderDetailPage({
                   className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isReprocessing ? "animate-spin" : ""}`} />
-                  {isArabic ? "إعادة معالجة الويب هوك" : "Rejouer Webhook"}
+                  {isArabic
+                    ? "إعادة معالجة الويب هوك"
+                    : isEnglish
+                    ? "Replay Webhook"
+                    : "Rejouer Webhook"}
                 </Button>
 
                 {order.status === "delivered" && (order.transactions || []).length < 3 && (
@@ -265,7 +294,11 @@ export default function AdminOrderDetailPage({
                     className="min-h-[40px] sm:min-h-0 text-xs bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-1.5 text-white w-full sm:w-auto"
                   >
                     <ShieldAlert className="w-3.5 h-3.5" />
-                    {isArabic ? "تسوية القيود المالية" : "Régulariser Grand Livre"}
+                    {isArabic
+                      ? "تسوية القيود المالية"
+                      : isEnglish
+                      ? "Reconcile Ledger"
+                      : "Régulariser Grand Livre"}
                   </Button>
                 )}
               </div>
@@ -295,9 +328,13 @@ export default function AdminOrderDetailPage({
               {/* Left Column (2 Cols): Details & Financials */}
               <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                 {/* Customer & Delivery Card */}
-                <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-4">
+                <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-4 shadow-xs">
                   <h3 className="text-sm font-semibold text-neutral-900 border-b border-neutral-100 pb-2">
-                    {isArabic ? "بيانات العميل والشحن" : "Détails Client & Expédition"}
+                    {isArabic
+                      ? "بيانات العميل والشحن"
+                      : isEnglish
+                      ? "Customer & Shipping Details"
+                      : "Détails Client & Expédition"}
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -314,7 +351,13 @@ export default function AdminOrderDetailPage({
                           type="button"
                           onClick={() => handleCopy("detail-phone", order.customerPhone)}
                           className="p-1 text-neutral-400 hover:text-neutral-700"
-                          title={isArabic ? "نسخ الهاتف" : "Copier le numéro"}
+                          title={
+                            isArabic
+                              ? "نسخ الهاتف"
+                              : isEnglish
+                              ? "Copy phone number"
+                              : "Copier le numéro"
+                          }
                         >
                           {copiedId === "detail-phone" ? (
                             <Check className="w-3 h-3 text-emerald-600" />
@@ -334,15 +377,27 @@ export default function AdminOrderDetailPage({
                     </div>
 
                     {/* Logistics Courier Box */}
-                    <div className="space-y-2 bg-neutral-50 p-3.5 rounded-lg border border-neutral-200">
+                    <div className="space-y-2 bg-neutral-50 p-3.5 rounded-xl border border-neutral-200">
                       <div className="text-xs font-semibold text-neutral-700 flex items-center justify-between">
-                        <span>{isArabic ? "معلومات شركة التوصيل" : "Logistique Yalidine"}</span>
+                        <span>
+                          {isArabic
+                            ? "معلومات شركة التوصيل"
+                            : isEnglish
+                            ? "Courier Logistics"
+                            : "Logistique Transporteur"}
+                        </span>
                         <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-800">
                           {order.courier || "YALIDINE"}
                         </span>
                       </div>
                       <div className="text-xs text-neutral-600 flex items-center justify-between">
-                        <span>{isArabic ? "رقم التتبع:" : "N° de Suivi:"}</span>
+                        <span>
+                          {isArabic
+                            ? "رقم التتبع:"
+                            : isEnglish
+                            ? "Tracking #:"
+                            : "N° de Suivi:"}
+                        </span>
                         {order.trackingNumber ? (
                           <div className="flex items-center gap-1">
                             <span className="font-mono font-bold text-neutral-900">
@@ -352,7 +407,13 @@ export default function AdminOrderDetailPage({
                               type="button"
                               onClick={() => handleCopy("detail-tracking", order.trackingNumber!)}
                               className="p-1 text-neutral-400 hover:text-neutral-700"
-                              title={isArabic ? "نسخ التتبع" : "Copier le numéro"}
+                              title={
+                                isArabic
+                                  ? "نسخ التتبع"
+                                  : isEnglish
+                                  ? "Copy tracking number"
+                                  : "Copier le numéro"
+                              }
                             >
                               {copiedId === "detail-tracking" ? (
                                 <Check className="w-3 h-3 text-emerald-600" />
@@ -363,13 +424,23 @@ export default function AdminOrderDetailPage({
                           </div>
                         ) : (
                           <span className="text-neutral-400 italic">
-                            {isArabic ? "غير مخصص" : "Non assigné"}
+                            {isArabic
+                              ? "غير مخصص"
+                              : isEnglish
+                              ? "Unassigned"
+                              : "Non assigné"}
                           </span>
                         )}
                       </div>
                       {order.cancellationReason && (
                         <div className="text-xs text-rose-600 pt-1 border-t border-rose-100">
-                          <strong>{isArabic ? "سبب الإلغاء:" : "Motif d'annulation:"}</strong>{" "}
+                          <strong>
+                            {isArabic
+                              ? "سبب الإلغاء:"
+                              : isEnglish
+                              ? "Cancellation Reason:"
+                              : "Motif d'annulation:"}
+                          </strong>{" "}
                           {order.cancellationReason}
                         </div>
                       )}
@@ -378,35 +449,55 @@ export default function AdminOrderDetailPage({
 
                   {/* Dual Identity Box: Supplier & Affiliate */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-neutral-100">
-                    <div className="p-3 rounded-lg bg-purple-50/70 border border-purple-200 text-xs">
+                    <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200 text-xs">
                       <div className="flex items-center gap-1.5 text-purple-800 font-semibold mb-1">
                         <Store className="w-3.5 h-3.5" />
-                        <span>{isArabic ? "المورد (صاحب المنتج والضمان)" : "Fournisseur (Propriétaire)"}</span>
+                        <span>
+                          {isArabic
+                            ? "المورد (صاحب المنتج والضمان)"
+                            : isEnglish
+                            ? "Supplier (Merchant & Escrow)"
+                            : "Fournisseur (Propriétaire)"}
+                        </span>
                       </div>
                       <div className="font-medium text-neutral-900">
-                        {order.supplierName || "Fournisseur Partenaire"}
+                        {order.supplierName || (isEnglish ? "Partner Supplier" : "Fournisseur Partenaire")}
                       </div>
                       <div className="text-[10px] text-neutral-500 font-mono mt-0.5">
                         ID: {order.supplierId}
                       </div>
                       <div className="text-[11px] text-purple-700 font-semibold mt-1">
-                        {isArabic ? "تمويل CPA الإجمالي: 100%" : "Financement CPA Brut: 100%"}
+                        {isArabic
+                          ? "تمويل CPA الإجمالي: 100%"
+                          : isEnglish
+                          ? "Gross CPA Escrow Funding: 100%"
+                          : "Financement CPA Brut: 100%"}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-sky-50/70 border border-sky-200 text-xs">
+                    <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200 text-xs">
                       <div className="flex items-center gap-1.5 text-sky-800 font-semibold mb-1">
                         <TrendingUp className="w-3.5 h-3.5" />
-                        <span>{isArabic ? "المسوق (صاحب الإحالة)" : "Affilié (Media Buyer)"}</span>
+                        <span>
+                          {isArabic
+                            ? "المسوق (صاحب الإحالة)"
+                            : isEnglish
+                            ? "Affiliate (Media Buyer)"
+                            : "Affilié (Media Buyer)"}
+                        </span>
                       </div>
                       <div className="font-medium text-neutral-900">
-                        {order.affiliateName || "Affilié ViteDrop"}
+                        {order.affiliateName || (isEnglish ? "ViteDrop Affiliate" : "Affilié ViteDrop")}
                       </div>
                       <div className="text-[10px] text-neutral-500 font-mono mt-0.5">
                         ID: {order.affiliateId}
                       </div>
                       <div className="text-[11px] text-sky-700 font-semibold mt-1">
-                        {isArabic ? "العمولة الصافية: 80% عند التسليم" : "Gain Net Affilié: 80% après livraison"}
+                        {isArabic
+                          ? "العمولة الصافية: 80% عند التسليم"
+                          : isEnglish
+                          ? "Net Affiliate Payout: 80% on delivery"
+                          : "Gain Net Affilié: 80% après livraison"}
                       </div>
                     </div>
                   </div>
@@ -424,10 +515,14 @@ export default function AdminOrderDetailPage({
 
                 {/* Inventory Movements */}
                 {order.inventoryMovements && order.inventoryMovements.length > 0 && (
-                  <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-3">
+                  <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-3 shadow-xs">
                     <h3 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
                       <Package className="w-4 h-4 text-neutral-500" />
-                      {isArabic ? "حركات المخزون المرتبطة" : "Mouvements de Stock Associés"}
+                      {isArabic
+                        ? "حركات المخزون المرتبطة"
+                        : isEnglish
+                        ? "Linked Inventory Movements"
+                        : "Mouvements de Stock Associés"}
                     </h3>
                     <div className="divide-y divide-neutral-100 text-xs font-mono">
                       {order.inventoryMovements.map((mov) => (
@@ -436,7 +531,8 @@ export default function AdminOrderDetailPage({
                             {mov.movementType}
                           </span>
                           <span className="font-bold text-neutral-800">
-                            {mov.quantity > 0 ? `+${mov.quantity}` : mov.quantity} unités
+                            {mov.quantity > 0 ? `+${mov.quantity}` : mov.quantity}{" "}
+                            {isArabic ? "وحدة" : isEnglish ? "units" : "unités"}
                           </span>
                           <span className="text-neutral-400 text-[11px]">
                             {formatDateTime(mov.createdAt, lang)}
@@ -449,10 +545,14 @@ export default function AdminOrderDetailPage({
 
                 {/* Attribution & Tracking Metadata */}
                 {(order.utm_source || order.click_id || order.fbclid || order.ttclid) && (
-                  <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-3">
+                  <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-3 shadow-xs">
                     <h3 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
                       <Layers className="w-4 h-4 text-neutral-500" />
-                      {isArabic ? "بيانات التتبع والإحالة" : "Métadonnées d'Attribution Marketing"}
+                      {isArabic
+                        ? "بيانات التتبع والإحالة"
+                        : isEnglish
+                        ? "Marketing Attribution Metadata"
+                        : "Métadonnées d'Attribution Marketing"}
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                       {order.utm_source && (
@@ -463,7 +563,9 @@ export default function AdminOrderDetailPage({
                       )}
                       {order.utm_campaign && (
                         <div className="p-2.5 bg-neutral-50 rounded border border-neutral-200">
-                          <span className="text-[10px] text-neutral-400 block font-sans">Campagne</span>
+                          <span className="text-[10px] text-neutral-400 block font-sans">
+                            {isEnglish ? "Campaign" : "Campagne"}
+                          </span>
                           <span className="font-semibold text-neutral-800">{order.utm_campaign}</span>
                         </div>
                       )}
@@ -489,25 +591,37 @@ export default function AdminOrderDetailPage({
               {/* Right Column: Timeline & Notes */}
               <div className="space-y-4 sm:space-y-6">
                 {/* State History Timeline */}
-                <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-4">
+                <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-4 shadow-xs">
                   <h3 className="text-sm font-semibold text-neutral-900 border-b border-neutral-100 pb-2">
-                    {isArabic ? "مسار وتاريخ الحالات" : "Historique des Transitions"}
+                    {isArabic
+                      ? "مسار وتاريخ الحالات"
+                      : isEnglish
+                      ? "State Transition History"
+                      : "Historique des Transitions"}
                   </h3>
                   <OrderStatusTimeline events={order.events || []} lang={lang} />
                 </div>
 
                 {/* Admin Notes Card */}
-                <div className="bg-white rounded-xl border border-neutral-200/80 p-3.5 sm:p-5 lg:p-6 space-y-4">
+                <div className="bg-white rounded-2xl border border-[#e7e5df] p-3.5 sm:p-5 lg:p-6 space-y-4 shadow-xs">
                   <h3 className="text-sm font-semibold text-neutral-900 flex items-center gap-2 border-b border-neutral-100 pb-2">
                     <MessageSquare className="w-4 h-4 text-neutral-500" />
-                    {isArabic ? "الملاحظات الإدارية" : "Notes Administratives"}
+                    {isArabic
+                      ? "الملاحظات الإدارية"
+                      : isEnglish
+                      ? "Administrative Notes"
+                      : "Notes Administratives"}
                   </h3>
 
                   {/* Existing Notes */}
                   <div className="space-y-2.5 max-h-60 overflow-y-auto">
                     {(!order.notes || order.notes.length === 0) ? (
                       <p className="text-xs text-neutral-400 italic py-2">
-                        {isArabic ? "لا توجد ملاحظات مسجلة." : "Aucune note administrative."}
+                        {isArabic
+                          ? "لا توجد ملاحظات مسجلة."
+                          : isEnglish
+                          ? "No administrative notes recorded."
+                          : "Aucune note administrative."}
                       </p>
                     ) : (
                       order.notes.map((note) => (
@@ -529,7 +643,11 @@ export default function AdminOrderDetailPage({
                     <textarea
                       rows={2}
                       placeholder={
-                        isArabic ? "أضف ملاحظة إدارية..." : "Ajouter une note d'audit..."
+                        isArabic
+                          ? "أضف ملاحظة إدارية..."
+                          : isEnglish
+                          ? "Add an audit note..."
+                          : "Ajouter une note d'audit..."
                       }
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
@@ -544,7 +662,7 @@ export default function AdminOrderDetailPage({
                         className="min-h-[40px] sm:min-h-0 text-xs flex items-center justify-center gap-1.5 w-full sm:w-auto"
                       >
                         <Send className="w-3 h-3" />
-                        {isArabic ? "إضافة ملاحظة" : "Ajouter"}
+                        {isArabic ? "إضافة ملاحظة" : isEnglish ? "Add Note" : "Ajouter"}
                       </Button>
                     </div>
                   </form>

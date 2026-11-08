@@ -522,27 +522,29 @@ export default function AdminDepositRequestsPage() {
   };
 
   // Status badge helper
-  const renderStatusBadge = (status: string) => {
+  const renderStatusBadge = (status: string, lang: Language = "fr") => {
+    const isAr = lang === "ar";
+    const isEn = lang === "en";
     switch (status) {
       case "PENDING":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            En attente
+            {isAr ? "قيد الانتظار" : isEn ? "Pending" : "En attente"}
           </span>
         );
       case "APPROVED":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-            Validée
+            {isAr ? "مصادق عليها" : isEn ? "Approved" : "Validée"}
           </span>
         );
       case "REJECTED":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
             <XCircle className="w-3 h-3 text-rose-600" />
-            Rejetée
+            {isAr ? "مرفوضة" : isEn ? "Rejected" : "Rejetée"}
           </span>
         );
       default:
@@ -700,7 +702,7 @@ export default function AdminDepositRequestsPage() {
 
                     {/* Status */}
                     <td className="py-3.5 px-4 align-middle">
-                      {renderStatusBadge(item.status)}
+                      {renderStatusBadge(item.status, currentLang)}
                     </td>
 
                     {/* Date */}
@@ -767,13 +769,13 @@ export default function AdminDepositRequestsPage() {
           return (
             <div
               key={item.id}
-              className="p-4 rounded-xl border border-black/[0.06] bg-white space-y-3"
+              className="space-y-3"
               data-testid="admin-deposit-card"
             >
               {/* Top Row: Supplier & Status */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0">
                     {item.supplierName.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
@@ -785,11 +787,11 @@ export default function AdminDepositRequestsPage() {
                     </span>
                   </div>
                 </div>
-                {renderStatusBadge(item.status)}
+                {renderStatusBadge(item.status, currentLang)}
               </div>
 
               {/* Middle Details Grid */}
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-black/[0.04] text-xs">
+              <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-stone-50/80 border border-[#e7e5df]/80 text-xs">
                 <div>
                   <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">
                     {t.amountCol}
@@ -799,7 +801,7 @@ export default function AdminDepositRequestsPage() {
                   </span>
                   {isHighValue && (
                     <span
-                      className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 ml-1"
+                      className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 ms-1"
                       data-testid="priority-deposit-badge"
                     >
                       {t.priorityBadge}
@@ -815,10 +817,10 @@ export default function AdminDepositRequestsPage() {
               </div>
 
               {/* Slip preview & Reference */}
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-black/[0.04]">
+              <div className="flex items-center justify-between gap-2 pt-1">
                 <div className="min-w-0 flex items-center gap-2">
                   {item.receiptUrl === "DIRECT_ADMIN_TOPUP" ? (
-                    <div className="px-2 py-1 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-1 shrink-0">
+                    <div className="min-h-[36px] px-2.5 py-1 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-1.5 shrink-0">
                       <ShieldCheck className="w-3.5 h-3.5" />
                       <span>Admin Direct</span>
                     </div>
@@ -826,7 +828,7 @@ export default function AdminDepositRequestsPage() {
                     <button
                       type="button"
                       onClick={() => setPreviewSlipRequest(item)}
-                      className="px-2 py-1 rounded-lg border border-purple-200 bg-purple-50 text-purple-700 text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer"
+                      className="min-h-[38px] px-3 py-1.5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100/80 text-purple-700 text-xs font-semibold flex items-center gap-1.5 shrink-0 cursor-pointer transition-colors"
                       data-testid="preview-slip-btn"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -839,18 +841,18 @@ export default function AdminDepositRequestsPage() {
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] font-mono text-neutral-400">
+                <span className="text-[10px] font-mono text-neutral-400 shrink-0">
                   {formatDateTime(item.createdAt, currentLang)}
                 </span>
               </div>
 
               {/* Actions */}
               {item.status === "PENDING" && (
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-black/[0.04]">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-100">
                   <button
                     type="button"
                     onClick={() => handleOpenApproveModal(item)}
-                    className="inline-flex items-center justify-center text-xs bg-emerald-600 hover:bg-emerald-700 active:scale-[0.96] text-white font-semibold h-9 rounded-xl shadow-xs transition-all cursor-pointer gap-1"
+                    className="inline-flex items-center justify-center text-xs bg-emerald-600 hover:bg-emerald-700 active:scale-[0.96] text-white font-semibold min-h-[40px] rounded-xl shadow-xs transition-all cursor-pointer gap-1"
                     data-testid="approve-deposit-btn"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 me-1" />
@@ -860,7 +862,7 @@ export default function AdminDepositRequestsPage() {
                     size="sm"
                     variant="danger"
                     onClick={() => handleOpenRejectModal(item)}
-                    className="text-xs h-9 rounded-xl"
+                    className="text-xs min-h-[40px] rounded-xl"
                     data-testid="reject-deposit-btn"
                   >
                     <XCircle className="w-3.5 h-3.5 me-1" />
@@ -949,47 +951,47 @@ export default function AdminDepositRequestsPage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-black/[0.08] shadow-xs space-y-1">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-[#e7e5df] shadow-xs space-y-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block truncate">
                   {t.kpi.pendingSum}
                 </span>
-                <div className="text-lg sm:text-xl font-bold font-mono text-amber-700">
+                <div className="text-base sm:text-xl font-bold font-mono text-amber-700 truncate">
                   {formatDZD(kpis.pendingSum, currentLang)}
                 </div>
-                <p className="text-[10px] text-neutral-400">{t.kpi.pendingSumSub}</p>
+                <p className="text-[10px] text-neutral-400 truncate">{t.kpi.pendingSumSub}</p>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-black/[0.08] shadow-xs space-y-1">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-[#e7e5df] shadow-xs space-y-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block truncate">
                   {t.kpi.pendingCount}
                 </span>
-                <div className="text-lg sm:text-xl font-bold font-mono text-neutral-900 flex items-center gap-2">
+                <div className="text-base sm:text-xl font-bold font-mono text-neutral-900 flex items-center gap-2">
                   <span>{pendingCount}</span>
                   {pendingCount > 0 && (
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                   )}
                 </div>
-                <p className="text-[10px] text-neutral-400">{t.kpi.pendingCountSub}</p>
+                <p className="text-[10px] text-neutral-400 truncate">{t.kpi.pendingCountSub}</p>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-black/[0.08] shadow-xs space-y-1">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-[#e7e5df] shadow-xs space-y-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block truncate">
                   {t.kpi.approvedCount}
                 </span>
-                <div className="text-lg sm:text-xl font-bold font-mono text-emerald-700">
+                <div className="text-base sm:text-xl font-bold font-mono text-emerald-700">
                   {kpis.approvedCount}
                 </div>
-                <p className="text-[10px] text-neutral-400">{t.kpi.approvedCountSub}</p>
+                <p className="text-[10px] text-neutral-400 truncate">{t.kpi.approvedCountSub}</p>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-black/[0.08] shadow-xs space-y-1">
-                <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-[#e7e5df] shadow-xs space-y-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block truncate">
                   {t.kpi.approvedSum}
                 </span>
-                <div className="text-lg sm:text-xl font-bold font-mono text-[#064e3b]">
+                <div className="text-base sm:text-xl font-bold font-mono text-[#064e3b] truncate">
                   {formatDZD(kpis.approvedSum, currentLang)}
                 </div>
-                <p className="text-[10px] text-neutral-400">{t.kpi.approvedSumSub}</p>
+                <p className="text-[10px] text-neutral-400 truncate">{t.kpi.approvedSumSub}</p>
               </div>
             </div>
 
@@ -1022,13 +1024,13 @@ export default function AdminDepositRequestsPage() {
               />
 
               <div className="relative min-w-[260px] sm:max-w-xs">
-                <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-neutral-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t.searchPlaceholder}
-                  className="w-full text-xs pl-8 pr-3 py-1.5 rounded-full border border-black/[0.1] bg-white placeholder:text-neutral-400 focus:outline-none focus:border-purple-600"
+                  className="w-full min-h-[38px] text-xs ps-8 pe-3 py-1.5 rounded-full border border-[#e7e5df] bg-white placeholder:text-neutral-400 focus:outline-none focus:border-purple-600"
                   data-testid="deposits-search-input"
                 />
               </div>

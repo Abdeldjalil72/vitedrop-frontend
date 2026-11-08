@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,10 @@ const adminSettingsI18n = {
     hmacLabel: "Vérification de signature HMAC SHA-256",
     hmacActive: "Active et appliquée sur les endpoints Yalidine et ZR Express",
     saveBtn: "Enregistrer les Règles de Gouvernance",
+    loadingText: "Chargement des paramètres de la plateforme...",
+    immutableBadge: "RÈGLE IMMUABLE",
+    enforcedBadge: "APPLIQUÉ",
+    splitBadge: (fee: number) => `${fee}% Plateforme / ${100 - fee}% Net Affilié`,
   },
   en: {
     eyebrow: "Governance & Network",
@@ -71,6 +76,10 @@ const adminSettingsI18n = {
     hmacLabel: "HMAC SHA-256 Signature Verification",
     hmacActive: "Active and enforced across Yalidine and ZR Express listeners",
     saveBtn: "Save Governance Rules",
+    loadingText: "Loading platform parameters...",
+    immutableBadge: "IMMUTABLE RULE",
+    enforcedBadge: "ENFORCED",
+    splitBadge: (fee: number) => `${fee}% Platform / ${100 - fee}% Net Affiliate`,
   },
   ar: {
     eyebrow: "الحوكمة والشبكة",
@@ -94,6 +103,10 @@ const adminSettingsI18n = {
     hmacLabel: "التحقق من التوقيع الرقمي HMAC SHA-256",
     hmacActive: "مفعل ومطبق بشكل إلزامي على Yalidine وZR Express",
     saveBtn: "حفظ قواعد الحوكمة",
+    loadingText: "جاري تحميل إعدادات المنصة...",
+    immutableBadge: "قاعدة ثابتة",
+    enforcedBadge: "مفعل إلزامياً",
+    splitBadge: (fee: number) => `${fee}% المنصة / ${100 - fee}% صافي المسوق`,
   },
 };
 
@@ -160,15 +173,12 @@ export default function AdminSettingsPage() {
             dir={rtl ? "rtl" : "ltr"}
           >
             {/* Header */}
-            <div>
-              <span className="font-mono text-xs uppercase tracking-wider font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80 inline-block mb-2">
-                {t.eyebrow}
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
-                {t.title}
-              </h1>
-              <p className="text-sm text-neutral-600 mt-1">{t.subtitle}</p>
-            </div>
+            <AdminPageHeader
+              badge={t.eyebrow}
+              badgeVariant="emerald"
+              title={t.title}
+              description={t.subtitle}
+            />
 
             {/* Feedback Banners */}
             {success && (
@@ -186,16 +196,16 @@ export default function AdminSettingsPage() {
             )}
 
             {loading ? (
-              <Card className="p-8 text-center bg-white border border-neutral-200">
+              <Card className="p-8 text-center bg-white border border-[#e7e5df]">
                 <div className="w-6 h-6 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-neutral-500 font-mono">Loading platform parameters...</p>
+                <p className="text-sm text-neutral-500 font-mono">{t.loadingText}</p>
               </Card>
             ) : (
               <form onSubmit={(e) => handleSave(e, t)} className="space-y-6">
                 {/* 1. Escrow & Double-Entry Economics */}
-                <Card className="p-6 bg-white border border-neutral-200/90 rounded-2xl shadow-xs space-y-4">
+                <Card className="p-4 sm:p-6 bg-white border border-[#e7e5df] rounded-2xl shadow-xs space-y-4">
                   <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0">
                       <Scale className="w-4 h-4" />
                     </div>
                     <div>
@@ -207,13 +217,12 @@ export default function AdminSettingsPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                         <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider">
                           {t.feeLabel}
                         </label>
                         <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
-                          {settings.platformFeePercent}% Platform /{" "}
-                          {100 - settings.platformFeePercent}% Net Affiliate
+                          {t.splitBadge(settings.platformFeePercent)}
                         </span>
                       </div>
                       <div className="relative">
@@ -295,9 +304,9 @@ export default function AdminSettingsPage() {
                 </Card>
 
                 {/* 2. Logistics & RTO Invariants */}
-                <Card className="p-6 bg-white border border-neutral-200/90 rounded-2xl shadow-xs space-y-4">
+                <Card className="p-4 sm:p-6 bg-white border border-[#e7e5df] rounded-2xl shadow-xs space-y-4">
                   <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-4 h-4" />
                     </div>
                     <div>
@@ -329,14 +338,14 @@ export default function AdminSettingsPage() {
                       />
                     </div>
 
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                      <div className="flex items-center justify-between mb-1">
+                    <div className="p-3.5 sm:p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                         <span className="text-xs font-semibold uppercase tracking-wider text-neutral-700 flex items-center gap-1.5">
-                          <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                          <Lock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                           {t.rtoPolicyLabel}
                         </span>
-                        <span className="font-mono text-xs font-bold text-neutral-800 bg-white px-2 py-0.5 rounded border border-neutral-200">
-                          IMMUTABLE RULE
+                        <span className="font-mono text-xs font-bold text-neutral-800 bg-white px-2 py-0.5 rounded border border-neutral-200 shrink-0">
+                          {t.immutableBadge}
                         </span>
                       </div>
                       <p className="text-xs text-neutral-600 leading-relaxed">
@@ -347,9 +356,9 @@ export default function AdminSettingsPage() {
                 </Card>
 
                 {/* 3. Courier Webhooks */}
-                <Card className="p-6 bg-white border border-neutral-200/90 rounded-2xl shadow-xs space-y-4">
+                <Card className="p-4 sm:p-6 bg-white border border-[#e7e5df] rounded-2xl shadow-xs space-y-4">
                   <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100">
-                    <div className="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-700 border border-cyan-200/80 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-700 border border-cyan-200/80 flex items-center justify-center shrink-0">
                       <Radio className="w-4 h-4" />
                     </div>
                     <div>
@@ -385,10 +394,10 @@ export default function AdminSettingsPage() {
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-cyan-50/50 border border-cyan-200/60">
-                      <div className="flex items-center gap-2.5">
-                        <ShieldAlert className="w-4 h-4 text-cyan-700" />
-                        <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-3.5 rounded-xl bg-cyan-50/50 border border-cyan-200/60">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <ShieldAlert className="w-4 h-4 text-cyan-700 shrink-0" />
+                        <div className="min-w-0">
                           <div className="text-xs font-semibold text-cyan-900">
                             {t.hmacLabel}
                           </div>
@@ -397,8 +406,8 @@ export default function AdminSettingsPage() {
                           </div>
                         </div>
                       </div>
-                      <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/80 px-2 py-0.5 rounded">
-                        ENFORCED
+                      <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/80 px-2 py-0.5 rounded shrink-0">
+                        {t.enforcedBadge}
                       </span>
                     </div>
                   </div>

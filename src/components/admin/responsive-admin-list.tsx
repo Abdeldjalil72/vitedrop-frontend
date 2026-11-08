@@ -109,17 +109,20 @@ export function ResponsiveAdminList<T>({
         </div>
       ) : (
         <>
-          {/* Mobile Cards (Phones only: block sm:hidden) */}
-          <div className="block sm:hidden divide-y divide-neutral-100">
+          {/* Mobile & Tablet Cards (< 1024px: block lg:hidden, 2-col grid on md:) */}
+          <div className="block lg:hidden divide-y divide-neutral-100 md:divide-y-0 md:grid md:grid-cols-2 md:gap-3 md:p-3.5">
             {items.map((item, index) => (
-              <div key={index} className="p-3.5 hover:bg-neutral-50/50 transition-colors">
+              <div
+                key={index}
+                className="p-3.5 md:rounded-xl md:border md:border-[#e7e5df] hover:bg-neutral-50/50 transition-colors"
+              >
                 {renderCard(item, index)}
               </div>
             ))}
           </div>
 
-          {/* Desktop Table (Tablet & Desktop: hidden sm:block) */}
-          <div className="hidden sm:block overflow-x-auto custom-scrollbar">
+          {/* Desktop Table (>= 1024px: hidden lg:block) */}
+          <div className="hidden lg:block overflow-x-auto custom-scrollbar">
             {renderTable()}
           </div>
         </>
@@ -133,7 +136,7 @@ export function ResponsiveAdminList<T>({
             size="sm"
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
-            className="text-xs flex items-center gap-1 h-8 px-2.5"
+            className="text-xs flex items-center gap-1 min-h-[38px] sm:min-h-[32px] h-9 sm:h-8 px-3 sm:px-2.5"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>{isArabic ? "السابق" : isEnglish ? "Previous" : "Précédent"}</span>
@@ -148,7 +151,7 @@ export function ResponsiveAdminList<T>({
             size="sm"
             disabled={page >= totalPages}
             onClick={() => onPageChange(page + 1)}
-            className="text-xs flex items-center gap-1 h-8 px-2.5"
+            className="text-xs flex items-center gap-1 min-h-[38px] sm:min-h-[32px] h-9 sm:h-8 px-3 sm:px-2.5"
           >
             <span>{isArabic ? "التالي" : isEnglish ? "Next" : "Suivant"}</span>
             <ChevronRight className="w-3.5 h-3.5" />
