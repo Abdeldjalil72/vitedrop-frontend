@@ -527,13 +527,13 @@ export function Sidebar({
         style={{ willChange: "transform" }}
         className={`fixed inset-y-0 start-0 z-50 w-[min(18rem,calc(100vw-2rem))] bg-white border-e ${
           role === "admin" ? "border-[#e7e5df]" : "border-black/[0.08]"
-        } flex flex-col justify-between overflow-hidden transition-[width] duration-300 md:static ${
+        } flex flex-col overflow-hidden transition-[width] duration-300 md:sticky md:top-0 md:h-screen md:max-h-screen md:self-start md:shrink-0 md:z-40 ${
           isOpen
             ? "translate-x-0 md:w-64"
             : `${isRtl ? "translate-x-full" : "-translate-x-full"} md:translate-x-0 md:w-0 md:border-transparent`
         }`}
       >
-        <div className={`flex flex-col h-full ${
+        <div className={`w-64 min-w-[16rem] flex flex-col h-full max-h-screen overflow-hidden ${
           role === "admin"
             ? "bg-gradient-to-b from-white via-[#fdfdfc] to-[#f8f7f4]"
             : "bg-gradient-to-b from-white via-white to-[#fafafa]"
@@ -599,7 +599,7 @@ export function Sidebar({
           </div>
 
           {/* Categorized Navigation Links with Context-Driven Color Highlights */}
-          <nav className="flex-1 px-2.5 py-3 sm:px-3 sm:py-3.5 space-y-4 overflow-y-auto">
+          <nav className="flex-1 min-h-0 px-2.5 py-3 sm:px-3 sm:py-3.5 space-y-4 overflow-y-auto overscroll-contain custom-scrollbar">
             {navSections.map((section, sIdx) => (
               <div key={section.title || sIdx} className="space-y-1">
                 {section.title && (
@@ -682,7 +682,7 @@ export function Sidebar({
             role === "admin"
               ? "border-[#e7e5df] bg-[#fbfaf8]/70"
               : "border-black/[0.06] bg-white/50"
-          } space-y-2.5 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]`}>
+          } space-y-2.5 shrink-0 mt-auto pb-[max(0.75rem,env(safe-area-inset-bottom))]`}>
             {/* Role Contextual Widget */}
             {role === "admin" ? (
               <div className="p-2.5 rounded-xl bg-[#06241b] text-emerald-50 border border-emerald-900/60 shadow-2xs flex items-center gap-2.5">

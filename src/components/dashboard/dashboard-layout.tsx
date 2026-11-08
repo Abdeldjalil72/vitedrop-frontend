@@ -244,7 +244,7 @@ export function DashboardLayout({
       data-dashboard-role={role}
       className={`dashboard-ui min-h-screen ${
         role === "admin" ? "bg-[#f8f7f4]" : "bg-[#fafafa]"
-      } flex antialiased text-neutral-900 w-full max-w-full overflow-x-hidden`}
+      } flex antialiased text-neutral-900 w-full max-w-full overflow-x-clip`}
     >
       {/* Sidebar */}
       <Sidebar
@@ -264,7 +264,7 @@ export function DashboardLayout({
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-clip">
         <Topbar
           role={role}
           balance={balance}
@@ -284,7 +284,7 @@ export function DashboardLayout({
           }}
         />
 
-        <main className="flex-1 px-3 py-4 sm:p-6 lg:p-8 max-w-[1400px] w-full min-w-0 mx-auto">
+        <main className="flex-1 px-3 py-4 sm:p-6 lg:p-8 max-w-7xl 2xl:max-w-[1640px] w-full min-w-0 mx-auto">
           {children({
             role,
             lang,

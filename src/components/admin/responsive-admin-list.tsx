@@ -119,7 +119,7 @@ export function ResponsiveAdminList<T>({
           </div>
 
           {/* Desktop Table (Tablet & Desktop: hidden sm:block) */}
-          <div className="hidden sm:block overflow-x-auto">
+          <div className="hidden sm:block overflow-x-auto custom-scrollbar">
             {renderTable()}
           </div>
         </>

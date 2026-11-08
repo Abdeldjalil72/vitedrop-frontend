@@ -9,7 +9,7 @@ export function Table({
   containerClassName?: string;
 }) {
   return (
-    <div className={`w-full overflow-x-auto rounded-2xl border border-black/[0.08] bg-white ${containerClassName}`}>
+    <div className={`w-full overflow-x-auto custom-scrollbar rounded-2xl border border-black/[0.08] bg-white ${containerClassName}`}>
       <table className={`w-full text-start text-sm border-collapse ${className}`} {...props}>
         {children}
       </table>
