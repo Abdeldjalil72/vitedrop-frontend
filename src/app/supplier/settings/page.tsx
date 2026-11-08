@@ -53,7 +53,13 @@ const supplierSettingsI18n = {
       auto: "Automatique (Optimisation selon Wilaya)",
       yalidine: "Yalidine Express uniquement",
       zr: "ZR Express uniquement",
+      noest: "Noest Express uniquement",
+      ecotrack: "Ecotrack uniquement",
+      maystro: "Maystro Delivery uniquement",
+      guepex: "Guepex uniquement",
     },
+    loadingParams: "Chargement des paramètres...",
+    dynamicTagInjection: "Injection dynamique de balises",
     whatsappSection: "Modèle de Confirmation WhatsApp (Speed-Dial)",
     whatsappSubtitle: "Ce texte pré-rempli s'ouvre automatiquement lors du clic sur le bouton WhatsApp du centre d'appels.",
     templateLabel: "Message de confirmation",
@@ -82,7 +88,13 @@ const supplierSettingsI18n = {
       auto: "Automated (Optimal routing by Wilaya)",
       yalidine: "Yalidine Express Only",
       zr: "ZR Express Only",
+      noest: "Noest Express Only",
+      ecotrack: "Ecotrack Only",
+      maystro: "Maystro Delivery Only",
+      guepex: "Guepex Only",
     },
+    loadingParams: "Loading store parameters...",
+    dynamicTagInjection: "Dynamic Tag Injection",
     whatsappSection: "Call-Center WhatsApp Confirmation Script",
     whatsappSubtitle: "This pre-filled message opens in 1 click from the call-center speed-dial queue.",
     templateLabel: "Confirmation Script Template",
@@ -111,7 +123,13 @@ const supplierSettingsI18n = {
       auto: "تلقائي (توجيه ذكي حسب الولاية)",
       yalidine: "ياليدين إكسبريس فقط (Yalidine)",
       zr: "زد آر إكسبريس فقط (ZR Express)",
+      noest: "نوست إكسبريس فقط (Noest)",
+      ecotrack: "إيكوتراك فقط (Ecotrack)",
+      maystro: "مايسترو ديليفري فقط (Maystro)",
+      guepex: "غيبكس فقط (Guepex)",
     },
+    loadingParams: "جاري تحميل إعدادات المتجر...",
+    dynamicTagInjection: "إدراج الوسوم التلقائي",
     whatsappSection: "نموذج رسالة التأكيد عبر واتساب",
     whatsappSubtitle: "يتم فتح هذه الرسالة الجاهزة بنقرة واحدة عند الاتصال بالزبون عبر واتساب.",
     templateLabel: "نص رسالة التأكيد",
@@ -237,7 +255,7 @@ export default function SupplierSettingsPage() {
             {loading ? (
               <Card className="p-8 text-center bg-white border border-neutral-200">
                 <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-neutral-500 font-mono">Loading store parameters...</p>
+                <p className="text-sm text-neutral-500 font-mono">{t.loadingParams}</p>
               </Card>
             ) : (
               <form onSubmit={(e) => handleSave(e, t)} className="space-y-6">
@@ -284,7 +302,7 @@ export default function SupplierSettingsPage() {
                           onChange={(e) =>
                             setSettings({ ...settings, phone: e.target.value })
                           }
-                          className="w-full font-mono text-left"
+                          className="w-full font-mono text-left pr-9"
                           placeholder="0550123456"
                         />
                         <Phone className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
@@ -307,7 +325,7 @@ export default function SupplierSettingsPage() {
                               notificationEmail: e.target.value,
                             })
                           }
-                          className="w-full font-mono text-left"
+                          className="w-full font-mono text-left pr-9"
                           placeholder="supplier@vitedrop.com"
                         />
                         <Mail className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
@@ -402,6 +420,10 @@ export default function SupplierSettingsPage() {
                       <option value="AUTO">{t.couriers.auto}</option>
                       <option value="YALIDINE">{t.couriers.yalidine}</option>
                       <option value="ZR_EXPRESS">{t.couriers.zr}</option>
+                      <option value="NOEST">{t.couriers.noest}</option>
+                      <option value="ECOTRACK">{t.couriers.ecotrack}</option>
+                      <option value="MAYSTRO">{t.couriers.maystro}</option>
+                      <option value="GUEPEX">{t.couriers.guepex}</option>
                     </select>
                   </div>
                 </Card>
@@ -428,8 +450,7 @@ export default function SupplierSettingsPage() {
                         {t.templateLabel}
                       </label>
                       <span className="text-xs text-neutral-400 font-mono flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-purple-600" /> Dynamic Tag
-                        Injection
+                        <Sparkles className="w-3 h-3 text-purple-600" /> {t.dynamicTagInjection}
                       </span>
                     </div>
                     <Textarea

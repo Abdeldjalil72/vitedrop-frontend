@@ -225,8 +225,13 @@ export default function ProductDetailPage({
                   <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-2.5 text-xs text-sky-900">
                     <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
                     <span>
-                      Paiement garanti par <strong>l'Escrow Prépayé ViteDrop</strong> dès
-                      confirmation de livraison par le transporteur.
+                      {lang === "ar" ? (
+                        <>الدفع مضمون عبر <strong>نظام الضمان المسبق ViteDrop Escrow</strong> فور تأكيد التسليم من شركة التوصيل.</>
+                      ) : lang === "en" ? (
+                        <>Payment 100% guaranteed via <strong>ViteDrop Prepaid Escrow</strong> upon carrier delivery confirmation.</>
+                      ) : (
+                        <>Paiement garanti par <strong>l'Escrow Prépayé ViteDrop</strong> dès confirmation de livraison par le transporteur.</>
+                      )}
                     </span>
                   </div>
 
@@ -243,7 +248,11 @@ export default function ProductDetailPage({
                     </Button>
 
                     <p className="text-[11px] text-center text-[#6b6b6b]">
-                      Génère un lien unique compatible Meta Ads & TikTok Pixel CAPI
+                      {lang === "ar"
+                        ? "يتم توليد رابط فريد متوافق مع Meta Ads و TikTok Pixel CAPI"
+                        : lang === "en"
+                        ? "Generates a unique tracking link compatible with Meta Ads & TikTok Pixel CAPI"
+                        : "Génère un lien unique compatible Meta Ads & TikTok Pixel CAPI"}
                     </p>
                   </div>
                 </Card>
@@ -254,39 +263,72 @@ export default function ProductDetailPage({
             <Card className="p-6 sm:p-8 space-y-4">
               <CardHeader
                 title={t.marketplace.marketingAngles}
-                subtitle="Recommandations et angles d'accroche pour maximiser votre ROAS en Algérie"
+                subtitle={
+                  lang === "ar"
+                    ? "توصيات وزوايا تسويقية إبداعية لمضاعفة العائد على الإنفاق الإعلاني (ROAS) في الجزائر"
+                    : lang === "en"
+                    ? "Creative angles and ad copy recommendations to maximize ROAS in Algeria"
+                    : "Recommandations et angles d'accroche pour maximiser votre ROAS en Algérie"
+                }
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                 <div className="p-4 rounded-2xl bg-[#fafafa] border border-black/[0.04] space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
                     <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>Angle 1 : Économie de Temps</span>
+                    <span>
+                      {lang === "ar"
+                        ? "الزاوية 1: توفير الوقت والجهد"
+                        : lang === "en"
+                        ? "Angle 1: Time & Effort Saver"
+                        : "Angle 1 : Économie de Temps"}
+                    </span>
                   </div>
                   <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                    Mettre en avant le gain de temps et la simplicité d'utilisation chez soi sans
-                    déplacement. Vidéo UGC avant/après avec démonstration immédiate.
+                    {lang === "ar"
+                      ? "إبراز سهولة الاستخدام وتوفير التنقل. فيديو UGC مقارنة قبل/بعد مع استعراض النتيجة الفورية."
+                      : lang === "en"
+                      ? "Highlight convenience, time savings, and effortless home use. UGC before/after video showing instant results."
+                      : "Mettre en avant le gain de temps et la simplicité d'utilisation chez soi sans déplacement. Vidéo UGC avant/après avec démonstration immédiate."}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#fafafa] border border-black/[0.04] space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
                     <Truck className="w-4 h-4 text-sky-500" />
-                    <span>Angle 2 : Paiement à la Réception</span>
+                    <span>
+                      {lang === "ar"
+                        ? "الزاوية 2: الدفع عند الاستلام والمعاينة"
+                        : lang === "en"
+                        ? "Angle 2: Cash on Delivery with Inspection"
+                        : "Angle 2 : Paiement à la Réception"}
+                    </span>
                   </div>
                   <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                    Rassurer le consommateur algérien : « الدفع عند الاستلام بعد المعاينة والتأكد
-                    من الجودة ». Réduit le taux de refus au téléphone.
+                    {lang === "ar"
+                      ? "طمأنة الزبون الجزائري: « الدفع عند الاستلام بعد المعاينة والتأكد من الجودة » لخفض نسبة الإلغاء هاتفياً."
+                      : lang === "en"
+                      ? "Reassure Algerian buyers: 'Cash on delivery after package inspection'. Minimizes refusal rate during confirmation call."
+                      : "Rassurer le consommateur algérien : « الدفع عند الاستلام بعد المعاينة والتأكد من الجودة ». Réduit le taux de refus au téléphone."}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#fafafa] border border-black/[0.04] space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
                     <Layers className="w-4 h-4 text-purple-500" />
-                    <span>Angle 3 : Pack Promo 2 Unités</span>
+                    <span>
+                      {lang === "ar"
+                        ? "الزاوية 3: عروض الحزم الترويجية (2 قطع)"
+                        : lang === "en"
+                        ? "Angle 3: Bundle & Multi-Buy Promo"
+                        : "Angle 3 : Pack Promo 2 Unités"}
+                    </span>
                   </div>
                   <p className="text-xs text-[#6b6b6b] leading-relaxed">
-                    Offre « 1 achetée = 2ème à -50% » ou livraison gratuite dès 2 unités pour
-                    augmenter le panier moyen (AOV).
+                    {lang === "ar"
+                      ? "عرض « اشتري 1 واحصل على الثانية بنصف السعر » أو توصيل مجاني عند شراء قطعتين لرفع متوسط قيمة الطلب (AOV)."
+                      : lang === "en"
+                      ? "Offer 'Buy 1, get 2nd at 50% off' or free delivery on 2+ units to scale your Average Order Value (AOV)."
+                      : "Offre « 1 achetée = 2ème à -50% » ou livraison gratuite dès 2 unités pour augmenter le panier moyen (AOV)."}
                   </p>
                 </div>
               </div>

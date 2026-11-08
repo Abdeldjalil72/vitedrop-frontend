@@ -396,44 +396,44 @@ export default function SupplierWalletPage() {
 
               {/* 4-Metric Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-black/[0.06] text-xs">
-                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1">
-                  <span className="text-[11px] text-neutral-500 block font-medium">
+                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1 min-w-0">
+                  <span className="text-[11px] text-neutral-500 block font-medium truncate">
                     {wLoc.solvencyAvailableBalance}
                   </span>
-                  <span className="font-mono text-base font-bold text-neutral-950 block" data-testid="solvency-available-balance">
+                  <span className="font-mono text-base font-bold text-neutral-950 block truncate" data-testid="solvency-available-balance">
                     {formatDZD(balance, lang)}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1">
-                  <span className="text-[11px] text-neutral-500 block font-medium">
+                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1 min-w-0">
+                  <span className="text-[11px] text-neutral-500 block font-medium truncate">
                     {wLoc.inTransitLiabilityTitle}
                   </span>
-                  <span className="font-mono text-base font-bold text-amber-700 block" data-testid="solvency-transit-liability">
+                  <span className="font-mono text-base font-bold text-amber-700 block truncate" data-testid="solvency-transit-liability">
                     {formatDZD(inTransitLiability, lang)}
                   </span>
-                  <span className="text-[10px] text-neutral-400 block font-mono">
+                  <span className="text-[10px] text-neutral-400 block font-mono truncate">
                     {inTransitCount} {wLoc.parcelsOnTheRoad}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1">
-                  <span className="text-[11px] text-neutral-500 block font-medium">
+                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1 min-w-0">
+                  <span className="text-[11px] text-neutral-500 block font-medium truncate">
                     {wLoc.netFreeMarginTitle}
                   </span>
-                  <span className="font-mono text-base font-bold text-emerald-700 block" data-testid="solvency-net-free-margin">
+                  <span className="font-mono text-base font-bold text-emerald-700 block truncate" data-testid="solvency-net-free-margin">
                     {formatDZD(netFreeMargin, lang)}
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1">
-                  <span className="text-[11px] text-neutral-500 block font-medium">
-                    Couverture Estimée
+                <div className="p-3.5 rounded-2xl bg-white border border-black/[0.06] shadow-2xs space-y-1 min-w-0">
+                  <span className="text-[11px] text-neutral-500 block font-medium truncate">
+                    {isAr ? "التغطية التقديرية" : lang === "en" ? "Estimated Runway" : "Couverture Estimée"}
                   </span>
-                  <span className="font-mono text-base font-bold text-purple-700 block" data-testid="solvency-runway-deliveries">
-                    ~{runwayDeliveries} livraisons
+                  <span className="font-mono text-base font-bold text-purple-700 block truncate" data-testid="solvency-runway-deliveries">
+                    ~{runwayDeliveries} {isAr ? "طلبية توصيل" : lang === "en" ? "deliveries" : "livraisons"}
                   </span>
-                  <span className="text-[10px] text-neutral-400 block font-mono">
+                  <span className="text-[10px] text-neutral-400 block font-mono truncate">
                     ~1 250 DZD/CPA
                   </span>
                 </div>
@@ -761,8 +761,8 @@ export default function SupplierWalletPage() {
 
             {/* Transactions Ledger Container */}
             <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-              {/* Mobile Cards View (< 640px) */}
-              <div className="block sm:hidden divide-y divide-neutral-100">
+              {/* Mobile / Tablet Cards View (< 1024px) */}
+              <div className="block lg:hidden divide-y divide-neutral-100">
                 {isLoading ? (
                   <div className="p-6 space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -796,14 +796,14 @@ export default function SupplierWalletPage() {
                             <button
                               type="button"
                               onClick={() => handleCopy(tx.id, `mob-${tx.id}`)}
-                              className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                              className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded text-neutral-400 hover:text-neutral-700 cursor-pointer"
                               data-testid="copy-tx-ref-btn"
                               aria-label="Copier Réf"
                             >
                               {copiedId === `mob-${tx.id}` ? (
-                                <Check className="w-3 h-3 text-emerald-600" />
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
                               ) : (
-                                <Copy className="w-3 h-3" />
+                                <Copy className="w-3.5 h-3.5" />
                               )}
                             </button>
                           </div>
@@ -857,8 +857,8 @@ export default function SupplierWalletPage() {
                 )}
               </div>
 
-              {/* Desktop Table View (>= 640px) */}
-              <div className="hidden sm:block overflow-x-auto w-full min-w-0">
+              {/* Desktop Table View (>= 1024px) */}
+              <div className="hidden lg:block overflow-x-auto w-full min-w-0">
                 <Table>
                   <TableHeader>
                     <TableRow>

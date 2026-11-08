@@ -290,8 +290,8 @@ export default function SupplierProductsPage() {
 
             {/* Products Container */}
             <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-              {/* Mobile Cards View (< 640px) */}
-              <div className="block sm:hidden divide-y divide-neutral-100">
+              {/* Mobile / Tablet Cards View (< 1024px) */}
+              <div className="block lg:hidden divide-y divide-neutral-100">
                 {isLoading ? (
                   <div className="p-6 space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -330,14 +330,14 @@ export default function SupplierProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleCopy(p.id, `mob-id-${p.id}`)}
-                                className="p-0.5 rounded text-neutral-400 hover:text-black cursor-pointer"
+                                className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded text-neutral-400 hover:text-black cursor-pointer"
                                 data-testid="copy-product-id-btn"
                                 aria-label="Copier ID"
                               >
                                 {copiedId === `mob-id-${p.id}` ? (
-                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
@@ -420,7 +420,7 @@ export default function SupplierProductsPage() {
                               setEditingProduct(p);
                               setIsProductModalOpen(true);
                             }}
-                            className="w-full text-xs font-semibold py-1.5 gap-1.5 justify-center border-neutral-200 hover:bg-neutral-50 text-neutral-800"
+                            className="w-full min-h-[40px] text-xs font-semibold py-1.5 gap-1.5 justify-center border-neutral-200 hover:bg-neutral-50 text-neutral-800"
                             data-testid={`mobile-edit-product-${p.id}`}
                           >
                             <Edit3 className="w-3.5 h-3.5 text-neutral-500" />
@@ -433,8 +433,8 @@ export default function SupplierProductsPage() {
                 )}
               </div>
 
-              {/* Desktop Table View (>= 640px) */}
-              <div className="hidden sm:block overflow-x-auto w-full min-w-0">
+              {/* Desktop Table View (>= 1024px) */}
+              <div className="hidden lg:block overflow-x-auto w-full min-w-0">
                 <Table>
                   <TableHeader>
                     <TableRow>

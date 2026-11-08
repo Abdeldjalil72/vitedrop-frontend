@@ -145,7 +145,7 @@ export default function AffiliateMarketplacePage() {
 
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1.5 rounded-2xl bg-emerald-50 text-emerald-800 text-xs font-mono font-semibold border border-emerald-200/60">
-                  {filteredProducts.length} {lang === "ar" ? "منتج رابح" : "produits disponibles"}
+                  {filteredProducts.length} {lang === "ar" ? "منتج رابح" : lang === "en" ? "products available" : "produits disponibles"}
                 </span>
               </div>
             </div>
@@ -226,7 +226,11 @@ export default function AffiliateMarketplacePage() {
               <div className="py-20 flex flex-col items-center justify-center gap-3">
                 <RefreshCw className="w-8 h-8 text-sky-600 animate-spin" />
                 <p className="text-xs font-medium text-neutral-500">
-                  {lang === "ar" ? "جاري تحميل المنتجات من قاعدة البيانات..." : "Chargement du catalogue en direct..."}
+                  {lang === "ar"
+                    ? "جاري تحميل المنتجات من قاعدة البيانات..."
+                    : lang === "en"
+                    ? "Loading real-time catalog..."
+                    : "Chargement du catalogue en direct..."}
                 </p>
               </div>
             )}
@@ -304,7 +308,7 @@ export default function AffiliateMarketplacePage() {
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="w-full text-xs"
+                            className="w-full min-h-[40px] text-xs flex items-center justify-center"
                             data-testid="view-product-details-btn"
                           >
                             {t.marketplace.viewDetails}
@@ -313,7 +317,7 @@ export default function AffiliateMarketplacePage() {
 
                         <Button
                           size="sm"
-                          className="w-full text-xs"
+                          className="w-full min-h-[40px] text-xs"
                           onClick={() => setActiveModalProduct(p)}
                           data-testid="generate-link-btn"
                         >
@@ -332,11 +336,13 @@ export default function AffiliateMarketplacePage() {
               <div className="p-16 text-center bg-white rounded-3xl border border-dashed border-black/10">
                 <Package className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
                 <h4 className="text-base font-semibold text-neutral-800">
-                  {lang === "ar" ? "لا توجد منتجات متاحة حالياً" : "Aucun produit disponible"}
+                  {lang === "ar" ? "لا توجد منتجات متاحة حالياً" : lang === "en" ? "No products available" : "Aucun produit disponible"}
                 </h4>
                 <p className="text-xs text-[#6b6b6b] mt-1 max-w-sm mx-auto">
                   {lang === "ar"
                     ? "لم يتم العثور على منتجات في قاعدة البيانات."
+                    : lang === "en"
+                    ? "No active products found in the catalog right now."
                     : "Aucun produit actif n'a été trouvé dans la base de données pour le moment."}
                 </p>
               </div>

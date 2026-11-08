@@ -430,7 +430,7 @@ export function SupplierProductModal({
       data-testid="supplier-product-modal"
     >
       <div
-        className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[92vh] [overscroll-behavior:contain] text-start animate-in zoom-in-95 duration-200"
+        className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-black/[0.08] overflow-hidden flex flex-col max-h-[min(92vh,calc(100dvh-1.5rem))] [overscroll-behavior:contain] text-start animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -677,22 +677,10 @@ export function SupplierProductModal({
                 </div>
               </div>
 
-              {/* Dynamic Solvency Escrow Buffer & 80/20 CPA Breakdown */}
+              {/* Dynamic Solvency Escrow Buffer */}
               {cpaNum > 0 && (
-                <div className="pt-3 border-t border-emerald-200/60 space-y-2 text-xs">
-                  <div className="flex justify-between items-center text-[11px] text-neutral-600">
-                    <span>{isAr ? "عمولة المسوق الصافية (80%):" : "Gain Net Affilié (80%):"}</span>
-                    <span className="font-mono font-bold text-emerald-700">
-                      {formatDZD(Math.round(cpaNum * 0.8), lang)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] text-neutral-600">
-                    <span>{isAr ? "رسوم المنصة (20%):" : "Frais Plateforme ViteDrop (20%):"}</span>
-                    <span className="font-mono font-bold text-neutral-700">
-                      {formatDZD(Math.round(cpaNum * 0.2), lang)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pt-1 border-t border-emerald-100">
+                <div className="pt-3 border-t border-emerald-200/60 text-xs">
+                  <div className="flex justify-between items-center">
                     <span className="font-semibold text-neutral-900">{t.requiredEscrow}</span>
                     <span className="font-mono font-bold text-neutral-950 text-sm">
                       {formatDZD(requiredEscrow, lang)}

@@ -388,8 +388,8 @@ export default function SupplierOrdersPage() {
               </div>
             </div>
 
-            {/* Desktop Orders Table (>= 640px) */}
-            <div className="hidden sm:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
+            {/* Desktop Orders Table (>= 1024px) */}
+            <div className="hidden lg:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
               <Table data-testid="supplier-orders-table">
                 <TableHeader>
                   <TableRow>
@@ -709,8 +709,8 @@ export default function SupplierOrdersPage() {
               </Table>
             </div>
 
-            {/* Mobile Cards View (< 640px) */}
-            <div className="sm:hidden flex flex-col gap-3">
+            {/* Mobile Cards View (< 1024px) */}
+            <div className="lg:hidden flex flex-col gap-3">
               {isLoading ? (
                 <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
                   <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-purple-600" />
@@ -748,7 +748,7 @@ export default function SupplierOrdersPage() {
                               href={buildWhatsAppUrl(order, lang)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-0.5 rounded text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors inline-flex items-center"
+                              className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded-lg text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
                               title="WhatsApp"
                               aria-label="WhatsApp"
                               data-testid="whatsapp-order-btn-mobile"
@@ -789,7 +789,7 @@ export default function SupplierOrdersPage() {
                             type="button"
                             data-testid="copy-tracking-btn-mobile"
                             onClick={() => handleCopy(order.trackingNumber!, order.id)}
-                            className="text-purple-700 hover:text-purple-900 font-medium text-[11px] px-2 py-0.5 rounded bg-white shadow-2xs"
+                            className="text-purple-700 hover:text-purple-900 font-medium text-[11px] min-h-[32px] px-2.5 py-1 rounded-lg bg-white shadow-2xs inline-flex items-center justify-center cursor-pointer"
                           >
                             {copiedId === order.id ? (
                               <span className="text-emerald-600 font-bold">✓</span>
@@ -813,7 +813,7 @@ export default function SupplierOrdersPage() {
                               data-testid="dispatch-yalidine-btn-mobile"
                               disabled={actionLoadingId === order.id}
                               onClick={() => handleDispatchYalidine(order.id)}
-                              className="flex-1 text-xs py-1.5 bg-purple-700 hover:bg-purple-800 text-white gap-1 justify-center shadow-xs"
+                              className="flex-1 min-h-[40px] text-xs py-1.5 bg-purple-700 hover:bg-purple-800 text-white gap-1 justify-center shadow-xs"
                             >
                               {actionLoadingId === order.id ? (
                                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -827,7 +827,7 @@ export default function SupplierOrdersPage() {
                               data-testid="dispatch-order-btn-mobile"
                               disabled={actionLoadingId === order.id}
                               onClick={() => handleDispatchOrder(order.id, o.msgDispatched)}
-                              className="flex-1 text-xs py-1.5 bg-slate-900 hover:bg-neutral-800 text-white gap-1 justify-center"
+                              className="flex-1 min-h-[40px] text-xs py-1.5 bg-slate-900 hover:bg-neutral-800 text-white gap-1 justify-center"
                             >
                               {actionLoadingId === order.id ? (
                                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -844,7 +844,7 @@ export default function SupplierOrdersPage() {
                                 setCustomTrackingInput(order.trackingNumber || "");
                                 setCustomCourierInput(order.courier || "YALIDINE");
                               }}
-                              className="p-2 rounded-xl border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0 cursor-pointer"
+                              className="min-w-[40px] min-h-[40px] p-2 rounded-xl border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0 inline-flex items-center justify-center cursor-pointer"
                               title={isAr ? "إدخال رقم تتبع مخصص" : "Saisir un numéro de suivi personnalisé"}
                             >
                               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -858,7 +858,7 @@ export default function SupplierOrdersPage() {
                                 variant="secondary"
                                 data-testid="view-waybill-btn-mobile"
                                 onClick={() => handleOpenWaybill(order)}
-                                className="flex-1 text-xs py-1.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300 justify-center"
+                                className="flex-1 min-h-[40px] text-xs py-1.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300 justify-center"
                               >
                                 <Printer className="w-3.5 h-3.5" />
                                 <span>{isAr ? "البوليصة" : isEn ? "Waybill" : "Bordereau"}</span>
@@ -877,7 +877,7 @@ export default function SupplierOrdersPage() {
                                     order.courier || undefined
                                   )
                                 }
-                                className="flex-1 text-xs py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 justify-center"
+                                className="flex-1 min-h-[40px] text-xs py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 justify-center"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 <span>{o.simulateDeliveredMobile}</span>
@@ -898,7 +898,7 @@ export default function SupplierOrdersPage() {
                                     order.courier || undefined
                                   )
                                 }
-                                className="flex-1 text-xs py-1.5 bg-rose-600 hover:bg-rose-700 text-white gap-1 justify-center"
+                                className="flex-1 min-h-[40px] text-xs py-1.5 bg-rose-600 hover:bg-rose-700 text-white gap-1 justify-center"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" />
                                 <span>{isAr ? "إرجاع" : isEn ? "Return" : "Retour"}</span>
@@ -912,7 +912,7 @@ export default function SupplierOrdersPage() {
                               variant="secondary"
                               data-testid="view-waybill-btn-mobile"
                               onClick={() => handleOpenWaybill(order)}
-                              className="text-xs py-1 px-2.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300"
+                              className="min-h-[40px] text-xs py-1 px-2.5 gap-1 text-neutral-700 hover:text-neutral-900 border-neutral-300"
                             >
                               <Printer className="w-3.5 h-3.5" />
                               <span>{isAr ? "البوليصة" : isEn ? "Waybill" : "Bordereau"}</span>
@@ -940,7 +940,7 @@ export default function SupplierOrdersPage() {
                                   data-testid="rto-restock-btn-mobile"
                                   disabled={actionLoadingId === order.id}
                                   onClick={() => handleRestockRto(order.id, "INTACT")}
-                                  className="flex-1 text-xs py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 justify-center shadow-xs cursor-pointer"
+                                  className="flex-1 min-h-[40px] text-xs py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white gap-1 justify-center shadow-xs cursor-pointer"
                                 >
                                   {actionLoadingId === order.id ? (
                                     <RefreshCw className="w-3 h-3 animate-spin" />
@@ -955,7 +955,7 @@ export default function SupplierOrdersPage() {
                                   data-testid="rto-damage-btn-mobile"
                                   disabled={actionLoadingId === order.id}
                                   onClick={() => handleRestockRto(order.id, "DAMAGED")}
-                                  className="text-xs py-1.5 text-rose-700 border-rose-200 hover:bg-rose-50 gap-1 px-3 cursor-pointer"
+                                  className="min-h-[40px] text-xs py-1.5 text-rose-700 border-rose-200 hover:bg-rose-50 gap-1 px-3 cursor-pointer"
                                 >
                                   <AlertCircle className="w-3 h-3 text-rose-600" />
                                   <span>{isAr ? "تالف" : isEn ? "Damaged" : "Défectueux"}</span>
@@ -1009,6 +1009,10 @@ export default function SupplierOrdersPage() {
                     >
                       <option value="YALIDINE">Yalidine Express</option>
                       <option value="ZR_EXPRESS">ZR Express</option>
+                      <option value="NOEST">Noest Express</option>
+                      <option value="ECOTRACK">Ecotrack</option>
+                      <option value="MAYSTRO">Maystro Delivery</option>
+                      <option value="GUEPEX">Guepex</option>
                     </select>
                   </div>
 

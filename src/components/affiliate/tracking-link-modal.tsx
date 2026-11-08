@@ -116,9 +116,10 @@ export function TrackingLinkModal({
             <input
               type="text"
               readOnly
+              dir="ltr"
               value={trackingUrl}
               data-testid="generated-link-input"
-              className="w-full font-mono text-xs bg-[#fafafa] border border-black/10 rounded-2xl px-3.5 py-2.5 text-neutral-800 focus:outline-none"
+              className="w-full font-mono text-xs bg-[#fafafa] border border-black/10 rounded-2xl px-3.5 py-2.5 text-neutral-800 focus:outline-none text-left"
             />
             <Button
               type="button"
@@ -147,11 +148,28 @@ export function TrackingLinkModal({
         <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-2.5 text-[11px] text-sky-900 leading-relaxed">
           <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
           <span>
-            Ce lien capture automatiquement{" "}
-            <code className="bg-white/80 px-1 py-0.5 rounded font-mono">click_id</code>,{" "}
-            <code className="bg-white/80 px-1 py-0.5 rounded font-mono">fbclid</code> et{" "}
-            <code className="bg-white/80 px-1 py-0.5 rounded font-mono">ttclid</code>. Les
-            événements de conversion (CAPI) sont expédiés en tâche de fond dès validation.
+            {lang === "ar" ? (
+              <>
+                يلتقط هذا الرابط تلقائياً{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">click_id</code>،{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">fbclid</code> و{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">ttclid</code>. يتم إرسال أحداث التحويل (CAPI) مباشرة إلى خوادم الإعلانات في الخلفية فور التأكيد.
+              </>
+            ) : lang === "en" ? (
+              <>
+                This link automatically captures{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">click_id</code>,{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">fbclid</code> and{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">ttclid</code>. Server-side conversion events (CAPI) are dispatched asynchronously upon confirmation.
+              </>
+            ) : (
+              <>
+                Ce lien capture automatiquement{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">click_id</code>,{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">fbclid</code> et{" "}
+                <code className="bg-white/80 px-1 py-0.5 rounded font-mono">ttclid</code>. Les événements de conversion (CAPI) sont expédiés en tâche de fond dès validation.
+              </>
+            )}
           </span>
         </div>
 
@@ -163,7 +181,13 @@ export function TrackingLinkModal({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700"
           >
-            <span>Tester la page client</span>
+            <span>
+              {lang === "ar"
+                ? "معاينة صفحة الزبون"
+                : lang === "en"
+                ? "Preview Customer Landing Page"
+                : "Tester la page client"}
+            </span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 

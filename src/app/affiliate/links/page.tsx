@@ -314,7 +314,7 @@ export default function AffiliateLinksPage() {
                       onClick={loadProducts}
                       className="h-7 px-2 text-xs border-rose-200 text-rose-700 hover:bg-rose-100 shrink-0"
                     >
-                      <RefreshCw className="w-3 h-3 mr-1" />
+                      <RefreshCw className="w-3 h-3 me-1" />
                       {lang === "ar" ? "إعادة المحاولة" : "Réessayer"}
                     </Button>
                   </div>
@@ -409,7 +409,8 @@ export default function AffiliateLinksPage() {
                     </span>
                     <span
                       data-testid="generated-link-display"
-                      className="text-xs font-mono font-semibold text-neutral-900 truncate"
+                      dir="ltr"
+                      className="text-xs font-mono font-semibold text-neutral-900 truncate text-start"
                     >
                       {generatedLink || dict.selectProductPrompt}
                     </span>
@@ -511,8 +512,8 @@ export default function AffiliateLinksPage() {
                 </span>
               </div>
 
-              {/* Desktop Table View (>= 640px) */}
-              <div className="hidden sm:block">
+              {/* Desktop Table View (>= 1024px) */}
+              <div className="hidden lg:block">
                 <Table data-testid="affiliate-links-table">
                   <TableHeader>
                     <TableRow>
@@ -553,7 +554,7 @@ export default function AffiliateLinksPage() {
                                 {p.affiliateNetPayout ? formatDZD(p.affiliateNetPayout, lang) : "—"}
                               </span>
                             </TableCell>
-                            <TableCell className="font-mono text-xs text-neutral-500 max-w-xs truncate">
+                            <TableCell className="font-mono text-xs text-neutral-500 max-w-xs truncate" dir="ltr">
                               {directLink}
                             </TableCell>
                             <TableCell className="text-end">
@@ -582,8 +583,8 @@ export default function AffiliateLinksPage() {
                 </Table>
               </div>
 
-              {/* Mobile Card View (< 640px) */}
-              <div className="sm:hidden flex flex-col gap-3">
+              {/* Mobile Card View (< 1024px) */}
+              <div className="lg:hidden flex flex-col gap-3">
                 {products.length === 0 ? (
                   <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
                     {dict.emptyCatalog}
@@ -624,7 +625,7 @@ export default function AffiliateLinksPage() {
                           </span>
                         </div>
 
-                        <div className="p-2 rounded-xl bg-neutral-100/70 font-mono text-[11px] text-neutral-600 truncate">
+                        <div dir="ltr" className="p-2 rounded-xl bg-neutral-100/70 font-mono text-[11px] text-neutral-600 truncate text-start">
                           {directLink}
                         </div>
 
@@ -633,7 +634,7 @@ export default function AffiliateLinksPage() {
                           variant="secondary"
                           onClick={() => handleCopyDirect(p.id, directLink)}
                           data-testid="copy-product-link-btn"
-                          className={`w-full text-xs py-2 transition-all ${
+                          className={`w-full min-h-[40px] text-xs py-2 transition-all ${
                             isCopied ? "border-emerald-500 text-emerald-700 bg-emerald-50/50" : ""
                           }`}
                         >

@@ -553,11 +553,11 @@ function SupplierDashboardView({
                 </div>
 
                 <div className="flex items-center gap-4 bg-white/80 backdrop-blur-xs p-3 px-4 rounded-xl border border-black/5 shrink-0 self-stretch md:self-auto justify-between md:justify-start">
-                  <div>
-                    <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wide block">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wide block truncate">
                       {s.availableBalance}
                     </span>
-                    <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
+                    <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900 block truncate">
                       {formatDZD(currentBalance, lang)}
                     </span>
                   </div>
@@ -565,7 +565,7 @@ function SupplierDashboardView({
                     size="sm"
                     variant="secondary"
                     onClick={() => setIsTopUpModalOpen(true)}
-                    className="text-xs"
+                    className="text-xs shrink-0"
                   >
                     {s.details}
                   </Button>
@@ -915,8 +915,8 @@ function SupplierDashboardView({
                 )}
 
                 <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-                  {/* Mobile Cards View (390px) */}
-                  <div className="block sm:hidden divide-y divide-neutral-100">
+                  {/* Mobile Cards View (< 1024px) */}
+                  <div className="block lg:hidden divide-y divide-neutral-100">
                     {isLoading ? (
                       <div className="p-6 space-y-3">
                         {Array.from({ length: 3 }).map((_, i) => (
@@ -966,7 +966,7 @@ function SupplierDashboardView({
                                 <div className="flex items-center gap-2">
                                   <a
                                     href={`tel:${lead.customerPhone}`}
-                                    className="font-mono text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
+                                    className="font-mono text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1 min-h-[32px]"
                                   >
                                     <Phone className="w-3 h-3 text-emerald-600" />
                                     <span dir="ltr">{lead.customerPhone}</span>
@@ -975,7 +975,7 @@ function SupplierDashboardView({
                                     href={buildWhatsAppUrl(lead, lang)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="p-1 rounded text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors flex items-center gap-0.5 text-[11px] font-bold"
+                                    className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded-lg text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors gap-0.5 text-[11px] font-bold"
                                     title={s.whatsAppTooltip}
                                     aria-label={s.whatsAppTooltip}
                                     data-testid="whatsapp-lead-btn"
@@ -989,7 +989,7 @@ function SupplierDashboardView({
                                   <button
                                     type="button"
                                     onClick={() => handleIncrementCallAttempt(lead.id)}
-                                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono transition-all cursor-pointer border ${
+                                    className={`inline-flex items-center gap-1 px-2.5 py-1 min-h-[32px] rounded-full text-[10px] font-bold font-mono transition-all cursor-pointer border ${
                                       (callAttempts[lead.id] || 0) === 0
                                         ? "bg-neutral-50 text-neutral-600 border-neutral-200"
                                         : (callAttempts[lead.id] || 0) === 1
@@ -1013,14 +1013,14 @@ function SupplierDashboardView({
                                   <button
                                     type="button"
                                     onClick={() => handleCopy(lead.customerPhone, `lead-phone-${lead.id}`)}
-                                    className="p-1 rounded text-neutral-400 hover:text-black"
+                                    className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded-lg text-neutral-400 hover:text-black cursor-pointer"
                                     data-testid="copy-phone-btn"
                                     aria-label="Copier téléphone"
                                   >
                                     {copiedKey === `lead-phone-${lead.id}` ? (
-                                      <Check className="w-3 h-3 text-emerald-600" />
+                                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                                     ) : (
-                                      <Copy className="w-3 h-3" />
+                                      <Copy className="w-3.5 h-3.5" />
                                     )}
                                   </button>
                                 </div>
@@ -1052,7 +1052,7 @@ function SupplierDashboardView({
                                 size="sm"
                                 disabled={isProcessing}
                                 onClick={() => setCancelModalOrder(lead)}
-                                className="min-h-[38px] text-xs justify-center gap-1"
+                                className="min-h-[40px] text-xs justify-center gap-1"
                                 data-testid="cancel-lead-btn"
                               >
                                 <XCircle className="w-3.5 h-3.5" />
@@ -1062,7 +1062,7 @@ function SupplierDashboardView({
                                 size="sm"
                                 disabled={isProcessing}
                                 onClick={() => handleConfirmLead(lead.id, s.msgLeadConfirmed)}
-                                className="min-h-[38px] text-xs justify-center bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
+                                className="min-h-[40px] text-xs justify-center bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
                                 data-testid="confirm-lead-btn"
                               >
                                 {isProcessing ? (
@@ -1080,7 +1080,7 @@ function SupplierDashboardView({
                   </div>
 
                   {/* Desktop Table View */}
-                  <div className="hidden sm:block overflow-x-auto">
+                  <div className="hidden lg:block overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -1306,14 +1306,14 @@ function SupplierDashboardView({
                 {/* Priority 2: Floating Sticky Batch Drawer */}
                 {selectedLeadIds.length > 0 && (
                   <div
-                    className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 max-w-2xl w-[94vw] animate-in slide-in-from-bottom-5 duration-200"
+                    className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white p-3.5 sm:px-5 sm:py-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 max-w-2xl w-[94vw] animate-in slide-in-from-bottom-5 duration-200"
                     data-testid="supplier-batch-drawer"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
                       <span className="font-mono text-xs font-bold bg-white/20 px-2.5 py-1 rounded-full">
                         {s.batchSelectedCount.replace("{count}", String(selectedLeadIds.length))}
                       </span>
-                      <div className="hidden sm:block text-xs text-neutral-300 font-mono">
+                      <div className="text-xs text-neutral-300 font-mono">
                         {s.batchTotalCpa}{" "}
                         <span className="font-bold text-white">
                           {formatDZD(
@@ -1330,12 +1330,12 @@ function SupplierDashboardView({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                       <Button
                         size="sm"
                         variant="secondary"
                         onClick={() => handleBatchCallAttempt(s.batchCallAttemptSuccess)}
-                        className="text-xs bg-white/10 hover:bg-white/20 text-white border-white/20 gap-1.5"
+                        className="flex-1 sm:flex-none min-h-[40px] text-xs bg-white/10 hover:bg-white/20 text-white border-white/20 gap-1.5"
                         data-testid="batch-attempt-btn"
                       >
                         <PhoneMissed className="w-3.5 h-3.5" />
@@ -1346,7 +1346,7 @@ function SupplierDashboardView({
                         size="sm"
                         onClick={() => handleBatchConfirm(s.batchConfirmSuccess)}
                         disabled={isBatchProcessing}
-                        className="text-xs bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold gap-1.5 shadow-md shadow-emerald-500/20"
+                        className="flex-1 sm:flex-none min-h-[40px] text-xs bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold gap-1.5 shadow-md shadow-emerald-500/20"
                         data-testid="batch-confirm-btn"
                       >
                         {isBatchProcessing ? (
@@ -1360,7 +1360,7 @@ function SupplierDashboardView({
                       <button
                         type="button"
                         onClick={() => setSelectedLeadIds([])}
-                        className="text-xs text-neutral-400 hover:text-white underline cursor-pointer px-1 ml-1"
+                        className="w-full sm:w-auto text-center min-h-[32px] inline-flex items-center justify-center text-xs text-neutral-400 hover:text-white underline cursor-pointer px-1 sm:ml-1"
                         data-testid="batch-deselect-btn"
                       >
                         {s.batchDeselectBtn}
@@ -1390,8 +1390,8 @@ function SupplierDashboardView({
                 </div>
 
                 <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-                  {/* Mobile Cards (390px) */}
-                  <div className="block sm:hidden divide-y divide-neutral-100">
+                  {/* Mobile Cards (< 1024px) */}
+                  <div className="block lg:hidden divide-y divide-neutral-100">
                     {confirmedOrders.length === 0 ? (
                       <div className="p-8 text-center text-neutral-400 text-xs">
                         {s.emptyConfirmed}
@@ -1430,7 +1430,7 @@ function SupplierDashboardView({
                                 size="sm"
                                 disabled={isProcessing}
                                 onClick={() => handleDispatchOrder(order.id, s.msgDispatched)}
-                                className="w-full text-xs min-h-[38px] justify-center bg-slate-900 hover:bg-neutral-800 text-white gap-1.5"
+                                className="w-full text-xs min-h-[40px] justify-center bg-slate-900 hover:bg-neutral-800 text-white gap-1.5"
                                 data-testid="dispatch-order-btn"
                               >
                                 {isProcessing ? (
@@ -1448,7 +1448,7 @@ function SupplierDashboardView({
                   </div>
 
                   {/* Desktop Table */}
-                  <div className="hidden sm:block overflow-x-auto">
+                  <div className="hidden lg:block overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -1541,8 +1541,8 @@ function SupplierDashboardView({
                 </div>
 
                 <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
-                  {/* Mobile Cards View (390px) */}
-                  <div className="block sm:hidden divide-y divide-neutral-100">
+                  {/* Mobile Cards View (< 1024px) */}
+                  <div className="block lg:hidden divide-y divide-neutral-100">
                     {allOrders.length === 0 ? (
                       <div className="p-8 text-center text-neutral-400 text-xs">
                         {s.emptyAllOrders}
@@ -1582,14 +1582,14 @@ function SupplierDashboardView({
                                   <button
                                     type="button"
                                     onClick={() => handleCopy(order.trackingNumber!, `all-track-${order.id}`)}
-                                    className="p-1 rounded text-neutral-400 hover:text-black"
+                                    className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center p-1 rounded-lg text-neutral-400 hover:text-black cursor-pointer"
                                     data-testid="copy-tracking-btn"
                                     aria-label="Copier tracking"
                                   >
                                     {copiedKey === `all-track-${order.id}` ? (
-                                      <Check className="w-3 h-3 text-emerald-600" />
+                                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                                     ) : (
-                                      <Copy className="w-3 h-3" />
+                                      <Copy className="w-3.5 h-3.5" />
                                     )}
                                   </button>
                                 </div>
@@ -1612,10 +1612,10 @@ function SupplierDashboardView({
                                       s.msgWebhookDelivered.replace("{tracking}", order.trackingNumber!)
                                     )
                                   }
-                                  className="min-h-[36px] text-xs justify-center bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
+                                  className="min-h-[40px] text-xs justify-center bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
                                   data-testid="simulate-delivery-btn"
                                 >
-                                  <CheckCircle2 className="w-3 h-3" />
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
                                   <span>{s.simulateDelivered}</span>
                                 </Button>
                                 <Button
@@ -1629,10 +1629,10 @@ function SupplierDashboardView({
                                       s.msgWebhookReturn.replace("{tracking}", order.trackingNumber!)
                                     )
                                   }
-                                  className="min-h-[36px] text-xs justify-center gap-1"
+                                  className="min-h-[40px] text-xs justify-center gap-1"
                                   data-testid="simulate-return-btn"
                                 >
-                                  <XCircle className="w-3 h-3" />
+                                  <XCircle className="w-3.5 h-3.5" />
                                   <span>{s.simulateReturn}</span>
                                 </Button>
                               </div>
@@ -1644,7 +1644,7 @@ function SupplierDashboardView({
                   </div>
 
                   {/* Desktop Table View */}
-                  <div className="hidden sm:block overflow-x-auto">
+                  <div className="hidden lg:block overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>

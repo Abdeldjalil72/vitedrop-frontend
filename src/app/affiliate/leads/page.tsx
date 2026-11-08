@@ -373,70 +373,70 @@ export default function AffiliateLeadsPage() {
 
             {/* KPI Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Card className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+              <Card className="p-4 sm:p-5 min-w-0">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block truncate">
                   {dict.kpiCleared}
                 </span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-600">
+                <div className="mt-2 flex items-baseline justify-between gap-1 min-w-0">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-600 truncate">
                     {formatDZD(realizedEarnings, lang)}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-[11px] text-emerald-700 mt-1 font-medium">
+                <p className="text-[11px] text-emerald-700 mt-1 font-medium truncate">
                   {deliveredOrders.length} {dict.kpiDeliveredSuffix}
                 </p>
               </Card>
 
-              <Card className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+              <Card className="p-4 sm:p-5 min-w-0">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block truncate">
                   {dict.kpiPipeline}
                 </span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-blue-600">
+                <div className="mt-2 flex items-baseline justify-between gap-1 min-w-0">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-blue-600 truncate">
                     {formatDZD(pendingCommission, lang)}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                     <Clock className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-[11px] text-neutral-500 mt-1">
+                <p className="text-[11px] text-neutral-500 mt-1 truncate">
                   {newLeads.length + inTransitOrders.length} {dict.kpiPipelineSuffix}
                 </p>
               </Card>
 
-              <Card className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+              <Card className="p-4 sm:p-5 min-w-0">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block truncate">
                   {dict.kpiTotal}
                 </span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
+                <div className="mt-2 flex items-baseline justify-between gap-1 min-w-0">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900 truncate">
                     {totalLeads}
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center shrink-0">
                     <ListOrdered className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-[11px] text-neutral-500 mt-1">
+                <p className="text-[11px] text-neutral-500 mt-1 truncate">
                   {newLeads.length} {dict.kpiNewLeadsSuffix}
                 </p>
               </Card>
 
-              <Card className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block">
+              <Card className="p-4 sm:p-5 min-w-0">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide block truncate">
                   {dict.kpiDeliveryRate}
                 </span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900">
+                <div className="mt-2 flex items-baseline justify-between gap-1 min-w-0">
+                  <span className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-neutral-900 truncate">
                     {deliveryRate}%
                   </span>
                   <div className="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
                     <Truck className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-[11px] text-neutral-500 mt-1">
+                <p className="text-[11px] text-neutral-500 mt-1 truncate">
                   {canceledOrders.length} {dict.kpiRtoSuffix}
                 </p>
               </Card>
@@ -536,8 +536,8 @@ export default function AffiliateLeadsPage() {
               </div>
             </div>
 
-            {/* Desktop Orders Table (>= 640px) */}
-            <div className="hidden sm:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
+            {/* Desktop Orders Table (>= 1024px) */}
+            <div className="hidden lg:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
               <Table data-testid="affiliate-orders-table">
                 <TableHeader>
                   <TableRow>
@@ -586,7 +586,7 @@ export default function AffiliateLeadsPage() {
                                   handleCopy(order.id, order.id);
                                 }}
                                 data-testid="copy-order-id-btn"
-                                className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded cursor-pointer"
+                                className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 rounded cursor-pointer"
                                 title="Copier ID complet"
                               >
                                 {copiedId === order.id ? (
@@ -647,7 +647,7 @@ export default function AffiliateLeadsPage() {
                                     handleCopy(order.trackingNumber!, `track-${order.id}`);
                                   }}
                                   data-testid="copy-tracking-number-btn"
-                                  className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                                  className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                                   title="Copier Numéro de suivi"
                                 >
                                   {copiedId === `track-${order.id}` ? (
@@ -723,8 +723,8 @@ export default function AffiliateLeadsPage() {
               </Table>
             </div>
 
-            {/* Mobile Orders Card List (< 640px) */}
-            <div className="sm:hidden flex flex-col gap-3">
+            {/* Mobile Orders Card List (< 1024px) */}
+            <div className="lg:hidden flex flex-col gap-3">
               {isLoading ? (
                 <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
                   <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
@@ -759,7 +759,7 @@ export default function AffiliateLeadsPage() {
                                 handleCopy(order.id, order.id);
                               }}
                               data-testid="copy-order-id-btn"
-                              className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded cursor-pointer"
+                              className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 rounded cursor-pointer"
                             >
                               {copiedId === order.id ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -821,7 +821,7 @@ export default function AffiliateLeadsPage() {
                                 handleCopy(order.trackingNumber!, `track-${order.id}`);
                               }}
                               data-testid="copy-tracking-number-btn"
-                              className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                              className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                             >
                               {copiedId === `track-${order.id}` ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -838,7 +838,7 @@ export default function AffiliateLeadsPage() {
                         variant="secondary"
                         onClick={() => setSelectedOrder(order)}
                         data-testid="view-order-details-btn"
-                        className="w-full text-xs py-1.5"
+                        className="w-full min-h-[40px] text-xs py-1.5"
                       >
                         <Eye className="w-3.5 h-3.5 me-1" />
                         <span>{dict.viewDetails}</span>
@@ -864,7 +864,7 @@ export default function AffiliateLeadsPage() {
                 data-testid="affiliate-order-detail-modal"
                 className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
               >
-                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-lg w-full p-6 space-y-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-lg w-full p-6 space-y-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150 max-h-[min(90vh,calc(100dvh-2rem))] overflow-y-auto [overscroll-behavior:contain]">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
                     <div>
                       <span className="text-xs font-mono font-semibold text-neutral-800">

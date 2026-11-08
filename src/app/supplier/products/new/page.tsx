@@ -105,6 +105,7 @@ const newProductTranslations = {
     sectionMediaDesc: "Photo haute définition affichée dans la marketplace et sur les fiches produits.",
     imageDropzone: "Glissez une image ici ou cliquez pour sélectionner un fichier",
     imageHelper: "Formats supportés : PNG, JPG, WebP. Compression automatique fluide.",
+    imageOptimizedNote: "Image compressée & optimisée pour affichage mobile",
     changeImage: "Changer la photo",
     removeImage: "Supprimer",
     sectionPricing: "3. Prix de Vente & Budget CPA (Garantie Escrow)",
@@ -136,6 +137,7 @@ const newProductTranslations = {
     previewPlaceholderName: "Titre de votre produit",
     previewCpaBadge: "CPA Garanti",
     previewStockBadge: "unités",
+    allocatedStock: "Stock alloué :",
     solvencyTitle: "Radar de Solvabilité (Invariants 4/4)",
     rule1: "Prix de vente supérieur au budget CPA",
     rule2: "Budget CPA <= 50% du prix de vente",
@@ -168,6 +170,7 @@ const newProductTranslations = {
     sectionMediaDesc: "High-definition photo rendered in affiliate catalog cards.",
     imageDropzone: "Drag and drop an image here or click to browse",
     imageHelper: "Supported formats: PNG, JPG, WebP. Automatic smooth compression.",
+    imageOptimizedNote: "Compressed & optimized for high-speed mobile rendering",
     changeImage: "Change photo",
     removeImage: "Remove",
     sectionPricing: "3. Retail Price & CPA Guarantee (Escrow Buffer)",
@@ -199,6 +202,7 @@ const newProductTranslations = {
     previewPlaceholderName: "Your product title",
     previewCpaBadge: "Guaranteed CPA",
     previewStockBadge: "units",
+    allocatedStock: "Allocated Stock:",
     solvencyTitle: "Solvency Radar (4/4 Invariants)",
     rule1: "Retail price greater than CPA budget",
     rule2: "CPA budget <= 50% of retail price",
@@ -231,6 +235,7 @@ const newProductTranslations = {
     sectionMediaDesc: "صورة عالية الجودة تظهر في بطاقة المنتج للمسوقين.",
     imageDropzone: "اسحب الصورة هنا أو اضغط للاختيار من جهازك",
     imageHelper: "الملفات المدعومة: PNG, JPG, WebP. ضغط ذكي تلقائي للحجم.",
+    imageOptimizedNote: "تم ضغط الصورة وتحسينها لعرض سريع على الأجهزة المحمولة",
     changeImage: "تغيير الصورة",
     removeImage: "حذف",
     sectionPricing: "3. سعر البيع وميزانية CPA (ضمان Escrow)",
@@ -262,6 +267,7 @@ const newProductTranslations = {
     previewPlaceholderName: "عنوان منتجك الجديد",
     previewCpaBadge: "عمولة CPA مضمونة",
     previewStockBadge: "قطعة",
+    allocatedStock: "المخزون المخصص:",
     solvencyTitle: "فحص الملاءة المالية (الشروط 4/4)",
     rule1: "سعر البيع أكبر تماماً من ميزانية CPA",
     rule2: "ميزانية CPA لا تتجاوز 50% من سعر البيع",
@@ -666,7 +672,7 @@ export default function NewProductPage() {
                         </p>
                         <p className="text-xs text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                          <span>Image compressée & optimisée pour affichage mobile</span>
+                          <span>{t.imageOptimizedNote}</span>
                         </p>
                         <div className="flex items-center gap-3 mt-3">
                           <Button
@@ -1120,7 +1126,7 @@ export default function NewProductPage() {
 
                       {/* Stock Pill */}
                       <div className="flex items-center justify-between pt-1 text-[11px] text-neutral-500">
-                        <span>Stock alloué :</span>
+                        <span>{t.allocatedStock}</span>
                         <span className="font-mono font-bold text-neutral-800">
                           {stockNum} {t.previewStockBadge}
                         </span>

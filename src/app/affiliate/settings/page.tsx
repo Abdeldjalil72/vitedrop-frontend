@@ -41,6 +41,7 @@ const settingsI18n = {
     ccpNumKey: "Numéro Compte CCP + Clé (ex: 12345678 Clé 99)",
     bankRib: "RIB Bancaire",
     saveBtn: "Enregistrer les Préférences",
+    savingBtn: "Enregistrement...",
   },
   en: {
     eyebrow: "Profile Settings",
@@ -61,6 +62,7 @@ const settingsI18n = {
     ccpNumKey: "CCP Account Number + Key (e.g. 12345678 Key 99)",
     bankRib: "Bank RIB",
     saveBtn: "Save Changes",
+    savingBtn: "Saving...",
   },
   ar: {
     eyebrow: "إعدادات الحساب",
@@ -81,6 +83,7 @@ const settingsI18n = {
     ccpNumKey: "رقم حساب CCP مع المفتاح (مثال: 12345678 Clé 99)",
     bankRib: "رقم الحساب البنكي RIB",
     saveBtn: "حفظ التغييرات",
+    savingBtn: "جار الحفظ...",
   },
 };
 
@@ -226,8 +229,9 @@ export default function AffiliateSettingsPage() {
                     <input
                       type="text"
                       disabled
+                      dir="ltr"
                       value={currentUser?.email || ""}
-                      className="w-full text-xs rounded-xl border border-black/10 bg-neutral-100 px-3 py-2 font-mono text-neutral-600 cursor-not-allowed"
+                      className="w-full text-xs rounded-xl border border-black/10 bg-neutral-100 px-3 py-2 font-mono text-neutral-600 cursor-not-allowed text-left"
                     />
                   </div>
                   <div>
@@ -237,8 +241,9 @@ export default function AffiliateSettingsPage() {
                     <input
                       type="text"
                       disabled
+                      dir="ltr"
                       value={currentUser?.sub || ""}
-                      className="w-full text-xs rounded-xl border border-black/10 bg-neutral-100 px-3 py-2 font-mono text-neutral-600 cursor-not-allowed"
+                      className="w-full text-xs rounded-xl border border-black/10 bg-neutral-100 px-3 py-2 font-mono text-neutral-600 cursor-not-allowed text-left"
                     />
                   </div>
                 </div>
@@ -310,11 +315,12 @@ export default function AffiliateSettingsPage() {
                     <input
                       type="text"
                       required
+                      dir="ltr"
                       data-testid="payout-account-input"
                       value={ripOrCcp}
                       onChange={(e) => setRipOrCcp(e.target.value)}
                       placeholder={method === "BARIDIMOB" ? "00799999002345678901" : "12345678 99"}
-                      className="w-full text-xs rounded-xl border border-black/10 bg-white px-3 py-2 font-mono text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                      className="w-full text-xs rounded-xl border border-black/10 bg-white px-3 py-2 font-mono text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500 text-left"
                     />
                     {method === "BARIDIMOB" && ripOrCcp.replace(/[\s-]/g, "").length > 0 && (
                       <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 pt-1">
@@ -352,10 +358,10 @@ export default function AffiliateSettingsPage() {
                   type="submit"
                   disabled={isSaving}
                   data-testid="payout-save-btn"
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-xs font-semibold"
+                  className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#2563eb] text-white text-xs font-semibold justify-center"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{isSaving ? "Enregistrement..." : dict.saveBtn}</span>
+                  <span>{isSaving ? dict.savingBtn : dict.saveBtn}</span>
                 </Button>
               </div>
             </form>

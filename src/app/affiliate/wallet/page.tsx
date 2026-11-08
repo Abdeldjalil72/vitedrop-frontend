@@ -394,7 +394,7 @@ export default function AffiliateWalletPage() {
 
               <Button
                 size="sm"
-                onClick={() => setIsWithdrawModalOpen(true)}
+                onClick={handleOpenWithdrawModal}
                 disabled={balance <= 0}
                 className="bg-sky-500 hover:bg-sky-600 text-white shrink-0 border-0"
               >
@@ -418,8 +418,8 @@ export default function AffiliateWalletPage() {
                 </span>
               </div>
 
-              {/* Desktop Table (>= 640px) */}
-              <div className="hidden sm:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
+              {/* Desktop Table (>= 1024px) */}
+              <div className="hidden lg:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
                 <Table data-testid="affiliate-wallet-table">
                   <TableHeader>
                     <TableRow>
@@ -463,7 +463,7 @@ export default function AffiliateWalletPage() {
                                   type="button"
                                   onClick={() => handleCopy(tx.id, tx.id)}
                                   data-testid="copy-tx-ref-btn"
-                                  className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                                  className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                                 >
                                   {copiedTxId === tx.id ? (
                                     <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -536,8 +536,8 @@ export default function AffiliateWalletPage() {
                 </Table>
               </div>
 
-              {/* Mobile Cards (< 640px) */}
-              <div className="sm:hidden flex flex-col gap-3">
+              {/* Mobile Cards (< 1024px) */}
+              <div className="lg:hidden flex flex-col gap-3">
                 {isLoading ? (
                   <div className="p-8 text-center text-xs text-neutral-500 bg-white rounded-2xl border border-black/[0.08]">
                     <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
@@ -568,7 +568,7 @@ export default function AffiliateWalletPage() {
                               type="button"
                               onClick={() => handleCopy(tx.id, tx.id)}
                               data-testid="copy-tx-ref-btn"
-                              className="text-neutral-400 hover:text-neutral-700 p-0.5 cursor-pointer"
+                              className="min-w-[32px] min-h-[32px] inline-flex items-center justify-center text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                             >
                               {copiedTxId === tx.id ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -636,7 +636,7 @@ export default function AffiliateWalletPage() {
                 data-testid="affiliate-withdraw-modal"
                 className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
               >
-                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+                <div className="bg-white rounded-3xl border border-black/[0.08] max-w-md w-full max-h-[min(90vh,calc(100dvh-2rem))] overflow-y-auto [overscroll-behavior:contain] p-6 space-y-5 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
                   <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">

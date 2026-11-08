@@ -1390,7 +1390,7 @@ export interface SupplierSettings {
   notificationEmail: string;
   warehouseWilaya: number;
   warehouseCommune: string;
-  courierPreference: "YALIDINE" | "ZR_EXPRESS" | "AUTO";
+  courierPreference: "YALIDINE" | "ZR_EXPRESS" | "NOEST" | "ECOTRACK" | "MAYSTRO" | "GUEPEX" | "AUTO";
   whatsappTemplate: string;
   enableCallCenterNotifications: boolean;
   enableStockAlerts: boolean;

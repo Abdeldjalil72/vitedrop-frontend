@@ -228,10 +228,10 @@ export default function AffiliateDashboardPage() {
                   </span>
                   <div className="mt-2 text-xs text-sky-600 font-semibold">
                     {isAr
-                      ? "مؤكد عبر واجهة برمجة Yalidine و ZR"
+                      ? "مؤكد عبر واجهة ربط شركات التوصيل (6 شركات)"
                       : isEn
-                      ? "Confirmed via Yalidine/ZR Webhook"
-                      : "Confirmé par Webhook Yalidine/ZR"}
+                      ? "Confirmed via Carrier Webhook (6 Couriers)"
+                      : "Confirmé par Webhook Transporteur (6 Sociétés)"}
                   </div>
                 </div>
               </Card>
@@ -366,14 +366,18 @@ export default function AffiliateDashboardPage() {
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-sky-600" />
                   <h3 className="text-sm font-bold text-neutral-900">
-                    {isAr ? "مؤشرات الحملات الإعلانية ونسب التحويل (CAPI Telemetry)" : "Télémétrie Publicitaire & Conversion S2S"}
+                    {isAr
+                      ? "مؤشرات الحملات الإعلانية ونسب التحويل (CAPI Telemetry)"
+                      : isEn
+                      ? "Ad Campaigns & Server-Side Telemetry (CAPI)"
+                      : "Télémétrie Publicitaire & Conversion S2S"}
                   </h3>
                 </div>
                 <Link
                   href="/affiliate/links"
                   className="text-xs font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1"
                 >
-                  <span>{isAr ? "إدارة روابط الحملات" : "Gérer les liens de campagne"}</span>
+                  <span>{isAr ? "إدارة روابط الحملات" : isEn ? "Manage Tracking Links" : "Gérer les liens de campagne"}</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -383,7 +387,7 @@ export default function AffiliateDashboardPage() {
                 <Card enableHover className="p-5 border-black/[0.06] bg-white">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
-                      {isAr ? "إجمالي الزيارات والضغطات" : "Visites & Clics Ad"}
+                      {isAr ? "إجمالي الزيارات والضغطات" : isEn ? "Visits & Ad Clicks" : "Visites & Clics Ad"}
                     </span>
                     <div className="w-8 h-8 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center">
                       <MousePointerClick className="w-4 h-4" />
@@ -397,7 +401,7 @@ export default function AffiliateDashboardPage() {
                       {analytics?.totalClicks ?? 0}
                     </span>
                     <p className="mt-1 text-[11px] text-neutral-500">
-                      {isAr ? "زيارات موثوقة ومحمية من التكرار" : "Clics uniques filtrés anti-fraude"}
+                      {isAr ? "زيارات موثوقة ومحمية من التكرار" : isEn ? "Unique verified clicks (anti-fraud)" : "Clics uniques filtrés anti-fraude"}
                     </p>
                   </div>
                 </Card>
@@ -406,7 +410,7 @@ export default function AffiliateDashboardPage() {
                 <Card enableHover className="p-5 border-black/[0.06] bg-white">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
-                      {isAr ? "معدل التحويل (CR %)" : "Taux de Conversion (CR)"}
+                      {isAr ? "معدل التحويل (CR %)" : isEn ? "Conversion Rate (CR)" : "Taux de Conversion (CR)"}
                     </span>
                     <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
                       <Percent className="w-4 h-4" />
@@ -420,7 +424,7 @@ export default function AffiliateDashboardPage() {
                       {analytics?.conversionRate ?? 0}%
                     </span>
                     <p className="mt-1 text-[11px] text-neutral-500">
-                      {isAr ? "نسبة تحويل الزوار إلى طلبات مؤكدة" : "Commandes générées / Clics"}
+                      {isAr ? "نسبة تحويل الزوار إلى طلبات مؤكدة" : isEn ? "Orders generated / Clicks" : "Commandes générées / Clics"}
                     </p>
                   </div>
                 </Card>
@@ -429,7 +433,7 @@ export default function AffiliateDashboardPage() {
                 <Card enableHover className="p-5 border-black/[0.06] bg-white">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
-                      {isAr ? "عائد النقرة (EPC)" : "Gains par Clic (EPC)"}
+                      {isAr ? "عائد النقرة (EPC)" : isEn ? "Earnings Per Click (EPC)" : "Gains par Clic (EPC)"}
                     </span>
                     <div className="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
                       <Coins className="w-4 h-4" />
@@ -443,7 +447,7 @@ export default function AffiliateDashboardPage() {
                       {formatDZD(analytics?.epc ?? 0, lang)}
                     </span>
                     <p className="mt-1 text-[11px] text-neutral-500">
-                      {isAr ? "متوسط الربح الصافي عن كل زيارة" : "Gain net moyen généré par visite"}
+                      {isAr ? "متوسط الربح الصافي عن كل زيارة" : isEn ? "Average net profit generated per visit" : "Gain net moyen généré par visite"}
                     </p>
                   </div>
                 </Card>
@@ -475,8 +479,8 @@ export default function AffiliateDashboardPage() {
                 </Link>
               </div>
 
-              {/* Desktop Table View (>= 640px) */}
-              <div className="hidden sm:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
+              {/* Desktop Table View (>= 1024px) */}
+              <div className="hidden lg:block bg-white rounded-2xl border border-black/[0.08] shadow-xs overflow-hidden">
                 <Table data-testid="affiliate-recent-orders-table">
                   <TableHeader>
                     <TableRow>
@@ -561,8 +565,8 @@ export default function AffiliateDashboardPage() {
                 </Table>
               </div>
 
-              {/* Mobile Cards View (< 640px) */}
-              <div className="sm:hidden flex flex-col gap-3">
+              {/* Mobile Cards View (< 1024px) */}
+              <div className="lg:hidden flex flex-col gap-3">
                 {recentOrders.length > 0 ? (
                   recentOrders.map((order) => {
                     const wilayaInfo = getWilayaByCode(String(order.wilaya).padStart(2, "0"));
