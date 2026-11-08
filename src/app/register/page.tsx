@@ -225,6 +225,10 @@ function RegisterContent() {
   const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
+    router.prefetch("/verify-email");
+  }, [router]);
+
+  useEffect(() => {
     if (urlEmail && !email) {
       setEmail(urlEmail);
     }
@@ -324,13 +328,12 @@ function RegisterContent() {
         });
       }
 
-      setIsLoading(false);
       setSuccess(true);
 
-      // Redirect directly to verification page
+      // Redirect directly to verification page (fast 150ms transition, button remains disabled)
       setTimeout(() => {
         router.push(`/verify-email?email=${encodeURIComponent(email.trim().toLowerCase())}&role=${role}`);
-      }, 600);
+      }, 150);
     } catch (err: any) {
       setIsLoading(false);
       setError(err?.message || "Échec de l'inscription auprès du serveur.");

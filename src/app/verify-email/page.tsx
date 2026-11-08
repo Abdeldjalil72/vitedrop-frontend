@@ -13,6 +13,7 @@ function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get("email") || "";
+  const initialRole = searchParams.get("role") || "";
   const isUnverifiedRedirect = searchParams.get("unverified") === "true";
 
   const [email, setEmail] = useState(initialEmail);
@@ -21,8 +22,8 @@ function VerifyEmailContent() {
   const [success, setSuccess] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isResending, setIsResending] = useState<boolean>(false);
-  const [cooldown, setCooldown] = useState<number>(60);
-  const [canResend, setCanResend] = useState<boolean>(false);
+  const [cooldown, setCooldown] = useState<number>(isUnverifiedRedirect ? 0 : 60);
+  const [canResend, setCanResend] = useState<boolean>(isUnverifiedRedirect);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -149,6 +150,11 @@ function VerifyEmailContent() {
     try {
       const res = await apiResendVerification(email);
       setIsResending(false);
+      if (res?.isAlreadyVerified) {
+        setSuccess("Cette adresse e-mail est déjà confirmée. Redirection vers la page de connexion...");
+        setTimeout(() => router.push("/login"), 1200);
+        return;
+      }
       setSuccess("Un nouveau code à 6 chiffres a été envoyé par email.");
       setCooldown(60);
       setCanResend(false);
@@ -315,7 +321,7 @@ function VerifyEmailContent() {
             <div className="text-center text-xs text-[#6b6b6b] space-y-2.5">
               <div>
                 <Link
-                  href={`/register?email=${encodeURIComponent(email)}`}
+                  href={`/register?email=${encodeURIComponent(email)}${initialRole ? `&role=${initialRole}` : ""}`}
                   className="font-medium text-emerald-700 hover:text-emerald-800 hover:underline transition-colors"
                 >
                   {isAr
