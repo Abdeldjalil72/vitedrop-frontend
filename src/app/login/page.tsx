@@ -38,7 +38,7 @@ export default function LoginPage() {
       setSuccess(true);
 
       setTimeout(() => {
-        if (user?.role === "SUPPLIER") {
+        if (user?.role === "SUPPLIER" || user?.role === "CALL_CENTER_AGENT") {
           router.push("/supplier");
         } else if (user?.role === "ADMIN") {
           router.push("/admin");
@@ -108,10 +108,13 @@ export default function LoginPage() {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleSubmit} className="space-y-4">
               <Input
                 label={t.auth.email}
+                name="email"
                 type="email"
+                dir="ltr"
+                autoComplete="username"
                 placeholder="votre.nom@domaine.dz"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -121,7 +124,9 @@ export default function LoginPage() {
 
               <Input
                 label={t.auth.password}
+                name="password"
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -130,6 +135,19 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={
+                      showPassword
+                        ? lang === "ar"
+                          ? "إخفاء كلمة المرور"
+                          : lang === "en"
+                          ? "Hide password"
+                          : "Masquer le mot de passe"
+                        : lang === "ar"
+                        ? "إظهار كلمة المرور"
+                        : lang === "en"
+                        ? "Show password"
+                        : "Afficher le mot de passe"
+                    }
                     className="p-1 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

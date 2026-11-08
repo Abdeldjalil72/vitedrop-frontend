@@ -303,7 +303,7 @@ export function NotificationPopover({ lang = "fr" }: NotificationPopoverProps) {
       {isOpen && (
         <div
           dir={rtl ? "rtl" : "ltr"}
-          className={`absolute end-0 top-full mt-2 w-[min(92vw,390px)] bg-white rounded-3xl shadow-2xl border border-neutral-200/90 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-start`}
+          className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:end-0 sm:top-full sm:mt-2 sm:w-[390px] bg-white rounded-3xl shadow-2xl border border-neutral-200/90 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-start"
         >
           {/* Header */}
           <div className="p-3.5 sm:p-4 border-b border-neutral-100 flex items-center justify-between gap-2 bg-neutral-50/70">

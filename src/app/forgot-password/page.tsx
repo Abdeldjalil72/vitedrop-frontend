@@ -17,7 +17,10 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim()) {
+      setError("Veuillez remplir tous les champs.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -54,7 +57,11 @@ export default function ForgotPasswordPage() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-neutral-900">
-                    {lang === "ar" ? "تفقد بريدك الإلكتروني" : "Vérifiez vos e-mails"}
+                    {lang === "ar"
+                      ? "تفقد بريدك الإلكتروني"
+                      : lang === "en"
+                      ? "Check your inbox"
+                      : "Vérifiez vos e-mails"}
                   </h4>
                   <p className="text-xs text-[#6b6b6b] mt-1 leading-relaxed max-w-xs mx-auto">
                     {t.auth.resetSuccess}
@@ -71,7 +78,7 @@ export default function ForgotPasswordPage() {
             ) : (
               <form noValidate onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div data-testid="forgot-error-alert" className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                  <div role="alert" data-testid="forgot-error-alert" className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                     <span>{getLocalizedAuthError(error, lang)}</span>
                   </div>
@@ -80,7 +87,10 @@ export default function ForgotPasswordPage() {
                 <Input
                   data-testid="forgot-email-input"
                   label={t.auth.email}
+                  name="email"
                   type="email"
+                  dir="ltr"
+                  autoComplete="email"
                   placeholder="votre.email@domaine.dz"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

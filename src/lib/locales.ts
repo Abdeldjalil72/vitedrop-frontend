@@ -1494,6 +1494,100 @@ export function getLocalizedAuthError(rawError: any, lang: Language): string {
     return "Aucun code de vérification en attente pour cette adresse e-mail.";
   }
 
+  // 10. Required fields validation
+  if (
+    msg.includes("Veuillez remplir tous les champs") ||
+    msg.includes("Veuillez indiquer votre adresse e-mail") ||
+    msg.includes("Adresse e-mail requise")
+  ) {
+    if (lang === "ar") {
+      return "يرجى ملء جميع الحقول المطلوبة.";
+    }
+    if (lang === "en") {
+      return "Please fill in all required fields.";
+    }
+    return msg;
+  }
+
+  // 11. Password minimum length
+  if (msg.includes("au moins 6 caractères")) {
+    if (lang === "ar") {
+      return "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.";
+    }
+    if (lang === "en") {
+      return "Password must be at least 6 characters long.";
+    }
+    return msg;
+  }
+
+  // 12. Algerian phone validation
+  if (
+    msg.includes("Format algérien invalide") ||
+    msg.includes("Numéro invalide (doit commencer par 05, 06 ou 07)")
+  ) {
+    if (lang === "ar") {
+      return "صيغة رقم الهاتف الجزائري غير صالحة (يجب أن يبدأ بـ 05 أو 06 أو 07).";
+    }
+    if (lang === "en") {
+      return "Invalid Algerian phone format (must start with 05, 06, or 07).";
+    }
+    return msg;
+  }
+
+  // 13. Supplier company requirement
+  if (msg.includes("nom de l'entreprise ou marque est obligatoire")) {
+    if (lang === "ar") {
+      return "اسم الشركة أو العلامة التجارية إلزامي للموردين.";
+    }
+    if (lang === "en") {
+      return "Company or brand name is required for suppliers.";
+    }
+    return msg;
+  }
+
+  // 14. Password mismatch
+  if (msg.includes("ne correspondent pas")) {
+    if (lang === "ar") {
+      return "كلمتا المرور غير متطابقتين.";
+    }
+    if (lang === "en") {
+      return "Passwords do not match.";
+    }
+    return msg;
+  }
+
+  // 15. Reset token required or invalid
+  if (msg.includes("jeton de réinitialisation est requis")) {
+    if (lang === "ar") {
+      return "رمز استعادة كلمة المرور مطلوب.";
+    }
+    if (lang === "en") {
+      return "Reset token is required.";
+    }
+    return msg;
+  }
+
+  if (msg.includes("invalide ou a expiré") || msg.includes("Code invalide ou expiré")) {
+    if (lang === "ar") {
+      return "الرمز أو الرابط غير صالح أو منتهي الصلاحية.";
+    }
+    if (lang === "en") {
+      return "This code or reset link is invalid or has expired.";
+    }
+    return msg;
+  }
+
+  // 16. 6-digit OTP code required
+  if (msg.includes("6 chiffres du code")) {
+    if (lang === "ar") {
+      return "يرجى إدخال الأرقام الستة للرمز المرسل عبر البريد الإلكتروني.";
+    }
+    if (lang === "en") {
+      return "Please enter the 6-digit verification code sent to your email.";
+    }
+    return msg;
+  }
+
   // Generic fallback if network error
   if (!msg || msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("fetch failed")) {
     if (lang === "ar") return "تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مجددًا.";

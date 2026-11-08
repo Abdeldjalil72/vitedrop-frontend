@@ -139,16 +139,16 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
     await buyerTab.click();
     await expect(buyerTab).toHaveClass(/text-white/);
 
-    // Multilingual dropdown testing: Switch from English to French to Arabic
+    // Multilingual dropdown testing: Default is FR, switch to EN, then AR, then FR
     const langBtn = page.locator('[data-testid="nav-lang-btn"]');
     await expect(langBtn).toBeVisible();
-    await expect(langBtn).toContainText("EN");
-
-    // Click French
-    await langBtn.click();
-    const frOption = page.locator('[data-testid="lang-option-fr"]');
-    await frOption.click();
     await expect(langBtn).toContainText("FR");
+
+    // Click English
+    await langBtn.click();
+    const enOption = page.locator('[data-testid="lang-option-en"]');
+    await enOption.click();
+    await expect(langBtn).toContainText("EN");
 
     // Click Arabic
     await langBtn.click();
@@ -157,11 +157,11 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
     await expect(langBtn).toContainText("AR");
     await expect(page.locator("div[dir='rtl']").first()).toBeVisible();
 
-    // Reset to English
+    // Reset to French
     await langBtn.click();
-    const enOption = page.locator('[data-testid="lang-option-en"]');
-    await enOption.click();
-    await expect(langBtn).toContainText("EN");
+    const frOption = page.locator('[data-testid="lang-option-fr"]');
+    await frOption.click();
+    await expect(langBtn).toContainText("FR");
 
     // Auth links in navbar
     const loginLink = page.locator('[data-testid="nav-login-link"]');
@@ -300,7 +300,7 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
 
-    const routes = ["/", "/register", "/forgot-password"];
+    const routes = ["/", "/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
 
     for (const route of routes) {
       await page.goto(route);
@@ -348,5 +348,39 @@ test.describe("Public Marketing & Registration Onboarding Funnel", () => {
 
     const forgotRtl = page.locator("div[dir='rtl']").first();
     await expect(forgotRtl).toBeVisible();
+  });
+
+  test("guarantees English (EN) localization parity across register dropdowns, reset-password, and 360px OTP verification", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+
+    // 1. Register Page EN localization
+    await page.goto("/register");
+    await page.locator('[data-testid="auth-lang-en"]').click();
+    await expect(page.getByText("Affiliate Profile & Channels")).toBeVisible();
+    await expect(page.getByText("Primary Traffic Source")).toBeVisible();
+    await expect(page.locator('[data-testid="register-submit-btn"]')).toContainText("Create my account & receive code");
+
+    // Switch to Supplier tab in EN
+    await page.locator('[data-testid="tab-supplier"]').click();
+    await expect(page.getByText("Supplier & Warehouse Profile")).toBeVisible();
+    await expect(page.getByText("Business Activity Type")).toBeVisible();
+
+    // 2. Reset Password EN localization
+    await page.goto("/reset-password");
+    await expect(page.getByRole("heading", { name: "Set a new password" })).toBeVisible();
+    await expect(page.locator('[data-testid="reset-submit-btn"]')).toContainText("Save new password");
+
+    // 3. Verify Email at 360px with zero overflow and OTP autocomplete
+    await page.goto("/verify-email?email=test@vitedrop.dz");
+    await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
+    const firstOtp = page.locator('[data-testid="otp-digit-0"]');
+    await expect(firstOtp).toHaveAttribute("autocomplete", "one-time-code");
+
+    const hasOverflow360 = await page.evaluate(() => {
+      return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+    });
+    expect(hasOverflow360).toBe(false);
   });
 });

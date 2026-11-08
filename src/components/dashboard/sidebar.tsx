@@ -338,7 +338,7 @@ export function Sidebar({
         },
         {
           id: "supplier-call-center",
-          label: lang === "ar" ? "مركز الاتصال" : "Centre d'Appels",
+          label: lang === "ar" ? "مركز الاتصال" : lang === "en" ? "Call Center" : "Centre d'Appels",
           href: "/supplier/call-center",
           icon: <Phone className="w-4 h-4" />,
           colorTheme: "amber",

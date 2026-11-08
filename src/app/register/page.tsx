@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { WilayaSelect } from "@/components/ui/wilaya-select";
 import { ModernSelect, type ModernSelectOption } from "@/components/ui/modern-select";
 import { Tabs } from "@/components/ui/tabs";
-import { translations, getLocalizedAuthError } from "@/lib/locales";
+import { translations, getLocalizedAuthError, type Language } from "@/lib/locales";
 import { validateAlgerianPhone } from "@/lib/formatters";
 import { apiRegisterAffiliate, apiRegisterSupplier } from "@/lib/api-client";
 import {
@@ -28,162 +28,184 @@ import {
   Briefcase,
   Headphones,
   BarChart3,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
-const getTrafficSourceOptions = (isAr: boolean): ModernSelectOption[] => [
-  {
-    value: "FACEBOOK_INSTAGRAM",
-    label: isAr ? "إعلانات فيسبوك وإنستغرام" : "Facebook & Instagram Ads",
-    secondaryLabel: isAr ? "Meta Ads" : "Meta Ads, Reels & Stories",
-    badge: "Meta",
-    badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  {
-    value: "TIKTOK_ADS",
-    label: isAr ? "إعلانات تيك توك" : "TikTok Ads",
-    secondaryLabel: isAr ? "TikTok Business" : "Spark Ads & Vidéos courtes",
-    badge: "TikTok",
-    badgeColor: "bg-neutral-900 text-white border-neutral-800",
-  },
-  {
-    value: "GOOGLE_ADS",
-    label: isAr ? "إعلانات غوغل ويوتيوب" : "Google Ads / YouTube",
-    secondaryLabel: isAr ? "Search & YouTube" : "Search, Shopping & Vidéo",
-    badge: "Google",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-  },
-  {
-    value: "SNAPCHAT_ADS",
-    label: isAr ? "إعلانات سناب شات" : "Snapchat Ads",
-    secondaryLabel: isAr ? "Snap Ads" : "Stories & Spotlight",
-    badge: "Snap",
-    badgeColor: "bg-yellow-50 text-yellow-800 border-yellow-200",
-  },
-  {
-    value: "INFLUENCE_COMMUNITY",
-    label: isAr ? "صناع المحتوى والمجموعات" : "Influence & Communautés",
-    secondaryLabel: isAr ? "Organic & Pages" : "Pages & Groupes thématiques",
-    badge: "Social",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-  },
-  {
-    value: "OTHER",
-    label: isAr ? "مصادر أخرى / قنوات متعددة" : "Autre source / Multi-canaux",
-    secondaryLabel: isAr ? "قنوات متنوعة" : "Réseaux mixtes & SEO",
-    badge: "Mixte",
-    badgeColor: "bg-stone-50 text-stone-700 border-stone-200",
-  },
-];
+const getTrafficSourceOptions = (lang: Language): ModernSelectOption[] => {
+  const isAr = lang === "ar";
+  const isEn = lang === "en";
+  return [
+    {
+      value: "FACEBOOK_INSTAGRAM",
+      label: isAr ? "إعلانات فيسبوك وإنستغرام" : "Facebook & Instagram Ads",
+      secondaryLabel: isAr ? "Meta Ads" : isEn ? "Meta Ads, Reels & Stories" : "Meta Ads, Reels & Stories",
+      badge: "Meta",
+      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+    },
+    {
+      value: "TIKTOK_ADS",
+      label: isAr ? "إعلانات تيك توك" : "TikTok Ads",
+      secondaryLabel: isAr ? "TikTok Business" : isEn ? "Spark Ads & Short Videos" : "Spark Ads & Vidéos courtes",
+      badge: "TikTok",
+      badgeColor: "bg-neutral-900 text-white border-neutral-800",
+    },
+    {
+      value: "GOOGLE_ADS",
+      label: isAr ? "إعلانات غوغل ويوتيوب" : "Google Ads / YouTube",
+      secondaryLabel: isAr ? "Search & YouTube" : isEn ? "Search, Shopping & Video" : "Search, Shopping & Vidéo",
+      badge: "Google",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    },
+    {
+      value: "SNAPCHAT_ADS",
+      label: isAr ? "إعلانات سناب شات" : "Snapchat Ads",
+      secondaryLabel: isAr ? "Snap Ads" : "Stories & Spotlight",
+      badge: "Snap",
+      badgeColor: "bg-yellow-50 text-yellow-800 border-yellow-200",
+    },
+    {
+      value: "INFLUENCE_COMMUNITY",
+      label: isAr ? "صناع المحتوى والمجموعات" : isEn ? "Influencers & Communities" : "Influence & Communautés",
+      secondaryLabel: isAr ? "Organic & Pages" : isEn ? "Thematic Pages & Groups" : "Pages & Groupes thématiques",
+      badge: "Social",
+      badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+    },
+    {
+      value: "OTHER",
+      label: isAr ? "مصادر أخرى / قنوات متعددة" : isEn ? "Other source / Multi-channel" : "Autre source / Multi-canaux",
+      secondaryLabel: isAr ? "قنوات متنوعة" : isEn ? "Mixed networks & SEO" : "Réseaux mixtes & SEO",
+      badge: isEn ? "Mixed" : "Mixte",
+      badgeColor: "bg-stone-50 text-stone-700 border-stone-200",
+    },
+  ];
+};
 
-const getExperienceLevelOptions = (isAr: boolean): ModernSelectOption[] => [
-  {
-    value: "BEGINNER",
-    label: isAr ? "مبتدئ" : "Débutant",
-    secondaryLabel: isAr ? "أقل من 10 طلبيات / يوم" : "Moins de 10 commandes / jour",
-    badge: "< 10/j",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  },
-  {
-    value: "INTERMEDIATE",
-    label: isAr ? "متوسط" : "Intermédiaire",
-    secondaryLabel: isAr ? "10 إلى 50 طلبية / يوم" : "10 à 50 commandes / jour",
-    badge: "10-50/j",
-    badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
-  },
-  {
-    value: "ADVANCED",
-    label: isAr ? "محترف / سكيل" : "Confirmé / Scale",
-    secondaryLabel: isAr ? "أكثر من 50 طلبية / يوم" : "+ de 50 commandes / jour",
-    badge: "50+/j",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-  },
-];
+const getExperienceLevelOptions = (lang: Language): ModernSelectOption[] => {
+  const isAr = lang === "ar";
+  const isEn = lang === "en";
+  return [
+    {
+      value: "BEGINNER",
+      label: isAr ? "مبتدئ" : isEn ? "Beginner" : "Débutant",
+      secondaryLabel: isAr ? "أقل من 10 طلبيات / يوم" : isEn ? "Under 10 orders / day" : "Moins de 10 commandes / jour",
+      badge: isEn ? "< 10/d" : "< 10/j",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    },
+    {
+      value: "INTERMEDIATE",
+      label: isAr ? "متوسط" : isEn ? "Intermediate" : "Intermédiaire",
+      secondaryLabel: isAr ? "10 إلى 50 طلبية / يوم" : isEn ? "10 to 50 orders / day" : "10 à 50 commandes / jour",
+      badge: isEn ? "10-50/d" : "10-50/j",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+    },
+    {
+      value: "ADVANCED",
+      label: isAr ? "محترف / سكيل" : isEn ? "Advanced / Scale" : "Confirmé / Scale",
+      secondaryLabel: isAr ? "أكثر من 50 طلبية / يوم" : isEn ? "50+ orders / day" : "+ de 50 commandes / jour",
+      badge: isEn ? "50+/d" : "50+/j",
+      badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+    },
+  ];
+};
 
-const getBusinessTypeOptions = (isAr: boolean): ModernSelectOption[] => [
-  {
-    value: "IMPORTER",
-    label: isAr ? "مستورد مباشر" : "Importateur direct",
-    secondaryLabel: isAr ? "حاويات واستيراد مباشر" : "Stock conteneurs & gros volumes",
-    badge: "Import",
-    badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  {
-    value: "MANUFACTURER",
-    label: isAr ? "مصنع / منتج محلي" : "Fabricant / Producteur local",
-    secondaryLabel: isAr ? "صناعة وإنتاج وطني جزائري" : "Production locale certifiée DZ",
-    badge: "DZ Fabrique",
-    badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  },
-  {
-    value: "WHOLESALER",
-    label: isAr ? "تاجر جملة / موزع" : "Grossiste / Distributeur",
-    secondaryLabel: isAr ? "توزيع ومخازن جملة" : "Dépôt régional & distribution",
-    badge: "Grossiste",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
-  },
-  {
-    value: "ECOMMERCE_BRAND",
-    label: isAr ? "علامة تجارية إلكترونية" : "Marque E-commerce / D2C",
-    secondaryLabel: isAr ? "براند خاص وتصاميم حصرية" : "Produits exclusifs & branding",
-    badge: "Brand",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-  },
-];
+const getBusinessTypeOptions = (lang: Language): ModernSelectOption[] => {
+  const isAr = lang === "ar";
+  const isEn = lang === "en";
+  return [
+    {
+      value: "IMPORTER",
+      label: isAr ? "مستورد مباشر" : isEn ? "Direct Importer" : "Importateur direct",
+      secondaryLabel: isAr ? "حاويات واستيراد مباشر" : isEn ? "Container stock & bulk volumes" : "Stock conteneurs & gros volumes",
+      badge: "Import",
+      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+    },
+    {
+      value: "MANUFACTURER",
+      label: isAr ? "مصنع / منتج محلي" : isEn ? "Manufacturer / Local Producer" : "Fabricant / Producteur local",
+      secondaryLabel: isAr ? "صناعة وإنتاج وطني جزائري" : isEn ? "Certified Algerian local production" : "Production locale certifiée DZ",
+      badge: isEn ? "DZ Made" : "DZ Fabrique",
+      badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    },
+    {
+      value: "WHOLESALER",
+      label: isAr ? "تاجر جملة / موزع" : isEn ? "Wholesaler / Distributor" : "Grossiste / Distributeur",
+      secondaryLabel: isAr ? "توزيع ومخازن جملة" : isEn ? "Regional warehouse & distribution" : "Dépôt régional & distribution",
+      badge: isEn ? "Wholesale" : "Grossiste",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    },
+    {
+      value: "ECOMMERCE_BRAND",
+      label: isAr ? "علامة تجارية إلكترونية" : isEn ? "E-commerce / D2C Brand" : "Marque E-commerce / D2C",
+      secondaryLabel: isAr ? "براند خاص وتصاميم حصرية" : isEn ? "Exclusive products & branding" : "Produits exclusifs & branding",
+      badge: "Brand",
+      badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+    },
+  ];
+};
 
-const getCallCenterPreferenceOptions = (isAr: boolean): ModernSelectOption[] => [
-  {
-    value: "VITEDROP_MANAGED",
-    label: isAr ? "مركز اتصال فايت دروب" : "Call Center ViteDrop",
-    secondaryLabel: isAr ? "تغطية 58 ولاية بلهجة محلية" : "58 Wilayas certifié, dialecte DZ",
-    badge: isAr ? "موصى به" : "Recommandé",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
-  },
-  {
-    value: "IN_HOUSE",
-    label: isAr ? "مركز اتصال داخلي" : "Call Center interne",
-    secondaryLabel: isAr ? "فريق تأكيد خاص بك" : "Géré par votre propre équipe",
-    badge: "Interne",
-    badgeColor: "bg-stone-50 text-stone-700 border-stone-200",
-  },
-  {
-    value: "HYBRID",
-    label: isAr ? "مختلط / حسب المنتجات" : "Mixte / Selon les produits",
-    secondaryLabel: isAr ? "توزيع مرن للاتصالات" : "Gestion hybride flexible",
-    badge: "Mixte",
-    badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
-  },
-];
+const getCallCenterPreferenceOptions = (lang: Language): ModernSelectOption[] => {
+  const isAr = lang === "ar";
+  const isEn = lang === "en";
+  return [
+    {
+      value: "VITEDROP_MANAGED",
+      label: isAr ? "مركز اتصال فايت دروب" : isEn ? "ViteDrop Managed Call Center" : "Call Center ViteDrop",
+      secondaryLabel: isAr ? "تغطية 58 ولاية بلهجة محلية" : isEn ? "58 Wilayas certified, DZ dialect" : "58 Wilayas certifié, dialecte DZ",
+      badge: isAr ? "موصى به" : isEn ? "Recommended" : "Recommandé",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200 font-bold",
+    },
+    {
+      value: "IN_HOUSE",
+      label: isAr ? "مركز اتصال داخلي" : isEn ? "In-House Call Center" : "Call Center interne",
+      secondaryLabel: isAr ? "فريق تأكيد خاص بك" : isEn ? "Managed by your own team" : "Géré par votre propre équipe",
+      badge: isEn ? "In-House" : "Interne",
+      badgeColor: "bg-stone-50 text-stone-700 border-stone-200",
+    },
+    {
+      value: "HYBRID",
+      label: isAr ? "مختلط / حسب المنتجات" : isEn ? "Hybrid / Per Product" : "Mixte / Selon les produits",
+      secondaryLabel: isAr ? "توزيع مرن للاتصالات" : isEn ? "Flexible hybrid call routing" : "Gestion hybride flexible",
+      badge: isEn ? "Hybrid" : "Mixte",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+    },
+  ];
+};
 
-const getMonthlyVolumeOptions = (isAr: boolean): ModernSelectOption[] => [
-  {
-    value: "UNDER_100",
-    label: isAr ? "أقل من 100 طلبية / شهر" : "Moins de 100 commandes / mois",
-    secondaryLabel: isAr ? "بداية النشاط" : "Phase de lancement & test",
-    badge: "< 100",
-    badgeColor: "bg-neutral-100 text-neutral-700 border-neutral-200",
-  },
-  {
-    value: "100_500",
-    label: isAr ? "100 إلى 500 طلبية / شهر" : "100 à 500 commandes / mois",
-    secondaryLabel: isAr ? "نشاط مستقر" : "Croissance régulière",
-    badge: "100-500",
-    badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
-  },
-  {
-    value: "500_2000",
-    label: isAr ? "500 إلى 2,000 طلبية / شهر" : "500 à 2 000 commandes / mois",
-    secondaryLabel: isAr ? "حجم كبير" : "Volume soutenu",
-    badge: "500-2K",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  },
-  {
-    value: "OVER_2000",
-    label: isAr ? "أكثر من 2,000 طلبية / شهر" : "Plus de 2 000 commandes / mois",
-    secondaryLabel: isAr ? "سعة ضخمة / شاحنات" : "Grand compte / Haute cadence",
-    badge: "2K+",
-    badgeColor: "bg-purple-50 text-purple-700 border-purple-200 font-bold",
-  },
-];
+const getMonthlyVolumeOptions = (lang: Language): ModernSelectOption[] => {
+  const isAr = lang === "ar";
+  const isEn = lang === "en";
+  return [
+    {
+      value: "UNDER_100",
+      label: isAr ? "أقل من 100 طلبية / شهر" : isEn ? "Under 100 orders / month" : "Moins de 100 commandes / mois",
+      secondaryLabel: isAr ? "بداية النشاط" : isEn ? "Launch & testing phase" : "Phase de lancement & test",
+      badge: "< 100",
+      badgeColor: "bg-neutral-100 text-neutral-700 border-neutral-200",
+    },
+    {
+      value: "100_500",
+      label: isAr ? "100 إلى 500 طلبية / شهر" : isEn ? "100 to 500 orders / month" : "100 à 500 commandes / mois",
+      secondaryLabel: isAr ? "نشاط مستقر" : isEn ? "Steady growth" : "Croissance régulière",
+      badge: "100-500",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+    },
+    {
+      value: "500_2000",
+      label: isAr ? "500 إلى 2,000 طلبية / شهر" : isEn ? "500 to 2,000 orders / month" : "500 à 2 000 commandes / mois",
+      secondaryLabel: isAr ? "حجم كبير" : isEn ? "High volume" : "Volume soutenu",
+      badge: "500-2K",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    },
+    {
+      value: "OVER_2000",
+      label: isAr ? "أكثر من 2,000 طلبية / شهر" : isEn ? "Over 2,000 orders / month" : "Plus de 2 000 commandes / mois",
+      secondaryLabel: isAr ? "سعة ضخمة / شاحنات" : isEn ? "Enterprise / High velocity" : "Grand compte / Haute cadence",
+      badge: "2K+",
+      badgeColor: "bg-purple-50 text-purple-700 border-purple-200 font-bold",
+    },
+  ];
+};
 
 function RegisterContent() {
   const router = useRouter();
@@ -228,6 +250,7 @@ function RegisterContent() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handlePhoneChange = (val: string) => {
     setPhone(val);
@@ -319,6 +342,7 @@ function RegisterContent() {
       {({ lang }) => {
         const t = translations[lang];
         const isAr = lang === "ar";
+        const isEn = lang === "en";
 
         const roleTabs = [
           { id: "affiliate" as const, label: t.auth.affiliateRole },
@@ -334,6 +358,8 @@ function RegisterContent() {
               <p className="text-xs text-[#6b6b6b] mt-1.5">
                 {isAr
                   ? "انضم إلى شبكة الأفلييت والتجارة الإلكترونية الأولى في الجزائر"
+                  : isEn
+                  ? "Join Algeria's #1 COD CPA Affiliate & Dropshipping Network"
                   : "Rejoignez le réseau d'affiliation CPA & Dropshipping COD n°1 en Algérie"}
               </p>
             </div>
@@ -353,7 +379,7 @@ function RegisterContent() {
 
             {/* Error / Success */}
             {error && (
-              <div data-testid="register-error-banner" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+              <div role="alert" data-testid="register-error-banner" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{getLocalizedAuthError(error, lang)}</span>
               </div>
@@ -362,7 +388,13 @@ function RegisterContent() {
             {success && (
               <div data-testid="register-success-banner" className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Compte créé ! Redirection vers la vérification par e-mail...</span>
+                <span>
+                  {isAr
+                    ? "تم إنشاء الحساب! جارٍ التوجيه إلى صفحة تأكيد البريد الإلكتروني..."
+                    : isEn
+                    ? "Account created! Redirecting to email verification..."
+                    : "Compte créé ! Redirection vers la vérification par e-mail..."}
+                </span>
               </div>
             )}
 
@@ -372,7 +404,9 @@ function RegisterContent() {
                 <Input
                   data-testid="register-name-input"
                   label={t.auth.fullName}
+                  name="name"
                   type="text"
+                  autoComplete="name"
                   placeholder="Karim Mansouri"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -383,7 +417,10 @@ function RegisterContent() {
                 <Input
                   data-testid="register-email-input"
                   label={t.auth.email}
+                  name="email"
                   type="email"
+                  dir="ltr"
+                  autoComplete="email"
                   placeholder="karim@exemple.dz"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -395,11 +432,13 @@ function RegisterContent() {
                   data-testid="register-phone-input"
                   dir="ltr"
                   label={t.auth.phone}
+                  name="tel"
                   type="tel"
+                  autoComplete="tel"
                   placeholder="0550 12 34 56"
                   value={phone}
                   onChange={(e) => handlePhoneChange(e.target.value)}
-                  error={phoneError}
+                  error={phoneError ? getLocalizedAuthError(phoneError, lang) : ""}
                   helperText={t.auth.phoneHint}
                   startIcon={<Phone className="w-4 h-4" />}
                   required
@@ -408,11 +447,35 @@ function RegisterContent() {
                 <Input
                   data-testid="register-password-input"
                   label={t.auth.password}
-                  type="password"
-                  placeholder="Minimum 6 caractères"
+                  name="new-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder={isAr ? "6 أحرف على الأقل" : isEn ? "Minimum 6 characters" : "Minimum 6 caractères"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   startIcon={<Lock className="w-4 h-4" />}
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={
+                        showPassword
+                          ? isAr
+                            ? "إخفاء كلمة المرور"
+                            : isEn
+                            ? "Hide password"
+                            : "Masquer le mot de passe"
+                          : isAr
+                          ? "إظهار كلمة المرور"
+                          : isEn
+                          ? "Show password"
+                          : "Afficher le mot de passe"
+                      }
+                      className="p-1 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  }
                   required
                 />
               </div>
@@ -422,43 +485,80 @@ function RegisterContent() {
                 <div className="space-y-3.5 pt-3 border-t border-black/[0.06] animate-in fade-in duration-300">
                   <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
                     <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{isAr ? "معلومات المسوق (Affilié)" : "Profil Affilié & Canaux"}</span>
+                    <span>
+                      {isAr
+                        ? "معلومات المسوق (Affilié)"
+                        : isEn
+                        ? "Affiliate Profile & Channels"
+                        : "Profil Affilié & Canaux"}
+                    </span>
                   </div>
 
                   <ModernSelect
-                    label={isAr ? "مصدر الزيارات الرئيسي (Traffic Source)" : "Source de trafic principale"}
+                    label={
+                      isAr
+                        ? "مصدر الزيارات الرئيسي (Traffic Source)"
+                        : isEn
+                        ? "Primary Traffic Source"
+                        : "Source de trafic principale"
+                    }
                     value={trafficSource}
                     onChange={(val) => setTrafficSource(val)}
-                    options={getTrafficSourceOptions(isAr)}
+                    options={getTrafficSourceOptions(lang)}
                     icon={<Share2 className="w-3.5 h-3.5 text-emerald-600" />}
                     data-testid="register-traffic-source-trigger"
                     nativeSelectTestId="register-traffic-source-select"
                   />
 
                   <ModernSelect
-                    label={isAr ? "الخبرة في التجارة الإلكترونية والدفع عند الاستلام" : "Expérience en E-commerce / COD"}
+                    label={
+                      isAr
+                        ? "الخبرة في التجارة الإلكترونية والدفع عند الاستلام"
+                        : isEn
+                        ? "E-commerce / COD Experience"
+                        : "Expérience en E-commerce / COD"
+                    }
                     value={experienceLevel}
                     onChange={(val) => setExperienceLevel(val)}
-                    options={getExperienceLevelOptions(isAr)}
+                    options={getExperienceLevelOptions(lang)}
                     icon={<Award className="w-3.5 h-3.5 text-emerald-600" />}
                     data-testid="register-experience-level-trigger"
                     nativeSelectTestId="register-experience-level-select"
                   />
 
                   <WilayaSelect
-                    label={isAr ? "ولاية الإقامة" : "Wilaya de résidence"}
+                    label={
+                      isAr
+                        ? "ولاية الإقامة"
+                        : isEn
+                        ? "Wilaya of Residence"
+                        : "Wilaya de résidence"
+                    }
                     value={affiliateWilaya}
                     onChange={(code) => setAffiliateWilaya(code)}
                     lang={lang}
                   />
 
                   <Input
-                    label={isAr ? "حساب تيليغرام أو واتساب (اختياري)" : "Pseudo Telegram ou WhatsApp (optionnel)"}
+                    label={
+                      isAr
+                        ? "حساب تيليغرام أو واتساب (اختياري)"
+                        : isEn
+                        ? "Telegram or WhatsApp Handle (optional)"
+                        : "Pseudo Telegram ou WhatsApp (optionnel)"
+                    }
                     type="text"
-                    placeholder="@karim_marketing ou 0550123456"
+                    dir="ltr"
+                    placeholder={isEn ? "@karim_marketing or 0550123456" : "@karim_marketing ou 0550123456"}
                     value={telegramHandle}
                     onChange={(e) => setTelegramHandle(e.target.value)}
-                    helperText={isAr ? "للتواصل المباشر مع مدير حسابك" : "Permet à votre Account Manager de vous contacter rapidement"}
+                    helperText={
+                      isAr
+                        ? "للتواصل المباشر مع مدير حسابك"
+                        : isEn
+                        ? "Allows your dedicated Account Manager to reach you quickly"
+                        : "Permet à votre Account Manager de vous contacter rapidement"
+                    }
                     startIcon={<Send className="w-4 h-4 text-neutral-400" />}
                   />
                 </div>
@@ -469,13 +569,21 @@ function RegisterContent() {
                 <div className="space-y-3.5 pt-3 border-t border-black/[0.06] animate-in fade-in duration-300">
                   <div className="flex items-center gap-2 text-xs font-semibold text-sky-800">
                     <Building2 className="w-3.5 h-3.5 text-sky-600" />
-                    <span>{isAr ? "معلومات المورد والمستودع" : "Profil Fournisseur & Entrepôt"}</span>
+                    <span>
+                      {isAr
+                        ? "معلومات المورد والمستودع"
+                        : isEn
+                        ? "Supplier & Warehouse Profile"
+                        : "Profil Fournisseur & Entrepôt"}
+                    </span>
                   </div>
 
                   <Input
                     data-testid="register-company-input"
                     label={t.auth.company}
+                    name="organization"
                     type="text"
+                    autoComplete="organization"
                     placeholder="Atlas Distribution SARL"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
@@ -485,7 +593,13 @@ function RegisterContent() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <WilayaSelect
-                      label={isAr ? "ولاية المستودع الرئيسي" : "Wilaya de l'entrepôt"}
+                      label={
+                        isAr
+                          ? "ولاية المستودع الرئيسي"
+                          : isEn
+                          ? "Primary Warehouse Wilaya"
+                          : "Wilaya de l'entrepôt"
+                      }
                       value={warehouseWilaya}
                       onChange={(code) => setWarehouseWilaya(code)}
                       lang={lang}
@@ -493,7 +607,13 @@ function RegisterContent() {
                     />
 
                     <Input
-                      label={isAr ? "بلدية المستودع (اختياري)" : "Commune de l'entrepôt (optionnel)"}
+                      label={
+                        isAr
+                          ? "بلدية المستودع (اختياري)"
+                          : isEn
+                          ? "Warehouse Commune (optional)"
+                          : "Commune de l'entrepôt (optionnel)"
+                      }
                       type="text"
                       placeholder="Ex: Boufarik, Oued Smar..."
                       value={warehouseCommune}
@@ -503,30 +623,48 @@ function RegisterContent() {
                   </div>
 
                   <ModernSelect
-                    label={isAr ? "نوع النشاط التجاري" : "Type d'activité commerciale"}
+                    label={
+                      isAr
+                        ? "نوع النشاط التجاري"
+                        : isEn
+                        ? "Business Activity Type"
+                        : "Type d'activité commerciale"
+                    }
                     value={businessType}
                     onChange={(val) => setBusinessType(val)}
-                    options={getBusinessTypeOptions(isAr)}
+                    options={getBusinessTypeOptions(lang)}
                     icon={<Briefcase className="w-3.5 h-3.5 text-sky-600" />}
                     data-testid="register-business-type-trigger"
                     nativeSelectTestId="register-business-type-select"
                   />
 
                   <ModernSelect
-                    label={isAr ? "تأكيد الطلبيات (Call Center)" : "Gestion de la confirmation des commandes"}
+                    label={
+                      isAr
+                        ? "تأكيد الطلبيات (Call Center)"
+                        : isEn
+                        ? "Order Confirmation Management (Call Center)"
+                        : "Gestion de la confirmation des commandes"
+                    }
                     value={callCenterPreference}
                     onChange={(val) => setCallCenterPreference(val)}
-                    options={getCallCenterPreferenceOptions(isAr)}
+                    options={getCallCenterPreferenceOptions(lang)}
                     icon={<Headphones className="w-3.5 h-3.5 text-sky-600" />}
                     data-testid="register-call-center-trigger"
                     nativeSelectTestId="register-call-center-select"
                   />
 
                   <ModernSelect
-                    label={isAr ? "الحجم الشهري المتوقع للطلبات" : "Volume de commandes estimé / mois"}
+                    label={
+                      isAr
+                        ? "الحجم الشهري المتوقع للطلبات"
+                        : isEn
+                        ? "Estimated Monthly Order Volume"
+                        : "Volume de commandes estimé / mois"
+                    }
                     value={monthlyVolume}
                     onChange={(val) => setMonthlyVolume(val)}
-                    options={getMonthlyVolumeOptions(isAr)}
+                    options={getMonthlyVolumeOptions(lang)}
                     icon={<BarChart3 className="w-3.5 h-3.5 text-sky-600" />}
                     data-testid="register-monthly-volume-trigger"
                     nativeSelectTestId="register-monthly-volume-select"
@@ -542,7 +680,11 @@ function RegisterContent() {
                   isLoading={isLoading}
                   className="w-full"
                 >
-                  {isAr ? "إنشاء حساب ومتابعة التأكيد" : "Créer mon compte et recevoir le code"}
+                  {isAr
+                    ? "إنشاء حساب ومتابعة التأكيد"
+                    : isEn
+                    ? "Create my account & receive code"
+                    : "Créer mon compte et recevoir le code"}
                 </Button>
               </div>
             </form>

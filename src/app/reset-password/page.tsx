@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiResetPassword } from "@/lib/api-client";
 import { getLocalizedAuthError } from "@/lib/locales";
-import { Lock, CheckCircle2, AlertCircle, KeyRound, ArrowRight } from "lucide-react";
+import { Lock, CheckCircle2, AlertCircle, KeyRound, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
@@ -17,6 +17,7 @@ function ResetPasswordContent() {
   const [token, setToken] = useState(urlToken);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -58,16 +59,23 @@ function ResetPasswordContent() {
     <AuthCard initialLang="fr">
       {({ lang }) => {
         const isAr = lang === "ar";
+        const isEn = lang === "en";
 
         return (
           <div className="space-y-6 text-start">
             <div className="text-center">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
-                {isAr ? "تعيين كلمة مرور جديدة" : "Nouveau mot de passe"}
+                {isAr
+                  ? "تعيين كلمة مرور جديدة"
+                  : isEn
+                  ? "Set a new password"
+                  : "Nouveau mot de passe"}
               </h2>
               <p className="text-xs text-[#6b6b6b] mt-1.5">
                 {isAr
                   ? "أدخل كلمة المرور الجديدة لتأمين حسابك والوصول إلى لوحة التحكم."
+                  : isEn
+                  ? "Choose a strong password to secure your ViteDrop workspace."
                   : "Choisissez un mot de passe sécurisé pour accéder à votre espace ViteDrop."}
               </p>
             </div>
@@ -79,19 +87,25 @@ function ResetPasswordContent() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-neutral-900">
-                    {isAr ? "تم تحديث كلمة المرور بنجاح" : "Mot de passe mis à jour !"}
+                    {isAr
+                      ? "تم تحديث كلمة المرور بنجاح"
+                      : isEn
+                      ? "Password updated!"
+                      : "Mot de passe mis à jour !"}
                   </h4>
                   <p className="text-xs text-[#6b6b6b] mt-1 leading-relaxed max-w-xs mx-auto">
                     {isAr
                       ? "يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة."
+                      : isEn
+                      ? "Your password has been reset. You can now sign in with your new credentials."
                       : "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter."}
                   </p>
                 </div>
                 <div className="pt-2">
                   <Link href="/login">
                     <Button data-testid="reset-login-btn" size="md" className="w-full">
-                      <span>{isAr ? "تسجيل الدخول" : "Se connecter"}</span>
-                      <ArrowRight className="w-4 h-4 ml-1.5 rtl:rotate-180" />
+                      <span>{isAr ? "تسجيل الدخول" : isEn ? "Sign in" : "Se connecter"}</span>
+                      <ArrowRight className="w-4 h-4 ms-1.5 rtl:rotate-180" />
                     </Button>
                   </Link>
                 </div>
@@ -100,6 +114,7 @@ function ResetPasswordContent() {
               <form noValidate onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                   <div
+                    role="alert"
                     data-testid="reset-error-alert"
                     className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2"
                   >
@@ -112,9 +127,23 @@ function ResetPasswordContent() {
                 {!urlToken && (
                   <Input
                     data-testid="reset-token-input"
-                    label={isAr ? "رمز التحقق (Token)" : "Jeton de réinitialisation"}
+                    label={
+                      isAr
+                        ? "رمز التحقق (Token)"
+                        : isEn
+                        ? "Reset Token"
+                        : "Jeton de réinitialisation"
+                    }
                     type="text"
-                    placeholder="Collez le jeton reçu"
+                    dir="ltr"
+                    autoComplete="off"
+                    placeholder={
+                      isAr
+                        ? "الصق رمز التحقق المستلم"
+                        : isEn
+                        ? "Paste the token you received"
+                        : "Collez le jeton reçu"
+                    }
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     startIcon={<KeyRound className="w-4 h-4" />}
@@ -124,20 +153,64 @@ function ResetPasswordContent() {
 
                 <Input
                   data-testid="reset-new-password-input"
-                  label={isAr ? "كلمة المرور الجديدة" : "Nouveau mot de passe"}
-                  type="password"
-                  placeholder="Min. 6 caractères"
+                  label={
+                    isAr
+                      ? "كلمة المرور الجديدة"
+                      : isEn
+                      ? "New password"
+                      : "Nouveau mot de passe"
+                  }
+                  name="new-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder={isAr ? "6 أحرف على الأقل" : isEn ? "Min. 6 characters" : "Min. 6 caractères"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   startIcon={<Lock className="w-4 h-4" />}
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={
+                        showPassword
+                          ? isAr
+                            ? "إخفاء كلمة المرور"
+                            : isEn
+                            ? "Hide password"
+                            : "Masquer le mot de passe"
+                          : isAr
+                          ? "إظهار كلمة المرور"
+                          : isEn
+                          ? "Show password"
+                          : "Afficher le mot de passe"
+                      }
+                      className="p-1 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  }
                   required
                 />
 
                 <Input
                   data-testid="reset-confirm-password-input"
-                  label={isAr ? "تأكيد كلمة المرور" : "Confirmez le mot de passe"}
-                  type="password"
-                  placeholder="Répétez le mot de passe"
+                  label={
+                    isAr
+                      ? "تأكيد كلمة المرور"
+                      : isEn
+                      ? "Confirm password"
+                      : "Confirmez le mot de passe"
+                  }
+                  name="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder={
+                    isAr
+                      ? "أعد إدخال كلمة المرور"
+                      : isEn
+                      ? "Repeat new password"
+                      : "Répétez le mot de passe"
+                  }
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   startIcon={<Lock className="w-4 h-4" />}
@@ -152,7 +225,11 @@ function ResetPasswordContent() {
                     isLoading={isLoading}
                     className="w-full"
                   >
-                    {isAr ? "حفظ كلمة المرور" : "Enregistrer le mot de passe"}
+                    {isAr
+                      ? "حفظ كلمة المرور"
+                      : isEn
+                      ? "Save new password"
+                      : "Enregistrer le mot de passe"}
                   </Button>
                 </div>
 
@@ -161,7 +238,13 @@ function ResetPasswordContent() {
                     href="/login"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6b6b6b] hover:text-neutral-900 transition-colors"
                   >
-                    <span>{isAr ? "العودة لتسجيل الدخول" : "Retour à la connexion"}</span>
+                    <span>
+                      {isAr
+                        ? "العودة لتسجيل الدخول"
+                        : isEn
+                        ? "Back to login"
+                        : "Retour à la connexion"}
+                    </span>
                   </Link>
                 </div>
               </form>

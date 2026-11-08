@@ -121,7 +121,7 @@ function VerifyEmailContent() {
       setSuccess("Adresse e-mail confirmée avec succès ! Redirection en cours...");
 
       setTimeout(() => {
-        if (res.user?.role === "SUPPLIER") {
+        if (res.user?.role === "SUPPLIER" || res.user?.role === "CALL_CENTER_AGENT") {
           router.push("/supplier");
         } else if (res.user?.role === "ADMIN") {
           router.push("/admin");
@@ -186,7 +186,9 @@ function VerifyEmailContent() {
                   ? `Enter the 6-digit verification code sent to`
                   : `Saisissez le code de confirmation à 6 chiffres envoyé à`}
                 <br />
-                <span className="font-semibold text-neutral-800 break-all">{email || "votre adresse email"}</span>
+                <span dir="ltr" className="font-semibold text-neutral-800 break-all">
+                  {email || (isAr ? "بريدك الإلكتروني" : isEn ? "your email address" : "votre adresse email")}
+                </span>
               </p>
             </div>
 
@@ -213,7 +215,21 @@ function VerifyEmailContent() {
             {success && (
               <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{success}</span>
+                <span>
+                  {success.includes("confirmée")
+                    ? isAr
+                      ? "تم تأكيد البريد الإلكتروني بنجاح! جارٍ التوجيه..."
+                      : isEn
+                      ? "Email address verified! Redirecting..."
+                      : success
+                    : success.includes("nouveau code")
+                    ? isAr
+                      ? "تم إرسال رمز تحقق جديد مكون من 6 أرقام إلى بريدك الإلكتروني."
+                      : isEn
+                      ? "A new 6-digit verification code has been sent to your email."
+                      : success
+                    : success}
+                </span>
               </div>
             )}
 
@@ -221,7 +237,7 @@ function VerifyEmailContent() {
             <div className="space-y-4">
               <div
                 dir="ltr"
-                className="flex justify-center items-center gap-2 sm:gap-3"
+                className="flex justify-center items-center gap-1.5 sm:gap-3"
                 onPaste={(e) => {
                   e.preventDefault();
                   handlePaste(e.clipboardData.getData("text"));
@@ -233,14 +249,23 @@ function VerifyEmailContent() {
                     ref={(el) => {
                       inputRefs.current[idx] = el;
                     }}
+                    data-testid={`otp-digit-${idx}`}
+                    aria-label={
+                      isAr
+                        ? `الرقم ${idx + 1} من 6`
+                        : isEn
+                        ? `Digit ${idx + 1} of 6`
+                        : `Chiffre ${idx + 1} sur 6`
+                    }
                     type="text"
                     inputMode="numeric"
+                    autoComplete={idx === 0 ? "one-time-code" : "off"}
                     pattern="[0-9]*"
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(idx, e)}
-                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold font-mono rounded-xl border border-neutral-300 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-xs transition-all"
+                    className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-2xl font-bold font-mono rounded-xl border border-neutral-300 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-xs transition-all"
                   />
                 ))}
               </div>
