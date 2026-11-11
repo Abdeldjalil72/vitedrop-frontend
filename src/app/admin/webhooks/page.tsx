@@ -104,10 +104,10 @@ export default function AdminWebhooksPage() {
               }
               description={
                 isArabic
-                  ? "سجل إشارات التوصيل الواردة من شركات الشحن (Yalidine, ZR Express) والتحقق من التوقيع الرقمي."
+                  ? "سجل إشارات التوصيل الواردة من شركات الشحن (Yalidine, ZR Express, Noest, Ecotrack, Maystro, Guepex) والتحقق من التوقيع الرقمي."
                   : isEnglish
-                  ? "Inbound courier logistics signal stream, HMAC signature validation, and state machine integrity."
-                  : "Flux des événements logistiques entrants, vérification HMAC et intégrité des transitions."
+                  ? "Inbound courier logistics signal stream across 6 Algerian providers, HMAC signature validation, and state machine integrity."
+                  : "Flux des événements logistiques entrants des 6 transporteurs algériens, vérification HMAC et intégrité des transitions."
               }
               actions={
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
@@ -210,11 +210,15 @@ export default function AdminWebhooksPage() {
                 </div>
 
                 {/* Provider Tabs */}
-                <div className="inline-flex p-1 bg-[#f4f4f4] rounded-full text-xs font-semibold">
+                <div className="inline-flex p-1 bg-[#f4f4f4] rounded-full text-xs font-semibold overflow-x-auto max-w-full">
                   {[
                     { id: "ALL", label: isArabic ? "كل الناقلين" : isEnglish ? "All Couriers" : "Tous" },
                     { id: "yalidine", label: "Yalidine" },
                     { id: "zr", label: "ZR Express" },
+                    { id: "noest", label: "Noest" },
+                    { id: "ecotrack", label: "Ecotrack" },
+                    { id: "maystro", label: "Maystro" },
+                    { id: "guepex", label: "Guepex" },
                   ].map((pr) => (
                     <button
                       key={pr.id}

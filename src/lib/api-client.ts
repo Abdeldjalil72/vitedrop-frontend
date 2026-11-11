@@ -603,15 +603,22 @@ export async function apiRestockRtoOrder(
 
 export async function apiSimulateCourierWebhook(
   trackingNumber: string,
-  status: "Livre" | "Retour",
-  provider?: "yalidine" | "zr_express" | string
+  status: "Livre" | "Retour" | string,
+  provider?: "yalidine" | "zr_express" | "noest" | "ecotrack" | "maystro" | "guepex" | string | null
 ): Promise<any> {
-  const isZr =
-    provider?.toLowerCase().includes("zr") ||
-    trackingNumber.trim().toUpperCase().startsWith("ZR");
-  const endpoint = isZr
-    ? "/webhooks/courier/zr-express"
-    : "/webhooks/courier/yalidine";
+  const cleanTrack = trackingNumber.trim().toUpperCase();
+  let providerSlug = (provider || "").toLowerCase().replace(/_/g, "-");
+
+  if (!providerSlug) {
+    if (cleanTrack.startsWith("ZR")) providerSlug = "zr-express";
+    else if (cleanTrack.startsWith("NOE")) providerSlug = "noest";
+    else if (cleanTrack.startsWith("ECO")) providerSlug = "ecotrack";
+    else if (cleanTrack.startsWith("MYS")) providerSlug = "maystro";
+    else if (cleanTrack.startsWith("GPX")) providerSlug = "guepex";
+    else providerSlug = "yalidine";
+  }
+
+  const endpoint = `/webhooks/courier/${providerSlug}`;
   return apiRequest(endpoint, {
     method: "POST",
     body: JSON.stringify({

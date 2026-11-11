@@ -20,7 +20,7 @@ const simulationTranslations = {
     desc: "Envoyez une notification de livraison ou d'échec simulée pour tester la transition d'état et le déblocage des commissions.",
     providerLabel: "Transporteur Logistique",
     trackingLabel: "Numéro de Suivi (Tracking)",
-    trackingPlaceholder: "Ex: YAL-ALG-987456 ou ZR-ORN-12345",
+    trackingPlaceholder: "Ex: YAL-ALG-987456, ZR-ORN-12345, NOE-..., ECO-...",
     statusLabel: "Événement Reçu",
     delivered: "Livré (Livre)",
     deliveredDesc: "Déclenche le passage à 'delivered' et le déblocage du CPA affilié.",
@@ -36,7 +36,7 @@ const simulationTranslations = {
     desc: "Send a mock delivery or return signal to test order state progression and affiliate payout release.",
     providerLabel: "Courier Logistics Provider",
     trackingLabel: "Tracking Number",
-    trackingPlaceholder: "e.g. YAL-ALG-987456 or ZR-ORN-12345",
+    trackingPlaceholder: "e.g. YAL-ALG-987456, ZR-ORN-12345, NOE-..., ECO-...",
     statusLabel: "Inbound Status Event",
     delivered: "Delivered (Livre)",
     deliveredDesc: "Transitions order to 'delivered' and unlocks affiliate CPA payout.",
@@ -52,7 +52,7 @@ const simulationTranslations = {
     desc: "إرسال إشارة توصيل أو إرجاع تجريبية لاختبار دورة حياة الطلبية وتسوية عمولة المسوق.",
     providerLabel: "شركة التوصيل",
     trackingLabel: "رقم التتبع (Tracking)",
-    trackingPlaceholder: "مثال: YAL-ALG-987456 أو ZR-ORN-12345",
+    trackingPlaceholder: "مثال: YAL-ALG-987456, ZR-ORN-12345, NOE-..., ECO-...",
     statusLabel: "حالة الإشعار الوارد",
     delivered: "تم التوصيل (Livre)",
     deliveredDesc: "ينقل الطلبية إلى 'تم التوصيل' ويحرر عمولة المسوق في المحفظة.",
@@ -65,13 +65,24 @@ const simulationTranslations = {
   },
 };
 
+export const COURIER_PROVIDERS = [
+  { id: "yalidine", name: "Yalidine", colorClass: "border-blue-600 bg-blue-50/70 text-blue-900 ring-1 ring-blue-500/20" },
+  { id: "zr_express", name: "ZR Express", colorClass: "border-amber-600 bg-amber-50/70 text-amber-900 ring-1 ring-amber-500/20" },
+  { id: "noest", name: "Noest", colorClass: "border-emerald-600 bg-emerald-50/70 text-emerald-900 ring-1 ring-emerald-500/20" },
+  { id: "ecotrack", name: "Ecotrack", colorClass: "border-purple-600 bg-purple-50/70 text-purple-900 ring-1 ring-purple-500/20" },
+  { id: "maystro", name: "Maystro", colorClass: "border-indigo-600 bg-indigo-50/70 text-indigo-900 ring-1 ring-indigo-500/20" },
+  { id: "guepex", name: "Guepex", colorClass: "border-cyan-600 bg-cyan-50/70 text-cyan-900 ring-1 ring-cyan-500/20" },
+] as const;
+
+export type CourierProviderType = (typeof COURIER_PROVIDERS)[number]["id"];
+
 export function WebhookSimulationModal({
   isOpen,
   onClose,
   onSuccess,
   lang = "fr",
 }: WebhookSimulationModalProps) {
-  const [provider, setProvider] = useState<"yalidine" | "zr_express">("yalidine");
+  const [provider, setProvider] = useState<CourierProviderType>("yalidine");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [status, setStatus] = useState<"Livre" | "Retour">("Livre");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -172,31 +183,25 @@ export function WebhookSimulationModal({
             <label className="text-xs font-semibold text-neutral-900 block">
               {t.providerLabel}
             </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setProvider("yalidine")}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  provider === "yalidine"
-                    ? "border-blue-600 bg-blue-50/70 text-blue-900 ring-1 ring-blue-500/20"
-                    : "border-neutral-200 text-neutral-700 hover:bg-neutral-50"
-                }`}
-              >
-                <Truck className="w-4 h-4 text-blue-500" />
-                <span>Yalidine Express</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setProvider("zr_express")}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  provider === "zr_express"
-                    ? "border-amber-600 bg-amber-50/70 text-amber-900 ring-1 ring-amber-500/20"
-                    : "border-neutral-200 text-neutral-700 hover:bg-neutral-50"
-                }`}
-              >
-                <Truck className="w-4 h-4 text-amber-500" />
-                <span>ZR Express</span>
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {COURIER_PROVIDERS.map((p) => {
+                const isSelected = provider === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setProvider(p.id)}
+                    className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      isSelected
+                        ? p.colorClass
+                        : "border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                    }`}
+                  >
+                    <Truck className={`w-3.5 h-3.5 ${isSelected ? "text-current" : "text-neutral-400"}`} />
+                    <span>{p.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

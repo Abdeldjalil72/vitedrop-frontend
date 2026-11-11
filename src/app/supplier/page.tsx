@@ -298,12 +298,13 @@ function SupplierDashboardView({
   const handleSimulateWebhook = async (
     trackingNumber: string,
     status: "Livre" | "Retour",
-    customMsg?: string
+    customMsg?: string,
+    courier?: string | null
   ) => {
     setActionLoadingId(trackingNumber);
     setErrorMessage(null);
     try {
-      await apiSimulateCourierWebhook(trackingNumber, status);
+      await apiSimulateCourierWebhook(trackingNumber, status, courier);
       setActionMessage(
         customMsg ||
           (status === "Livre"
@@ -1609,7 +1610,8 @@ function SupplierDashboardView({
                                     handleSimulateWebhook(
                                       order.trackingNumber!,
                                       "Livre",
-                                      s.msgWebhookDelivered.replace("{tracking}", order.trackingNumber!)
+                                      s.msgWebhookDelivered.replace("{tracking}", order.trackingNumber!),
+                                      order.courier
                                     )
                                   }
                                   className="min-h-[40px] text-xs justify-center bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
@@ -1626,7 +1628,8 @@ function SupplierDashboardView({
                                     handleSimulateWebhook(
                                       order.trackingNumber!,
                                       "Retour",
-                                      s.msgWebhookReturn.replace("{tracking}", order.trackingNumber!)
+                                      s.msgWebhookReturn.replace("{tracking}", order.trackingNumber!),
+                                      order.courier
                                     )
                                   }
                                   className="min-h-[40px] text-xs justify-center gap-1"
@@ -1728,7 +1731,8 @@ function SupplierDashboardView({
                                           handleSimulateWebhook(
                                             order.trackingNumber!,
                                             "Livre",
-                                            s.msgWebhookDelivered.replace("{tracking}", order.trackingNumber!)
+                                            s.msgWebhookDelivered.replace("{tracking}", order.trackingNumber!),
+                                            order.courier
                                           )
                                         }
                                         className="text-[11px] px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
@@ -1746,7 +1750,8 @@ function SupplierDashboardView({
                                           handleSimulateWebhook(
                                             order.trackingNumber!,
                                             "Retour",
-                                            s.msgWebhookReturn.replace("{tracking}", order.trackingNumber!)
+                                            s.msgWebhookReturn.replace("{tracking}", order.trackingNumber!),
+                                            order.courier
                                           )
                                         }
                                         className="text-[11px] px-2.5 py-1 gap-1"
